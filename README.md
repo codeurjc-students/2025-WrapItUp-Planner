@@ -230,6 +230,10 @@ The final thesis defense will be carried out.
 
 ---
 
+### Navigation Diagram
+
+![NavigationDiagram](images/NavigationDiagram.png)  
+
 **Entities**
 
 | Entity         | Description                                                                                  |
