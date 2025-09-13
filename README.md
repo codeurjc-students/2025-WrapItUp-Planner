@@ -141,17 +141,18 @@ The final thesis defense will be carried out.
 |--------------------|---------|
 | Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br>- View a line chart showing performance progression upon completing a quiz. |
 
-**Screens**
-
----
+## **Screens**
 
 ### **Landing & Authentication**
 **Landing** ![Landing](images/Landing.png)  
-  Landing page with the application's slogan.  
+  Landing page with the application's slogan and a background photo.  
+  
 **About Us** ![About Us](images/AboutUs.png)  
   This page offers further information about the application's functionalities and uses.
+  
 **Login** ![Login](images/LogIn.png)  
-  Allows existing users to sign in securely.  
+  Allows existing users to sign in securely.
+  
 **Register** ![Register](images/Register.png)  
   Page for new users to create an account.  
 
@@ -160,12 +161,16 @@ The final thesis defense will be carried out.
 ### **User Dashboard & Notes**
 **User Dashboard** ![User Dashboard](images/UserDashboard.png)  
   Main page for users showing key information and navigation to features.  
+  
 **My Notes** ![My Notes](images/MyNotes.png)  
   Displays all notes created by the user.  
+  
 **New Note** ![New Note](images/NewNote.png)  
   Interface to create a new note.  
+  
 **Generated Note** ![Generated Note](images/GeneratedNote.png)  
   Automatically generated notes based on the user privided documents.  
+  
 **Generated Quiz** ![Generated Quiz](images/GeneratedQuiz.png)  
   Quizzes generated from notes for study and practice.  
 
@@ -174,6 +179,7 @@ The final thesis defense will be carried out.
 ### **Admin Pages**
 **Admin Dashboard** ![Admin Dashboard](images/AdminDashboard.png)  
   Overview page for admins with access to the tickets page.  
+  
 **Admin Tickets** ![Admin Tickets](images/AdminTickets.png)  
   Interface to view and manage support tickets for reported comments.  
 
@@ -182,8 +188,10 @@ The final thesis defense will be carried out.
 ### **Calendar & Scheduling**
 **Calendar** ![Calendar](images/Calendar.png)  
   Monthly view of events.  
+  
 **Calendar Day** ![Calendar Day](images/CalendarDay.png)  
   Detailed daily view of events and tasks.  
+  
 **Calendar New Event** ![Calendar New Event](images/CalendarNewEvent.png)  
   Interface to create and schedule new events.  
 
@@ -192,6 +200,8 @@ The final thesis defense will be carried out.
 ### Navigation Diagram
 
 ![NavigationDiagram](images/NavigationDiagram.png)  
+
+## Entities and Relationships
 
 **Entities**
 
@@ -218,27 +228,27 @@ Comment can have multiple comment reports.
 
 CommentReport is linked to one comment and one user (the reporter).
 
-**Images**
+## Images
 
 Registered users and administrators will be allowed to have their own profile picture
 
-**Graphs**
+## Graphs
 
 -   Line chart: Registered users will be allowed to see a line chart based on their performance in the AI generated quizzes.
 
 -   Heatmap: Registered users may access a heatmap in their profile page based on the number of tasks each day during the current month.
 
-**Complementary Technology**
+## Complementary Technology
 
 -   Ngx-charts as a framework for all data visualization in the project.
 
 -   Google's Gemini Developer API for all the AI driven functionalities.
 
-**Advanced Query**
+## Advanced Query
 
 Registered users will be given the option to sort their generated summaries based on their average results in each of the quizzes.
 
-**Progress Tracking**
+## Progress Tracking
 
 The progress of the project will be documented through a blog in Medium with development announcements, complemented by the use of GitHub Projects for task management and project organization.
 
@@ -246,6 +256,6 @@ The progress of the project will be documented through a blog in Medium with dev
 
 \[Link to the Github Projects page\]
 
-**Author**
+## Author
 
 This application is developed within the framework of the Final Degree Project (TFG) of the degree in Software Engineering at the School of Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The project is carried out by Arturo Enrique Gutierrez Mirandona under the supervision of Micael Gallego.
