@@ -191,7 +191,7 @@ The final thesis defense will be carried out.
   Landing page with the application's slogan.  
 - **About Us** ![About Us](images/AboutUs.png)  
   This page offers further information about the application's functionalities and uses.
-- **Login** ![Login](images/Login.png)  
+- **Login** ![Login](images/LogIn.png)  
   Allows existing users to sign in securely.  
 - **Register** ![Register](images/Register.png)  
   Page for new users to create an account.  
