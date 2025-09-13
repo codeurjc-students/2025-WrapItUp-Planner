@@ -153,7 +153,8 @@ The first draft of the final report will be written.
 
 The final thesis defense will be carried out.
 
-# ///Gantt chart
+**Gantt Chart**
+![Gantt Chart](images/Gantt_Chart.png)
 
 ## Basic Functionalities
 
@@ -181,6 +182,53 @@ The final thesis defense will be carried out.
 |--------------------|---------|
 | Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br>- View a line chart showing performance progression upon completing a quiz. |
 
+**Screens**
+
+---
+
+### **Landing & Authentication**
+- **Landing** ![Landing](images/Landing.png)  
+  Landing page with the application's slogan.  
+- **About Us** ![About Us](images/AboutUs.png)  
+  This page offers further information about the application's functionalities and uses.
+- **Login** ![Login](images/Login.png)  
+  Allows existing users to sign in securely.  
+- **Register** ![Register](images/Register.png)  
+  Page for new users to create an account.  
+
+---
+
+### **User Dashboard & Notes**
+- **User Dashboard** ![User Dashboard](images/UserDashboard.png)  
+  Main page for users showing key information and navigation to features.  
+- **My Notes** ![My Notes](images/MyNotes.png)  
+  Displays all notes created by the user.  
+- **New Note** ![New Note](images/NewNote.png)  
+  Interface to create a new note.  
+- **Generated Note** ![Generated Note](images/GeneratedNote.png)  
+  Automatically generated notes based on the user privided documents.  
+- **Generated Quiz** ![Generated Quiz](images/GeneratedQuiz.png)  
+  Quizzes generated from notes for study and practice.  
+
+---
+
+### **Admin Pages**
+- **Admin Dashboard** ![Admin Dashboard](images/AdminDashboard.png)  
+  Overview page for admins with access to the tickets page.  
+- **Admin Tickets** ![Admin Tickets](images/AdminTickets.png)  
+  Interface to view and manage support tickets for reported comments.  
+
+---
+
+### **Calendar & Scheduling**
+- **Calendar** ![Calendar](images/Calendar.png)  
+  Monthly view of events.  
+- **Calendar Day** ![Calendar Day](images/CalendarDay.png)  
+  Detailed daily view of events and tasks.  
+- **Calendar New Event** ![Calendar New Event](images/CalendarNewEvent.png)  
+  Interface to create and schedule new events.  
+
+---
 
 **Entities**
 
