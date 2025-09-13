@@ -1,98 +1,57 @@
 # 2025-WrapItUp-Planner
-WrapItUp Planner is an All-In-One collaborative web platform designed to
-help students in managing their academic journey more efficiently. The
-application combines study organization, sharing knowledge and AI tools
-into a single place. Students can upload their notes which are processed
-using AI to generate overviews, summaries and interactive multiple
-choice questions to test their knowledge on a particular subject.
-Alongside this, an integrated interactive calendar with daily to-do
-lists and event scheduling is available to help students plan their time
-efficiently. This application means to foster academic collaboration by
-letting students share their AI generated notes and comment on them to
-create discussion. Overall WrapItUp Planner's goal is to simplify study
-management while also creating a community of students who value
-collaboration.
+WrapItUp Planner is an All-In-One collaborative web platform designed to help students in managing their academic journey more efficiently. The application combines study organization, sharing knowledge and AI tools into a single place. Students can upload their notes which are processed using AI to generate overviews, summaries and interactive multiple choice questions to test their knowledge on a particular subject. Alongside this, an integrated interactive calendar with daily to-do lists and event scheduling is available to help students plan their time efficiently. This application means to foster academic collaboration by letting students share their AI generated notes and comment on them to create discussion. Overall WrapItUp Planner's goal is to simplify study management while also creating a community of students who value collaboration.
 
-At this point in time only the functional and objectives have been
-defined; further development has not yet begun.
+At this point in time only the functional and objectives have been defined; further development has not yet begun.
 
 ## Functional Objectives
 
-WrapItUp Planner's main goal is to provide a collaborative platform
-where students can share and organize study materials. The application
-users are divided into three different categories, non-registered users,
-registered users and administrators, each with tailored functionalities
-and features. The core functionality of the application includes account
-management, access to shared AI generated summaries with an available
-quiz, an interactive calendar with task lists, and user communication
-through a comment section while ensuring proper moderation.
+WrapItUp Planner's main goal is to provide a collaborative platform where students can share and organize study materials. The application users are divided into three different categories, non-registered users, registered users and administrators, each with tailored functionalities and features. The core functionality of the application includes account management, access to shared AI generated summaries with an available quiz, an interactive calendar with task lists, and user communication through a comment section while ensuring proper moderation.
 
--   Registered users will be able to use an interactive calendar in
-    which they can create multi-day events.
+-   Registered users will be able to use an interactive calendar in which they can create multi-day events.
 
--   Registered users will be able to create multiple daily tasks in a
-    to-do list format.
+-   Registered users will be able to create multiple daily tasks in a to-do list format.
 
--   Registered users will be able to upload their notes, which will
-    automatically generate an overview, a summary, and a quiz using AI.
+-   Registered users will be able to upload their notes, which will automatically generate an overview, a summary, and a quiz using AI.
 
--   When accessing the AI-generated summary, users will be able to
-    complete an interactive multiple-choice quiz.
+-   When accessing the AI-generated summary, users will be able to complete an interactive multiple-choice quiz.
 
--   Users will be able to leave comments on the summary page, whether
-    they are the owner of the notes or have been granted access.
+-   Users will be able to leave comments on the summary page, whether they are the owner of the notes or have been granted access.
 
--   Registered users will be able to view a heat map based on the number
-    of daily tasks throughout the month, as well as a line graph showing
-    their progress on quiz results.
+-   Registered users will be able to view a heat map based on the number of daily tasks throughout the month, as well as a line graph showing their progress on quiz results.
 
 -   Users will be able to report comments.
 
--   Administrators will be able to manage user comment reports and, if
-    necessary, ban users.
+-   Administrators will be able to manage user comment reports and, if necessary, ban users.
 
 ## Technical Objectives
 
-This application's main objectives are Spring Boot backend, an Angular
-frontend, MySQL for data management, automated testing, and code quality
-checks with SonarQube. The project also integrates CI/CD with GitHub
-Actions, containerization with Docker, version control with GitHub Flow,
-and AI features powered by Google's Gemini API.
+This application's main objectives are Spring Boot backend, an Angular frontend, MySQL for data management, automated testing, and code quality checks with SonarQube. The project also integrates CI/CD with GitHub Actions, containerization with Docker, version control with GitHub Flow, and AI features powered by Google's Gemini API.
 
--   Backend: Development of the server-side of the application using
-    Spring Boot to provide a REST API.
+-   Backend: Development of the server-side of the application using Spring Boot to provide a REST API.
 
 -   Frontend: Implementation of the client-side interface with Angular.
 
--   Database Management: Use of MySQL for efficient storage, management
-    and search of the application's data.
+-   Database Management: Use of MySQL for efficient storage, management and search of the application's data.
 
--   Testing: Incorporation of automated testing, including both unit and
-    integration tests to ensure quality.
+-   Testing: Incorporation of automated testing, including both unit and integration tests to ensure quality.
 
--   Quality Assurance: Thorough static code analysis with SonarQube to
-    maintain quality and security standards during development.
+-   Quality Assurance: Thorough static code analysis with SonarQube to maintain quality and security standards during development.
 
--   Continuous Integration and Delivery: Use of GitHub Actions to
-    automate the CI/CD pipeline.
+-   Continuous Integration and Delivery: Use of GitHub Actions to automate the CI/CD pipeline.
 
--   Containerization: Packaging and deployment of the application
-    through Docker.
+-   Containerization: Packaging and deployment of the application through Docker.
 
--   Artificial Intelligence Integration: Integration of Google's Gemini
-    Developer API to enable AI-driven functionalities within the
-    application.
+-   Artificial Intelligence Integration: Integration of Google's Gemini Developer API to enable AI-driven functionalities within the application.
 
--   Version Control: Adoption of Git as the version control system, with
-    branch management following the GitHub Flow methodology.
+-   Version Control: Adoption of Git as the version control system, with branch management following the GitHub Flow methodology.
 
 ## Methodology
 
 **Phase 1 - Definition of functionalities and screens (Deadline Sep. 15)**
 
-Start Date -
+Start Date - July 28th
 
-End Date -
+End Date - 
 
 In this phase the main functionalities of the application will be
 defined as well as the different screens, user roles and also the
@@ -187,45 +146,45 @@ The final thesis defense will be carried out.
 ---
 
 ### **Landing & Authentication**
-- **Landing** ![Landing](images/Landing.png)  
+**Landing** ![Landing](images/Landing.png)  
   Landing page with the application's slogan.  
-- **About Us** ![About Us](images/AboutUs.png)  
+**About Us** ![About Us](images/AboutUs.png)  
   This page offers further information about the application's functionalities and uses.
-- **Login** ![Login](images/LogIn.png)  
+**Login** ![Login](images/LogIn.png)  
   Allows existing users to sign in securely.  
-- **Register** ![Register](images/Register.png)  
+**Register** ![Register](images/Register.png)  
   Page for new users to create an account.  
 
 ---
 
 ### **User Dashboard & Notes**
-- **User Dashboard** ![User Dashboard](images/UserDashboard.png)  
+**User Dashboard** ![User Dashboard](images/UserDashboard.png)  
   Main page for users showing key information and navigation to features.  
-- **My Notes** ![My Notes](images/MyNotes.png)  
+**My Notes** ![My Notes](images/MyNotes.png)  
   Displays all notes created by the user.  
-- **New Note** ![New Note](images/NewNote.png)  
+**New Note** ![New Note](images/NewNote.png)  
   Interface to create a new note.  
-- **Generated Note** ![Generated Note](images/GeneratedNote.png)  
+**Generated Note** ![Generated Note](images/GeneratedNote.png)  
   Automatically generated notes based on the user privided documents.  
-- **Generated Quiz** ![Generated Quiz](images/GeneratedQuiz.png)  
+**Generated Quiz** ![Generated Quiz](images/GeneratedQuiz.png)  
   Quizzes generated from notes for study and practice.  
 
 ---
 
 ### **Admin Pages**
-- **Admin Dashboard** ![Admin Dashboard](images/AdminDashboard.png)  
+**Admin Dashboard** ![Admin Dashboard](images/AdminDashboard.png)  
   Overview page for admins with access to the tickets page.  
-- **Admin Tickets** ![Admin Tickets](images/AdminTickets.png)  
+**Admin Tickets** ![Admin Tickets](images/AdminTickets.png)  
   Interface to view and manage support tickets for reported comments.  
 
 ---
 
 ### **Calendar & Scheduling**
-- **Calendar** ![Calendar](images/Calendar.png)  
+**Calendar** ![Calendar](images/Calendar.png)  
   Monthly view of events.  
-- **Calendar Day** ![Calendar Day](images/CalendarDay.png)  
+**Calendar Day** ![Calendar Day](images/CalendarDay.png)  
   Detailed daily view of events and tasks.  
-- **Calendar New Event** ![Calendar New Event](images/CalendarNewEvent.png)  
+**Calendar New Event** ![Calendar New Event](images/CalendarNewEvent.png)  
   Interface to create and schedule new events.  
 
 ---
@@ -261,16 +220,13 @@ CommentReport is linked to one comment and one user (the reporter).
 
 **Images**
 
-Registered users and administrators will be allowed to have their own
-profile picture
+Registered users and administrators will be allowed to have their own profile picture
 
 **Graphs**
 
--   Line chart: Registered users will be allowed to see a line chart
-    based on their performance in the AI generated quizzes.
+-   Line chart: Registered users will be allowed to see a line chart based on their performance in the AI generated quizzes.
 
--   Heatmap: Registered users may access a heatmap in their profile page
-    based on the number of tasks each day during the current month.
+-   Heatmap: Registered users may access a heatmap in their profile page based on the number of tasks each day during the current month.
 
 **Complementary Technology**
 
@@ -284,9 +240,7 @@ Registered users will be given the option to sort their generated summaries base
 
 **Progress Tracking**
 
-The progress of the project will be documented through a blog in Medium
-with development announcements, complemented by the use of GitHub
-Projects for task management and project organization.
+The progress of the project will be documented through a blog in Medium with development announcements, complemented by the use of GitHub Projects for task management and project organization.
 
 \[Link to the blog\]
 
@@ -294,8 +248,4 @@ Projects for task management and project organization.
 
 **Author**
 
-This application is developed within the framework of the Final Degree
-Project (TFG) of the degree in Software Engineering at the School of
-Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The
-project is carried out by Arturo Enrique Gutierrez Mirandona under the
-supervision of Micael Gallego.
+This application is developed within the framework of the Final Degree Project (TFG) of the degree in Software Engineering at the School of Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The project is carried out by Arturo Enrique Gutierrez Mirandona under the supervision of Micael Gallego.
