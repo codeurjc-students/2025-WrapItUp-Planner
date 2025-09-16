@@ -13,13 +13,13 @@ WrapItUp Planner's main goal is to provide a collaborative platform where studen
 
 -   Registered users will be able to upload their notes, which will automatically generate an overview, a summary, and a quiz using AI.
 
--   When accessing the AI-generated summary, users will be able to complete an interactive multiple-choice quiz.
+-   When accessing the AI-generated summary, registered and not registered users will be able to complete an interactive multiple-choice quiz.
 
--   Users will be able to leave comments on the summary page, whether they are the owner of the notes or have been granted access.
+-   Registered users will be able to leave comments on the summary page, whether they are the owner of the notes or have been granted access.
 
 -   Registered users will be able to view a heat map based on the number of daily tasks throughout the month, as well as a line graph showing their progress on quiz results.
 
--   Users will be able to report comments.
+-   Registered users will be able to report comments.
 
 -   Administrators will be able to manage user comment reports and, if necessary, ban users.
 
@@ -121,7 +121,7 @@ The final thesis defense will be carried out.
 
 | User Type           | Features |
 |--------------------|---------|
-| Unregistered Users  | - Register and log in to the platform.<br>- View notes if they have access to the link and the notes are not set as private.<br>- Leave comments on notes that have been shared with them. |
+| Unregistered Users  | - Register and log in to the platform.<br>- View notes if they have access to the link and the notes are not set as private.|
 | Registered Users    | - Access a personal profile page.<br>- Access to their personal list of notes.<br>- View notes, whether their own or another user's.<br>- Leave comments on notes they have access to.<br>- Communicate with other authorized users through a comment section associated with each note. |
 | Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments.<br>- Ability to ban a user from accessing the platform. |
 
@@ -252,7 +252,7 @@ Registered users will be given the option to sort their generated summaries base
 
 The progress of the project will be documented through a blog in Medium with development announcements, complemented by the use of GitHub Projects for task management and project organization.
 
-\[Link to the blog\]
+[Link to the blog](https://medium.com/@gutierrezarturox)
 
 \[Link to the Github Projects page\]
 
