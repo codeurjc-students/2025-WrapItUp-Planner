@@ -1,0 +1,14 @@
+<h2>AI Notes Details</h2>
+
+<label for="noteId">ID:</label>
+<input type="number" id="noteId" [(ngModel)]="noteId">
+<button (click)="fetchNote()">Buscar</button>
+
+<div *ngIf="note">
+  <p>Id: {{note.idSummary}}</p>
+  <p>Overview: {{note.overview}}</p>
+  <p>Summary: {{note.summary}}</p>
+  <p>JSON Questions: {{note.jsonQuestions}}</p>
+  <p>Visibility: {{note.visibility}}</p>
+  <p>UserId: {{note.userId}}</p>
+</div>
