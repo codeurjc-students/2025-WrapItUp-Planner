@@ -1,5 +1,5 @@
 export interface AINoteDTO {
-  idSummary: number;
+  id: number;
   overview: string;
   summary: string;
   jsonQuestions: string;

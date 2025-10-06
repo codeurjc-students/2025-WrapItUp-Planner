@@ -1,18 +1,19 @@
 package es.wrapitup.wrapitup_planner.dto;
 
 public class AINoteDTO {
-    private Long idSummary;
+    private Long id;
     private String overview;
     private String summary;
     private String jsonQuestions;
     private Boolean visibility;
     private Long userId;
     
-    public Long getIdSummary() {
-        return idSummary;
+    
+    public Long getUserId() {
+        return userId;
     }
-    public void setIdSummary(Long idSummary) {
-        this.idSummary = idSummary;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
     public String getOverview() {
         return overview;
@@ -38,10 +39,10 @@ public class AINoteDTO {
     public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
     }
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+        this.id = id;
     }
 }

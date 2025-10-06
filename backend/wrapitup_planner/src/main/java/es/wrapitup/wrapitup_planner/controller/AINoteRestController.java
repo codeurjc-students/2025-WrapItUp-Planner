@@ -16,7 +16,7 @@ import es.wrapitup.wrapitup_planner.service.AINoteService;
 
 @RestController
 @RequestMapping("/api/v1/notes")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:9876"})
 public class AINoteRestController {
     @Autowired
     AINoteService aiNoteService;

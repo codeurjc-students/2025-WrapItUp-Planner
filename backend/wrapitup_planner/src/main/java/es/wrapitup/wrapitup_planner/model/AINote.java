@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 public class AINote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idSummary;
+    private Long id;
     private String overview;
     private String summary;
     private String jsonQuestions;
@@ -14,23 +14,21 @@ public class AINote {
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
     private UserModel user;
-    
-    
-    public AINote(UserModel user, String overview, String summary, String jsonQuestions, Boolean visibility) {
+
+
+    public AINote(UserModel user, String overview, String summary, String jsonQuestions, boolean visibility) {
         this.user = user;
         this.overview = overview;
         this.summary = summary;
         this.jsonQuestions = jsonQuestions;
         this.visibility = visibility;
     }
+
+
+
     public AINote() {
     }
-    public Long getIdSummary() {
-        return idSummary;
-    }
-    public void setIdSummary(Long idSummary) {
-        this.idSummary = idSummary;
-    }
+    
     public UserModel getUser() {
         return user;
     }
@@ -60,5 +58,13 @@ public class AINote {
     }
     public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
