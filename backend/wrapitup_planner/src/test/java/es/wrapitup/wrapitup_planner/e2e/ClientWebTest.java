@@ -17,18 +17,26 @@ import org.springframework.test.context.ActiveProfiles;
 
 import es.wrapitup.wrapitup_planner.WrapitupPlannerApplication;
 
-@SpringBootTest(classes = WrapitupPlannerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT) //change to random later
+@Tag("client-e2e")
+@SpringBootTest(classes = WrapitupPlannerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) //change to random later
 public class ClientWebTest {
 
     private WebDriver driver;
     private WebDriverWait wait;
 
-    //@LocalServerPort
-    //private int port;
+    @LocalServerPort
+    private int port;
 
     @BeforeEach
     void setup() {
-        this.driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless=new"); // o "--headless" para versiones más antiguas
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--disable-gpu");
+    options.addArguments("--remote-allow-origins=*");
+    options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis());
+        this.driver = new ChromeDriver(options);
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 

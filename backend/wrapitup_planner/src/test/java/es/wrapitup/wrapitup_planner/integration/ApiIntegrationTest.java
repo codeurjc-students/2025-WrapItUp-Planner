@@ -1,6 +1,7 @@
 package es.wrapitup.wrapitup_planner.integration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,7 @@ import static io.restassured.RestAssured.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
+@Tag("integration")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiIntegrationTest {
 
