@@ -18,14 +18,11 @@ import org.springframework.test.context.ActiveProfiles;
 import es.wrapitup.wrapitup_planner.WrapitupPlannerApplication;
 
 @Tag("client-e2e")
-@SpringBootTest(classes = WrapitupPlannerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = WrapitupPlannerApplication.class)
 public class ClientWebTest {
 
     private WebDriver driver;
     private WebDriverWait wait;
-
-    @LocalServerPort
-    private int port;
 
     @BeforeEach
     void setup() {
@@ -60,9 +57,9 @@ public class ClientWebTest {
         inputId.sendKeys("1");
         WebElement buscarButton = driver.findElement(By.xpath("//button[text()='Buscar']"));
         buscarButton.click();
-        WebElement detailDiv = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-ainote-detail div"))
-        );
+        WebElement detailDiv = new WebDriverWait(driver, Duration.ofSeconds(10))
+        .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-ainote-detail div")));
+
         String detailText = detailDiv.getText();
         assertTrue(detailText.contains("Id: 1"));
         assertTrue(detailText.contains("Overview: Resumen general de la sesión de IA"));
@@ -71,5 +68,4 @@ public class ClientWebTest {
         assertTrue(detailText.contains("Visibility: true"));
         assertTrue(detailText.contains("UserId: 1"));
     }
-
 }
