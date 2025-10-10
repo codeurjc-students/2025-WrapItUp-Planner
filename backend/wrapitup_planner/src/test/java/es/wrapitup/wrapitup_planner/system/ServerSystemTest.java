@@ -32,18 +32,16 @@ public class ServerSystemTest {
 
     @Test
     void testFindByIdWithSqlDatabase() {
-        // Arrange: crear nota de prueba
-        // Crear usuario de prueba
+
         UserModel user = new UserModel();
         user.setUsername("testuser");
         user.setEmail("test@example.com");
         user.setRole("USER");
         user.setStatus("ACTIVE");
 
-        // Guardar el usuario si tu repositorio requiere persistencia
+
         userRepository.save(user);
 
-        // Crear nota y asignar el usuario
         AINote note = new AINote();
         note.setOverview("Resumen general de la sesión de IA");
         note.setSummary("Este es el contenido detallado del resumen");
@@ -54,7 +52,6 @@ public class ServerSystemTest {
         // Act: llamar al servicio real
         Optional<AINoteDTO> result = aiNoteService.findById(note.getId());
 
-        // Assert: validar resultados
         assertEquals(true, result.isPresent());
         assertEquals("Resumen general de la sesión de IA", result.get().getOverview());
         assertEquals("Este es el contenido detallado del resumen", result.get().getSummary());

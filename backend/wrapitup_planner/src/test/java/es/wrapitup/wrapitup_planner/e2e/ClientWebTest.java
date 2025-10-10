@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import es.wrapitup.wrapitup_planner.WrapitupPlannerApplication;
 
 @Tag("client-e2e")
-@SpringBootTest(classes = WrapitupPlannerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) //change to random later
+@SpringBootTest(classes = WrapitupPlannerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ClientWebTest {
 
     private WebDriver driver;
@@ -30,7 +30,7 @@ public class ClientWebTest {
     @BeforeEach
     void setup() {
         ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless=new"); // o "--headless" para versiones más antiguas
+    options.addArguments("--headless=new"); 
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu");

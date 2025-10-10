@@ -3,7 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AINoteService } from './ainote.service';
 import { AINoteDTO } from '../dtos/ainote.dto';
 
-describe('AINoteService (Integración real)', () => {
+describe('AINoteService', () => {
   let service: AINoteService;
 
   beforeEach(() => {

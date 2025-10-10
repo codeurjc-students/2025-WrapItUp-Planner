@@ -23,9 +23,6 @@ public class ApiIntegrationTest {
     @LocalServerPort
     int port;
 
-    @Autowired
-    private AINoteRepository aiNoteRepository;
-
     @BeforeEach
     void setUp(){
         RestAssured.port = port;
@@ -45,6 +42,4 @@ public class ApiIntegrationTest {
             .body("jsonQuestions", equalTo("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}"))
             .body("visibility", equalTo(true));
     }
-
-
 }
