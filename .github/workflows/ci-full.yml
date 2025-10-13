@@ -1,0 +1,111 @@
+name: CI Full
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  full-quality:
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wrapitup
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/wrapitup
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      # Backend: build + run
+      - name: Build backend
+        working-directory: ./backend/wrapitup_planner
+        run: mvn clean install -DskipTests
+    
+      - name: Start Spring Boot backend
+        working-directory: ./backend/wrapitup_planner
+        run: |
+          nohup mvn spring-boot:run > backend.log 2>&1 &
+          echo "⏳ Waiting for backend to start on port 8080..."
+          for i in {1..30}; do
+            if nc -z localhost 8080; then
+              echo "✅ Backend is up on port 8080!"
+              break
+            fi
+            echo "🕒 Waiting... ($i/30)"
+            sleep 3
+          done
+    
+      # Frontend: build + run
+      - name: Build frontend
+        working-directory: ./frontend/WrapItUp-Planner
+        run: |
+          npm ci
+          npm run build
+        
+      - name: Start Angular app
+        working-directory: ./frontend/WrapItUp-Planner
+        run: |
+          nohup npm start -- --host 0.0.0.0 --port 4200 > angular.log 2>&1 &
+          sleep 15
+          echo "✅ Angular app started on port 4200"
+
+      # Tests
+      - name: Run frontend tests
+        working-directory: ./frontend/WrapItUp-Planner
+        run: npm run test:all -- --no-watch --browsers=ChromeHeadless
+
+      - name: Run backend unit tests
+        working-directory: ./backend/wrapitup_planner
+        run: mvn test -Dgroups="unit"
+
+      - name: Run backend integration tests
+        working-directory: ./backend/wrapitup_planner
+        run: mvn test -Dgroups="integration"
+
+      - name: Run backend system tests
+        working-directory: ./backend/wrapitup_planner
+        run: mvn test -Dgroups="system"
+
+      - name: Run client-e2e tests
+        working-directory: ./backend/wrapitup_planner
+        run: mvn test -Dgroups="client-e2e"
