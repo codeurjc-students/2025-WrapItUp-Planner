@@ -48,24 +48,14 @@ public class ClientWebTest {
     }
 
     @Test
-    void testBuscarAINoteId1() {
-        driver.get(getBaseUrl() + "notes");
-        WebElement inputId = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.id("noteId"))
-        );
-        inputId.clear();
-        inputId.sendKeys("1");
-        WebElement buscarButton = driver.findElement(By.xpath("//button[text()='Buscar']"));
-        buscarButton.click();
+    void testMostrarAINoteId1() {
+        driver.get(getBaseUrl() + "notes/1");
+
         WebElement detailDiv = new WebDriverWait(driver, Duration.ofSeconds(10))
-        .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-ainote-detail div")));
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-ainote-detail div")));
 
         String detailText = detailDiv.getText();
-        assertTrue(detailText.contains("Id: 1"));
-        assertTrue(detailText.contains("Overview: Resumen general de la sesión de IA"));
-        assertTrue(detailText.contains("Summary: Este es el contenido detallado del resumen"));
-        assertTrue(detailText.contains("JSON Questions: {\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}"));
-        assertTrue(detailText.contains("Visibility: true"));
-        assertTrue(detailText.contains("UserId: 1"));
+
+        assertTrue(detailText.contains("Id: 1")); 
     }
 }

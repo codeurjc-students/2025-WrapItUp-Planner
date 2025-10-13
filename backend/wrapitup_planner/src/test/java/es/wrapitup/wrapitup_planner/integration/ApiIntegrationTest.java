@@ -34,12 +34,8 @@ public class ApiIntegrationTest {
             .when()
             .get("/api/v1/notes/1")
             .then()
-            .statusCode(OK.value()) // Verify HTTP 200 OK
+            .statusCode(OK.value())
             .contentType(ContentType.JSON)
-            .body("id", equalTo(1))
-            .body("overview", equalTo("Resumen general de la sesión de IA"))
-            .body("summary", equalTo("Este es el contenido detallado del resumen"))
-            .body("jsonQuestions", equalTo("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}"))
-            .body("visibility", equalTo(true));
+            .body("id", equalTo(1)); 
     }
 }

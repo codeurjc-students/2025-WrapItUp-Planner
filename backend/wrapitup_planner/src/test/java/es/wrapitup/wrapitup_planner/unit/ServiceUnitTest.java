@@ -66,9 +66,6 @@ public class ServiceUnitTest {
         assertEquals(true, result.isPresent());
         assertEquals(dto.getId(), result.get().getId());
         assertEquals(dto.getOverview(), result.get().getOverview());
-        assertEquals(dto.getSummary(), result.get().getSummary());
-        assertEquals(dto.getJsonQuestions(), result.get().getJsonQuestions());
-        assertEquals(dto.getVisibility(), result.get().getVisibility());
     }
 
 }

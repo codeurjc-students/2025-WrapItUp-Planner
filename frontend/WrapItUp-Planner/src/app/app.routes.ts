@@ -5,13 +5,11 @@ import { FormsModule } from '@angular/forms';
 
 
 export const routes: Routes = [
-    { path: 'notes', component: AINoteDetailComponent },
-    { path: '', redirectTo: '/notes', pathMatch: 'full' },
     { path: 'notes/:id', component: AINoteDetailComponent }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: false })],
   exports: [RouterModule, FormsModule]
 })
 export class AppRoutingModule { }

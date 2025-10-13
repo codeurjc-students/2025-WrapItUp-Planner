@@ -18,6 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("system")
+@Transactional
 @SpringBootTest
 public class ServerSystemTest {
 
@@ -49,7 +50,6 @@ public class ServerSystemTest {
         note.setVisibility(true);
         note.setUser(user);
         aiNoteRepository.save(note);
-        // Act: llamar al servicio real
         Optional<AINoteDTO> result = aiNoteService.findById(note.getId());
 
         assertEquals(true, result.isPresent());
