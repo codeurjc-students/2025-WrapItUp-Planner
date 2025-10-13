@@ -1,0 +1,48 @@
+name: CI Basic
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+      - 'fix/*'
+  workflow_dispatch:
+
+jobs:
+  basic-quality:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Backend: build + unit tests
+      - name: Build backend
+        working-directory: ./backend/wrapitup_planner
+        run: mvn clean install -DskipTests
+
+      - name: Run backend unit tests
+        working-directory: ./backend/wrapitup_planner
+        run: mvn test -Dgroups="unit"
+
+      # Frontend: build + unit tests
+      - name: Build frontend
+        working-directory: ./frontend/WrapItUp-Planner
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run frontend unit tests
+        working-directory: ./frontend/WrapItUp-Planner
+        run: npm run test:unit -- --no-watch --browsers=ChromeHeadless
