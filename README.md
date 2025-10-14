@@ -1,7 +1,7 @@
 # 2025-WrapItUp-Planner
 WrapItUp Planner is an All-In-One collaborative web platform designed to help students in managing their academic journey more efficiently. The application combines study organization, sharing knowledge and AI tools into a single place. Students can upload their notes which are processed using AI to generate overviews, summaries and interactive multiple choice questions to test their knowledge on a particular subject. Alongside this, an integrated interactive calendar with daily to-do lists and event scheduling is available to help students plan their time efficiently. This application means to foster academic collaboration by letting students share their AI generated notes and comment on them to create discussion. Overall WrapItUp Planner's goal is to simplify study management while also creating a community of students who value collaboration.
 
-At this point in time only the functional and objectives have been defined; further development has not yet begun.
+At this point in time only the functional and objectives have been defined; further development has not yet begun. 
 
 ## Functional Objectives
 
