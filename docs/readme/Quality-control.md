@@ -51,7 +51,7 @@ A total of **5 automated backend tests** were implemented so far:
 
 *Example of test execution:*  
 
-![Backend Test Execution](./images/MavenTests.png)  
+![Backend Test Execution](../../images/MavenTests.png)  
 
 ---
 
@@ -59,7 +59,7 @@ A total of **5 automated backend tests** were implemented so far:
 
 The frontend tests were performed using **Karma and Jasmine** to verify component behavior and integration with the REST API.  
 
-![Karma Test Results](./images/KarmaTests.png)  
+![Karma Test Results](../../images/KarmaTests.png)  
 *Figure 2: Karma and Jasmine test results showing passed frontend tests.*
 
 ---
@@ -68,7 +68,7 @@ The frontend tests were performed using **Karma and Jasmine** to verify componen
 
 The **Java backend code coverage** was measured using **JaCoCo**, providing insight into which parts of the code were tested.
 
-![JaCoCo Coverage](./images/JacocoReport.png)  
+![JaCoCo Coverage](../../images/JacocoReport.png)  
 *Figure 3: JaCoCo report showing code coverage for the backend.*
 
 ---
@@ -77,7 +77,7 @@ The **Java backend code coverage** was measured using **JaCoCo**, providing insi
 
 The frontend code coverage was generated using **Karma with the coverage reporter**. This report shows which components, methods, and lines were exercised by the tests, ensuring the reliability of the client-side application.
 
-![Frontend Coverage](./images/FrontendCoverage.png)  
+![Frontend Coverage](../../images/FrontendCoverage.png)  
 *Figure 4: Angular frontend coverage report showing lines, statements, functions, and branches covered.*
 
 ---
@@ -92,10 +92,10 @@ To ensure the quality, security, and maintainability of WrapItUp Planner, **Sona
 
 The following captures summarize the results of the static code analysis as of the end of Phase 2:
 
-![SonarCloud Dashboard](./images/sonarcloud_dashboard.png)  
+![SonarCloud Dashboard](../../images/sonarcloud_dashboard.png)  
 *Figure 1: SonarCloud dashboard showing overall code quality, including ratings for Security, Reliability, and Maintainability.*
 
-![Code Size Metrics](./images/sonarcloud_measures.png)  
+![Code Size Metrics](../../images/sonarcloud_measures.png)  
 *Figure 2: SonarCloud measures showing the size of the codebase, including lines of code, number of classes, and methods.*
 
 

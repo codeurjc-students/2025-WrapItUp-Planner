@@ -20,9 +20,9 @@
   - **Pull Requests:** At least one PR created and merged.
 - **Repository activity visualizations**:
   - **Commits over time:**  
-    ![Commits](./images/Commits.png)
+    ![Commits](../../images/Commits.png)
   - **Code frequency (lines added/removed):**  
-    ![Code Frequency](./images/Code-frequency.png)
+    ![Code Frequency](../../images/Code-frequency.png)
 
 ## 4. Continuous Integration (CI/CD)
 - **GitHub Actions** automates testing, building, and code validation for every push to feature branches and pull request to the main branch.

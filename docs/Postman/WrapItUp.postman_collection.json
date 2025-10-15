@@ -1,0 +1,26 @@
+{
+	"info": {
+		"_postman_id": "67a6bacd-84d5-46e0-89a2-3f3dba04a3e4",
+		"name": "WrapItUp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43213180"
+	},
+	"item": [
+		{
+			"name": "Get Note 1",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get User 1",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
