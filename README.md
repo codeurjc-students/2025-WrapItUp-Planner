@@ -259,3 +259,12 @@ The progress of the project will be documented through a blog in Medium with dev
 ## Author
 
 This application is developed within the framework of the Final Degree Project (TFG) of the degree in Software Engineering at the School of Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The project is carried out by Arturo Enrique Gutierrez Mirandona under the supervision of Micael Gallego.
+
+## Development Guide
+- [Introduction](docs/readme/Introduction.md) – a rundown of everything covered in this section.
+- [Technologies](docs/readme/Technologies.md) – Languages, libraries, additional services, and their use in the project.
+- [Tools](docs/readme/Tools.md) – IDEs and auxiliary tools used.
+- [Architecture](docs/readme/Architecture.md) – Description of SPA architecture, components (client, server, DB).
+- [Quality Control](docs/readme/Quality-control.md) – Automated tests, metrics, static code analysis.
+- [Development Process](docs/readme/Development-process.md) – Iterative process, Git, DevOps, and CI/CD.
+- [Code Execution and Editing](docs/readme/Code-Execution-And-Editing.md) – Instructions to clone, run, and interact with the application.
