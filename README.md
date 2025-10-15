@@ -51,7 +51,7 @@ This application's main objectives are Spring Boot backend, an Angular frontend,
 
 Start Date - July 28th
 
-End Date - 
+End Date - September 15th
 
 In this phase the main functionalities of the application will be
 defined as well as the different screens, user roles and also the
@@ -60,9 +60,9 @@ basic, intermediate and advanced categories.
 
 **Phase 2 - Repository, testing, and CI (Deadline Oct. 15)**
 
-Start Date -
+Start Date - September 16th
 
-End Date -
+End Date - October 15th
 
 The Git repository will be created, and the most essential functionality
 will be developed so that the client-side, server-side and database are
