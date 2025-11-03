@@ -24,8 +24,10 @@ public class ApiIntegrationTest {
     int port;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         RestAssured.port = port;
+        RestAssured.baseURI = "https://localhost";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

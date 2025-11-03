@@ -12,7 +12,7 @@ import { AINoteDTO } from '../dtos/ainote.dto';
 
 export class AINoteService {
 
-  private apiUrl = 'http://localhost:8080/api/v1/notes';
+  private apiUrl = 'https://localhost:8443/api/v1/notes';
 
   constructor(private http: HttpClient) { }
 

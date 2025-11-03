@@ -12,16 +12,16 @@ public class UserModel {
     private String username;
     private String email;
     private String passwordHashed;
-    private String role;  
+    private List<String> roles; 
     private String status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AINote> notes;
-    public UserModel(String username, String email, String passwordHashed, String role, String status) {
+    public UserModel(String username, String email, String passwordHashed, String status, String... roles) {
         this.username = username;
         this.email = email;
         this.passwordHashed = passwordHashed;
-        this.role = role;
+        this.roles = List.of(roles);
         this.status = status;
         this.notes = null;
     }
@@ -51,11 +51,12 @@ public class UserModel {
     public void setPasswordHashed(String passwordHashed) {
         this.passwordHashed = passwordHashed;
     }
-    public String getRole() {
-        return role;
-    }
-    public void setRole(String role) {
-        this.role = role;
+    public List<String> getRoles() {
+		return roles;
+	}
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
     public String getStatus() {
         return status;
