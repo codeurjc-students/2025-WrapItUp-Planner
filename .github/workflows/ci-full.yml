@@ -102,6 +102,8 @@ jobs:
           sleep 15
           echo "✅ Angular app started on port 4200"
 
+      - name: Create Chrome profile dir
+        run: mkdir -p /tmp/chrome-test-profile
       # Tests
       - name: Run frontend tests
         working-directory: ./frontend/WrapItUp-Planner
