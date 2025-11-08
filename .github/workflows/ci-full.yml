@@ -105,7 +105,7 @@ jobs:
       # Tests
       - name: Run frontend tests
         working-directory: ./frontend/WrapItUp-Planner
-        run: npm run test:ci -- --no-watch --browsers=ChromeHeadless 
+        run: npm run test:ci
 
       - name: Run backend unit tests
         working-directory: ./backend/wrapitup_planner
