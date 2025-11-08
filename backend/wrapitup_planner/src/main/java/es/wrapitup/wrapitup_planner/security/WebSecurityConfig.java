@@ -48,6 +48,7 @@ public class WebSecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin("http://localhost:4200");
+		config.addAllowedOrigin("http://localhost:4201");
 		config.addAllowedOrigin("http://localhost:9876");
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
 		config.addAllowedHeader("*");
