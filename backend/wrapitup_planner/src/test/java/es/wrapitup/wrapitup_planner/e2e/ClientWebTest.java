@@ -31,6 +31,7 @@ public class ClientWebTest {
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-gpu");
+    options.addArguments("--ignore-certificate-errors");
     options.addArguments("--remote-allow-origins=*");
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis());
         this.driver = new ChromeDriver(options);
