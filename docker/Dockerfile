@@ -8,7 +8,7 @@ COPY frontend/WrapItUp-Planner/angular.json frontend/WrapItUp-Planner/tsconfig.j
 COPY frontend/WrapItUp-Planner/src ./src
 
 RUN npm ci
-RUN npm run build --silent
+RUN npm run build --silent --base-href=/
 
 # Stage 2: build backend (maven) and inject frontend build into resources/static
 FROM maven:3.9.4-eclipse-temurin-21 AS maven_builder
