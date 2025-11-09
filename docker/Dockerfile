@@ -17,9 +17,9 @@ WORKDIR /app/backend
 # Copy backend sources
 COPY backend/wrapitup_planner/pom.xml ./pom.xml
 COPY backend/wrapitup_planner/src ./src
-# Copy the generated frontend build into backend resources so Spring serves it as static content
-# Adjust path according to Angular output (default: dist/WrapItUp-Planner)
-COPY --from=node_builder /app/frontend/dist/WrapItUp-Planner ./src/main/resources/static
+# Copy the generated frontend build into backend resources
+# En Angular 17+ el output está en dist/browser
+COPY --from=node_builder /app/frontend/dist/browser ./src/main/resources/static
 
 # Package the app (skip tests for faster builds in CI; remove -DskipTests for strict builds)
 RUN mvn -B -DskipTests package
