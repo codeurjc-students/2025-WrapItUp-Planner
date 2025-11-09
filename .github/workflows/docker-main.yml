@@ -1,0 +1,50 @@
+name: Publish dev on main
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push image (dev)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: arturox2500/wrapitup_planner:dev
+          platforms: linux/amd64
+
+      - name: Install oras
+        run: |
+          ORAS_VER=0.16.0
+          curl -sSL -o oras.tar.gz https://github.com/oras-project/oras/releases/download/v${ORAS_VER}/oras_${ORAS_VER}_linux_amd64.tar.gz
+          tar -xzf oras.tar.gz
+          sudo mv oras /usr/local/bin/
+        env:
+          ORAS_EXPERIMENTAL: "1"
+
+      - name: Push docker-compose.yml as OCI artifact (dev)
+        run: |
+          oras push docker://arturox2500/wrapitup_planner:dev docker/docker-compose.yml:application/vnd.docker.compose.file.v1+yaml
+        env:
+          ORAS_EXPERIMENTAL: "1"

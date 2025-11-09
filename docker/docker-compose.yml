@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wrapitup
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  app:
+    image: arturox2500/wrapitup_planner:0.1   # <-- reemplaza dockerhub_user por tu repo
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/wrapitup
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVER_SSL_KEY_STORE_PASSWORD: password
+    restart: unless-stopped
+
+volumes:
+  db_data:
