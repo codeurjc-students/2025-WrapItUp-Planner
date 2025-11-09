@@ -67,6 +67,12 @@ jobs:
           sudo mv oras /usr/local/bin/
         env:
           ORAS_EXPERIMENTAL: "1"
+    
+      - name: Login to Docker Hub for ORAS
+        run: |
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | oras login docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        env:
+            ORAS_EXPERIMENTAL: "1"
 
       - name: Push docker-compose.yml as OCI artifact (manual)
         run: |
