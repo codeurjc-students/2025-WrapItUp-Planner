@@ -26,17 +26,17 @@ jobs:
       - name: Compute tag
         id: compute
         run: |
-          if [ -n "${{ github.event.inputs.use_tag }}" ]; then
+            if [ -n "${{ github.event.inputs.use_tag }}" ]; then
             echo "tag=${{ github.event.inputs.use_tag }}" >> $GITHUB_OUTPUT
             exit 0
-          fi
-          BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          # Sanitize branch name by replacing / with -
-          BRANCH=${BRANCH//\//-}
-          SHORTSHA=$(git rev-parse --short HEAD)
-          DATE=$(date -u +"%Y%m%d%H%M")
-          TAG="${BRANCH}-${DATE}-${SHORTSHA}"
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+            fi
+            BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            # Sanitize branch name by replacing / with - and make lowercase
+            BRANCH=$(echo "${BRANCH//\//-}" | tr '[:upper:]' '[:lower:]')
+            SHORTSHA=$(git rev-parse --short HEAD)
+            DATE=$(date -u +"%Y%m%d%H%M")
+            TAG="${BRANCH}-${DATE}-${SHORTSHA}"
+            echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
