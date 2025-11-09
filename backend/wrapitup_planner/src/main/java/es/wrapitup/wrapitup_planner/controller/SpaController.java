@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class SpaController {
 
-    @RequestMapping(value = { "/", "/{path:[^\\.]*}", "/**/{path:[^\\.]*}" })
+    @RequestMapping(value = { "/", "/**/{path:[^\\.]*}" })
     public String forward() {
-        return "forward:/index.html";
+        // Apunta a la carpeta donde está index.html
+        return "forward:/browser/index.html";
     }
 }
+
