@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "443:443"
+      - "8443:443"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/wrapitup
       SPRING_DATASOURCE_USERNAME: user
