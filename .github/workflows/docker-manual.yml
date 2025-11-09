@@ -71,6 +71,7 @@ jobs:
       - name: Push docker-compose.yml as OCI artifact (manual)
         run: |
           TAG=${{ steps.compute.outputs.tag }}
-          oras push docker://arturox2500/wrapitup_planner:${TAG} docker/docker-compose.yml:application/vnd.docker.compose.file.v1+yaml
+          oras push docker://docker.io/arturox2500/wrapitup_planner:${TAG} docker/docker-compose.yml:application/vnd.docker.compose.file.v1+yaml
+
         env:
           ORAS_EXPERIMENTAL: "1"
