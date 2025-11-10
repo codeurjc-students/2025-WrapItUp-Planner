@@ -43,6 +43,14 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      
+      - name: Allow Java to bind to low ports (for 443)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcap2-bin
+          JAVA_BIN=$(readlink -f "$(which java)")
+          echo "Java binary path: $JAVA_BIN"
+          sudo setcap 'cap_net_bind_service=+ep' "$JAVA_BIN"
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -74,19 +82,20 @@ jobs:
         working-directory: ./backend/wrapitup_planner
         run: mvn clean install -DskipTests
     
-      - name: Start Spring Boot backend
+      - name: Start Spring Boot backend on 443
         working-directory: ./backend/wrapitup_planner
         run: |
-          nohup mvn spring-boot:run > backend.log 2>&1 &
-          echo "⏳ Waiting for backend to start on port 8080..."
+          nohup java -jar target/*.jar > backend.log 2>&1 &
+          echo "⏳ Waiting for backend to listen on 443..."
           for i in {1..30}; do
-            if nc -z localhost 8080; then
-              echo "✅ Backend is up on port 8080!"
-              break
+            if ss -ltn 'sport = :443' >/dev/null 2>&1 || nc -z localhost 443; then
+              echo "✅ Backend is up on 443"
+              exit 0
             fi
-            echo "🕒 Waiting... ($i/30)"
-            sleep 3
+            sleep 2
           done
+          echo "❌ Backend failed to start on 443"
+          exit 1
     
       # Frontend: build + run
       - name: Build frontend
@@ -102,10 +111,12 @@ jobs:
           sleep 15
           echo "✅ Angular app started on port 4200"
 
+      - name: Create Chrome profile dir
+        run: mkdir -p /tmp/chrome-test-profile
       # Tests
       - name: Run frontend tests
         working-directory: ./frontend/WrapItUp-Planner
-        run: npm run test:ci 
+        run: npm run test:ci
 
       - name: Run backend unit tests
         working-directory: ./backend/wrapitup_planner

@@ -1,0 +1,54 @@
+name: Publish on release
+
+on:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: ["ci-full"]
+    types: [completed]
+
+jobs:
+  publish:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_REPO: arturox2500/wrapitup_planner
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set TAG
+        id: tag
+        run: echo "TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker image
+        working-directory: ./docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }} -f Dockerfile ..
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:latest
+
+      - name: Publish docker-compose.yml
+        working-directory: ./docker
+        run: |
+          sed -i "s|wrapitup_planner:[^ ]*|wrapitup_planner:${{ steps.tag.outputs.TAG }}|g" docker-compose.yml
+          
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }} --file - . <<DOCKERFILE
+          FROM scratch
+          COPY docker-compose.yml /docker-compose.yml
+          DOCKERFILE
+          
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }}
+          
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:latest

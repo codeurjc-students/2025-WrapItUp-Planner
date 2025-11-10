@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ public class ServerSystemTest {
         UserModel user = new UserModel();
         user.setUsername("testuser");
         user.setEmail("test@example.com");
-        user.setRole("USER");
+        user.setRoles(Arrays.asList("USER"));
         user.setStatus("ACTIVE");
 
 

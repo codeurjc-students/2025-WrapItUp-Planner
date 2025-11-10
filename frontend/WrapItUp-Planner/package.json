@@ -6,7 +6,8 @@
     "start": "ng serve",
     "test:unit": "ng test --include='**/*.component.spec.ts' --exclude='**/*.service.spec.ts'",
     "test:integration": "ng test --include='**/*.service.spec.ts'",
-    "test:all": "ng test"
+    "test:all": "ng test",
+    "test:ci": "ng test --karma-config karma.conf.js --browsers ChromeHeadlessNoSandbox --no-watch"
   },
   "private": true,
   "dependencies": {

@@ -1,10 +1,12 @@
 package es.wrapitup.wrapitup_planner.dto;
 
+import java.util.List;
+
 public class UserModelDTO {
     private Long id;
     private String username;
     private String email;
-    private String role;  
+    List<String> roles;
     private String status;
     
     public Long getId() {
@@ -25,16 +27,16 @@ public class UserModelDTO {
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getRole() {
-        return role;
-    }
-    public void setRole(String role) {
-        this.role = role;
-    }
     public String getStatus() {
         return status;
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+    public List<String> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

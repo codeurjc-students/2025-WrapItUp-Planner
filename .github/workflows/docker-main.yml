@@ -1,0 +1,42 @@
+name: Publish dev on main
+
+on:
+  push:
+    branches: [ main ]
+  # Trigger this workflow also when the `ci-full` workflow completes (so it can run after CI passes)
+  workflow_run:
+    workflows: ["ci-full"]
+    types: [completed]
+
+jobs:
+  build-and-push:
+    # Run always for push events; when triggered by workflow_run only run if ci-full concluded successfully
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker Image
+        working-directory: ./docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:dev -f Dockerfile ..
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:dev
+
+      - name: Publish docker-compose.yml
+        working-directory: ./docker
+        run: |
+          sed -i "s|wrapitup_planner:[^ ]*|wrapitup_planner:dev|g" docker-compose.yml
+          
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:dev --file - . <<DOCKERFILE
+          FROM scratch
+          COPY docker-compose.yml /docker-compose.yml
+          DOCKERFILE
+          
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:dev
