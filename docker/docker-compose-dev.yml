@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   app:
-    image: arturox2500/wrapitup_planner:dev   # <-- reemplaza dockerhub_user por tu repo
+    image: arturox2500/wrapitup_planner:dev 
     depends_on:
       db:
         condition: service_healthy

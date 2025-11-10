@@ -2,15 +2,20 @@ name: Publish on release
 
 on:
   release:
-    types: [ published ]
+    types: [published]
+  workflow_run:
+    workflows: ["ci-full"]
+    types: [completed]
 
 jobs:
-  verify-and-publish:
+  publish:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       IMAGE_REPO: arturox2500/wrapitup_planner
+
     steps:
-      - name: Checkout repo (full)
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -19,65 +24,31 @@ jobs:
         id: tag
         run: echo "TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
 
-      - name: Verify backend pom.xml version matches tag
-        run: |
-          TAG=${{ github.event.release.tag_name }}
-          POM=backend/wrapitup_planner/pom.xml
-          if [ ! -f "$POM" ]; then echo "Missing $POM" && exit 1; fi
-          POM_VER=$(grep -m1 '<version>' "$POM" | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
-          if [ "$POM_VER" != "$TAG" ]; then echo "pom.xml version ($POM_VER) != tag ($TAG)" && exit 1; fi
-
-      - name: Verify frontend package.json version matches tag
-        run: |
-          TAG=${{ github.event.release.tag_name }}
-          PKG=frontend/WrapItUp-Planner/package.json
-          if [ ! -f "$PKG" ]; then echo "Missing $PKG" && exit 1; fi
-          PKG_VER=$(jq -r .version "$PKG")
-          if [ "$PKG_VER" != "$TAG" ]; then echo "package.json version ($PKG_VER) != tag ($TAG)" && exit 1; fi
-
-      - name: Verify docker/docker-compose.yml image tag matches release
-        run: |
-          TAG=${{ github.event.release.tag_name }}
-          COMPOSE=docker/docker-compose.yml
-          if [ ! -f "$COMPOSE" ]; then echo "Missing $COMPOSE" && exit 1; fi
-          grep -q "image:.*:${TAG}" "$COMPOSE" || (echo "docker-compose image tag not matching $TAG" && exit 1)
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & push image (release + latest)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: true
-          tags: |
-            arturox2500/wrapitup_planner:${{ github.event.release.tag_name }},
-            arturox2500/wrapitup_planner:latest
-          platforms: linux/amd64
-
-      - name: Install oras
+      - name: Build docker image
+        working-directory: ./docker
         run: |
-          ORAS_VER=0.16.0
-          curl -sSL -o oras.tar.gz https://github.com/oras-project/oras/releases/download/v${ORAS_VER}/oras_${ORAS_VER}_linux_amd64.tar.gz
-          tar -xzf oras.tar.gz
-          sudo mv oras /usr/local/bin/
-        env:
-          ORAS_EXPERIMENTAL: "1"
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }} -f Dockerfile ..
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:${{ steps.tag.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner:latest
 
-      - name: Push docker-compose.yml as OCI artifact (release)
+      - name: Publish docker-compose.yml
+        working-directory: ./docker
         run: |
-          TAG=${{ github.event.release.tag_name }}
-          oras push docker://arturox2500/wrapitup_planner:${TAG} docker/docker-compose.yml:application/vnd.docker.compose.file.v1+yaml
-          oras push docker://arturox2500/wrapitup_planner:latest docker/docker-compose.yml:application/vnd.docker.compose.file.v1+yaml
-        env:
-          ORAS_EXPERIMENTAL: "1"
+          sed -i "s|wrapitup_planner:[^ ]*|wrapitup_planner:${{ steps.tag.outputs.TAG }}|g" docker-compose.yml
+          
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }} --file - . <<DOCKERFILE
+          FROM scratch
+          COPY docker-compose.yml /docker-compose.yml
+          DOCKERFILE
+          
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }}
+          
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:latest

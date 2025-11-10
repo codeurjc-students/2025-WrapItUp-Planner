@@ -2,13 +2,12 @@
 FROM node:18 AS node_builder
 WORKDIR /app/frontend
 
-# Copiar ficheros para cache de npm
+
 COPY frontend/WrapItUp-Planner/package*.json ./
 COPY frontend/WrapItUp-Planner/angular.json frontend/WrapItUp-Planner/tsconfig*.json ./
 COPY frontend/WrapItUp-Planner/src ./src
 
 RUN npm ci --silent
-# Forzar output a una ruta conocida
 RUN npm run build -- --configuration production --output-path=dist/browser --base-href=/
 
 # Stage 2: build backend (maven) and inject frontend build into resources/static
