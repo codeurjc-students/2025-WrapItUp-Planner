@@ -9,7 +9,7 @@ public class SpaController {
     @RequestMapping(value = { "/", "/**/{path:[^\\.]*}" })
     public String forward() {
         // Apunta a la carpeta donde está index.html
-        return "forward:/browser/index.html";
+        return "forward:/index.html";
     }
 }
 

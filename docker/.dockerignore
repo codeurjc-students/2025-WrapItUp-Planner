@@ -1,0 +1,8 @@
+# frontend build/temp
+frontend/WrapItUp-Planner/node_modules
+frontend/WrapItUp-Planner/dist
+frontend/WrapItUp-Planner/.angular
+# backend build
+backend/wrapitup_planner/target
+# git
+.git
