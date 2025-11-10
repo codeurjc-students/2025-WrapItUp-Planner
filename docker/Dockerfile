@@ -33,4 +33,4 @@ WORKDIR /app
 COPY --from=maven_builder /app/backend/target/*.jar app.jar
 
 EXPOSE 443
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]
