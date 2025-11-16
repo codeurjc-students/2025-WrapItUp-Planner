@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.sql.Blob;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +18,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
 import es.wrapitup.wrapitup_planner.dto.AINoteDTO;
 import es.wrapitup.wrapitup_planner.dto.AINoteMapper;
 import es.wrapitup.wrapitup_planner.model.AINote;
 import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
+import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
+import es.wrapitup.wrapitup_planner.security.jwt.JwtTokenProvider;
+import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
+import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
 import es.wrapitup.wrapitup_planner.service.AINoteService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Tag("unit") 
 public class ServiceUnitTest {
@@ -33,6 +46,18 @@ public class ServiceUnitTest {
 
     @Mock
     private AINoteMapper aiNoteMapper;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
+    @InjectMocks
+    private UserLoginService userLoginService;
 
     @InjectMocks
     private AINoteService aiNoteService;
@@ -66,6 +91,42 @@ public class ServiceUnitTest {
         assertEquals(true, result.isPresent());
         assertEquals(dto.getId(), result.get().getId());
         assertEquals(dto.getOverview(), result.get().getOverview());
+    }
+
+    @Test
+    void loginSuccessAddsCookiesAndReturnsSuccess() {
+        String username = "unituser";
+        String password = "unitpass";
+
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+
+        UserDetails userDetails = new User(username, "pwd", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+
+        when(jwtTokenProvider.generateAccessToken(userDetails)).thenReturn("access-token");
+        when(jwtTokenProvider.generateRefreshToken(userDetails)).thenReturn("refresh-token");
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        var resp = userLoginService.login(response, new LoginRequest(username, password));
+
+        assertEquals(AuthResponse.Status.SUCCESS, resp.getBody().getStatus());
+        verify(response, times(2)).addCookie(any(Cookie.class));
+    }
+
+    @Test
+    void loginFailureThrowsWhenAuthenticationFails() {
+        String username = "baduser";
+        String password = "badpass";
+
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad creds"));
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        assertThrows(BadCredentialsException.class, () -> {
+            userLoginService.login(response, new LoginRequest(username, password));
+        });
     }
 
 }
