@@ -51,27 +51,32 @@ public class LoginController {
 	}
 
     @PostMapping("/user")
-	public ResponseEntity<?> register(@RequestBody UserModelDTO userDTO) {
+    public ResponseEntity<?> register(@RequestBody UserModelDTO userDTO) {
 
-    if (userDTO.getUsername() == null || userDTO.getUsername().isBlank() ||
-        userDTO.getEmail() == null || userDTO.getEmail().isBlank() ||
-        userDTO.getPassword() == null || userDTO.getPassword().isBlank()) {
+        if (userDTO.getUsername() == null || userDTO.getUsername().isBlank() ||
+            userDTO.getEmail() == null || userDTO.getEmail().isBlank() ||
+            userDTO.getPassword() == null || userDTO.getPassword().isBlank()) {
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", "Missing or blank fields"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Missing or blank fields"));
+        }
+
+        if (userDTO.getPassword().length() < 8) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Password must be at least 8 characters long"));
+        }
+
+        if (userService.findByName(userDTO.getUsername()) != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "User already exists"));
+        }
+
+        userService.createUser(userDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "User registered successfully"));
     }
 
-    if (userService.findByName(userDTO.getUsername()) != null) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(Map.of("error", "User already exists"));
-}
-
-
-    userService.createUser(userDTO);
-
-    return ResponseEntity.status(HttpStatus.CREATED)
-            .body(Map.of("message", "User registered successfully"));
-}
 
 
 }
