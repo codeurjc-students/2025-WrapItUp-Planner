@@ -1,0 +1,128 @@
+/* Component styles for auth card. Global variables are defined in src/styles.css */
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: var(--card-bg, #ffffff);
+  color: var(--card-text, #0a0a0a);
+  padding: 40px;
+  width: 380px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Make card a positioning context for the small footer link */
+.auth-card {
+  position: relative;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 22px;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--card-text, #0a0a0a);
+}
+
+.input-group {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: rgba(0,0,0,0.7);
+}
+
+.input-group input {
+  padding: 10px 12px;
+  border: 1px solid var(--input-border, #cccccc);
+  border-radius: 6px;
+  background: var(--input-bg, #ffffff);
+  color: var(--card-text, #0a0a0a);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.input-group input:focus {
+  border-color: #888;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+}
+
+.actions {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.actions button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.12s ease-in-out, transform 0.06s;
+}
+
+.actions button:hover:not(:disabled) {
+  background: #111;
+  transform: translateY(-1px);
+}
+
+.actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 10px;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+.message {
+  margin-top: 10px;
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+/* Fallback: ensure the card remains white even if other styles collide */
+app-root .auth-container .auth-card {
+  background: var(--card-bg, #ffffff) !important;
+  color: var(--card-text, #0a0a0a) !important;
+}
+
+app-root .auth-container .input-group input {
+  background: var(--input-bg, #ffffff) !important;
+  color: var(--card-text, #0a0a0a) !important;
+  border-color: var(--input-border, #cccccc) !important;
+}
+
+/* Small footer link in the bottom-left of the card */
+.card-footer-link {
+  position: absolute;
+  left: 20px;
+  bottom: 14px;
+}
+
+.card-footer-link .small-link {
+  font-size: 13px;
+  color: rgba(0,0,0,0.65);
+  text-decoration: none;
+}
+
+.card-footer-link .small-link:hover {
+  text-decoration: underline;
+}

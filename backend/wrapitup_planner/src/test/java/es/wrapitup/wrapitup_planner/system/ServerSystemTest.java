@@ -3,6 +3,7 @@ package es.wrapitup.wrapitup_planner.system;
 import es.wrapitup.wrapitup_planner.dto.AINoteDTO;
 import es.wrapitup.wrapitup_planner.model.AINote;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.AINoteService;
@@ -12,11 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.mock.web.MockHttpServletResponse;
+
+import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
+import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
+import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
+import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse.Status;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("system")
 @Transactional
@@ -32,6 +40,12 @@ public class ServerSystemTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserLoginService userLoginService;
+
     @Test
     void testFindByIdWithSqlDatabase() {
 
@@ -39,7 +53,7 @@ public class ServerSystemTest {
         user.setUsername("testuser");
         user.setEmail("test@example.com");
         user.setRoles(Arrays.asList("USER"));
-        user.setStatus("ACTIVE");
+        user.setStatus(UserStatus.ACTIVE);
 
 
         userRepository.save(user);
@@ -58,5 +72,29 @@ public class ServerSystemTest {
         assertEquals("Este es el contenido detallado del resumen", result.get().getSummary());
         assertEquals("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}", result.get().getJsonQuestions());
         assertEquals(true, result.get().getVisibility());
+    }
+
+    @Test
+    void loginViaUserLoginService() throws Exception {
+        String username = "sysuser";
+        String rawPassword = "sysPass123";
+
+        UserModel user = new UserModel();
+        user.setUsername(username);
+        user.setEmail("sys@example.com");
+        user.setRoles(java.util.Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+
+        userRepository.save(user);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        LoginRequest loginRequest = new LoginRequest(username, rawPassword);
+
+        var respEntity = userLoginService.login(response, loginRequest);
+        AuthResponse body = respEntity.getBody();
+
+        assertEquals(Status.SUCCESS, body.getStatus());
+        assertTrue(response.getCookies().length >= 1);
     }
 }

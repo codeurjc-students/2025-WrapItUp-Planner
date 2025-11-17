@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles: set page background to black so areas outside component stay dark */
+html, body, app-root {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: #000000;
+	font-family: Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color: #ffffff; /* default text color outside cards */
+}
+
+/* Ensure root component fills the page so component centering works */
+app-root {
+	display: block;
+	min-height: 100%;
+}
+
+/* Optional: reset link/button defaults globally for consistent look */
+button { font-family: inherit; }
+
+/* Theme variables (global) */
+:root {
+	--bg-color: #000000;
+	--card-bg: #ffffff;
+	--card-text: #0a0a0a;
+	--input-bg: #ffffff;
+	--input-border: #cccccc;
+	--primary: #000000;
+}

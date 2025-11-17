@@ -59,4 +59,53 @@ public class ClientWebTest {
 
         assertTrue(detailText.contains("Id: 1")); 
     }
+
+    @Test
+    void testRegisterShortPassword() {
+        driver.get(getBaseUrl() + "register");
+
+        WebElement usernameInput = driver.findElement(By.id("username"));
+        WebElement emailInput = driver.findElement(By.id("email"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+        WebElement repeatInput = driver.findElement(By.id("repeatPassword"));
+
+        usernameInput.sendKeys("shortpass_user");
+        emailInput.sendKeys("shortpass@example.com");
+        passwordInput.sendKeys("12345");
+        repeatInput.sendKeys("12345");
+
+        WebElement submit = driver.findElement(By.cssSelector(".actions button[type='submit']"));
+        assertFalse(submit.isEnabled());
+
+        WebElement errorDiv = driver.findElement(By.cssSelector(".error"));
+        assertEquals("Password must be at least 8 characters", errorDiv.getText());
+    }
+
+    @Test
+    void testRegisterNewUser() {
+        long ts = System.currentTimeMillis();
+        String username = "e2e_user_" + ts;
+        String email = "e2e+" + ts + "@example.com";
+        String password = "Password123";
+
+        driver.get(getBaseUrl() + "register");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".auth-card")));
+
+        driver.findElement(By.id("username")).sendKeys(username);
+        driver.findElement(By.id("email")).sendKeys(email);
+        driver.findElement(By.id("password")).sendKeys(password);
+        driver.findElement(By.id("repeatPassword")).sendKeys(password);
+
+        WebElement submit = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".actions button[type='submit']")));
+        submit.click();
+
+        wait.until(ExpectedConditions.urlContains("/login"));
+
+        WebElement h2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".auth-card h2")));
+        assertEquals("Login", h2.getText());
+    }
+
+
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import es.wrapitup.wrapitup_planner.model.AINote;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -25,8 +26,8 @@ public class DatabaseInitizalizer {
         "genericUser", 
         "genericUser@example.com", 
         "12345678", 
-        "Registered", 
-        "Active"
+        UserStatus.ACTIVE, 
+        "USER"
         );
 
         AINote note = new AINote(

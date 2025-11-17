@@ -16,8 +16,8 @@ export class AINoteService {
 
   constructor(private http: HttpClient) { }
 
-  getNoteById(id: number) {
-  return this.http.get<AINoteDTO>(`${this.apiUrl}/${id}`);
-}
+  getNoteById(id: number): Observable<AINoteDTO> {
+    return this.http.get<AINoteDTO>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  }
 
 }
