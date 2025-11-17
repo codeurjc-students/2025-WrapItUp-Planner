@@ -1,0 +1,17 @@
+<div class="auth-card">
+  <h2>Login</h2>
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label for="username">Username</label>
+      <input id="username" name="username" [(ngModel)]="username" required />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" [(ngModel)]="password" required />
+    </div>
+    <div class="actions">
+      <button type="submit">Login</button>
+    </div>
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </form>
+</div>
