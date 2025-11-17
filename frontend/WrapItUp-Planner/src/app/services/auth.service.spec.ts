@@ -24,35 +24,29 @@ describe('AuthService (integration with real API)', () => {
     expect(service).toBeTruthy();
   });
 
-  it('register should call real API (POST /user)', (done) => {
+  it('register and then login should work', (done) => {
     const payload: UserModelDTO = { username: TEST_USER, email: TEST_EMAIL, password: 'pwd12345' };
 
-    // We call the real API. The test asserts that the Observable emits or errors.
     service.register(payload).subscribe({
-      next: (res) => {
-        // success path depends on backend; just ensure we received a response object
-        expect(res).toBeDefined();
-        done();
+      next: () => {
+        service.login(TEST_USER, 'pwd12345').subscribe({
+          next: (res) => {
+            expect(res).toBeDefined();
+            done();
+          },
+          error: (err) => {
+            fail('Login request failed: ' + (err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
       },
       error: (err) => {
         fail('Register request failed: ' + (err?.message || JSON.stringify(err)));
         done();
       }
     });
-  }, 20000);
+  });
 
-  it('login should call real API (POST /login)', (done) => {
-    service.login(TEST_USER, 'pwd12345').subscribe({
-      next: (res) => {
-        expect(res).toBeDefined();
-        done();
-      },
-      error: (err) => {
-        fail('Login request failed: ' + (err?.message || JSON.stringify(err)));
-        done();
-      }
-    });
-  }, 10000);
 
   it('logout should call real API (POST /logout)', (done) => {
     service.logout().subscribe({
