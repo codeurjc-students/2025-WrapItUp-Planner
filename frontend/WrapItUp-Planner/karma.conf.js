@@ -29,7 +29,7 @@ module.exports = function (config) {
         flags: [
         '--no-sandbox',
         '--disable-gpu',
-        '--ignore-certificate-errors',
+        '--ignore-certificate-errors'
         ],
     },
     },

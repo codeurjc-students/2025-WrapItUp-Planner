@@ -6,8 +6,7 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { AINoteDetailComponent } from './components/notes-details.component';
 import { AINoteService } from './services/ainote.service';
-import { LoginComponent } from './components/auth/login.component';
-import { RegisterComponent } from './components/auth/register.component';
+import { AuthComponent } from './components/auth/auth.component';
 import { AuthService } from './services/auth.service';
 import { routes } from './app.routes';
 
@@ -16,9 +15,8 @@ import { routes } from './app.routes';
 @NgModule({
   declarations: [
     AppComponent,
-    AINoteDetailComponent
-    , LoginComponent
-    , RegisterComponent
+    AINoteDetailComponent,
+    AuthComponent
   ],
   imports: [
     BrowserModule,
