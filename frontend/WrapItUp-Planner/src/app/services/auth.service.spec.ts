@@ -47,7 +47,6 @@ describe('AuthService (integration with real API)', () => {
     });
   });
 
-
   it('logout should call real API (POST /logout)', (done) => {
     service.logout().subscribe({
       next: (res) => {
