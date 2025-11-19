@@ -6,6 +6,11 @@ import { of } from 'rxjs';
 
 import { AuthComponent } from './auth.component';
 import { AuthService } from '../../services/auth.service';
+import { Component } from '@angular/core';
+
+
+@Component({ selector: 'app-header', template: '' })
+class AppHeaderStubComponent {}
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
@@ -18,7 +23,7 @@ describe('AuthComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FormsModule, RouterTestingModule.withRoutes([])],
-      declarations: [AuthComponent],
+      declarations: [AuthComponent, AppHeaderStubComponent], 
       providers: [
         { provide: AuthService, useValue: authSpy }
       ]
@@ -45,7 +50,6 @@ describe('AuthComponent', () => {
 
     component.onSubmit();
 
-    // allow observable handlers to run
     setTimeout(() => {
       expect(authSpy.login).toHaveBeenCalledWith('testuser', 'password123');
       expect(navSpy).toHaveBeenCalledWith(['/']);
