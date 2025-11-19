@@ -1,25 +1,23 @@
-/* Component styles for auth card. Global variables are defined in src/styles.css */
-
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  background: linear-gradient(135deg, #3a3a3a, #555); /* Fondo igual que About Us */
 }
 
 .auth-card {
-  background: var(--card-bg, #ffffff);
-  color: var(--card-text, #0a0a0a);
-  padding: 40px;
-  width: 380px;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(0,0,0,0.08);
-}
-
-/* Make card a positioning context for the small footer link */
-.auth-card {
+  background: #ffffff;
+  color: #222222;
+  padding: 2.5rem 3rem; /* Padding más compacto y profesional */
+  width: 100%;
+  max-width: 380px; /* Tamaño proporcionado */
+  border-radius: 24px;
+  box-shadow: 0 12px 50px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
   position: relative;
 }
 
@@ -27,8 +25,9 @@
   text-align: center;
   margin-bottom: 22px;
   font-weight: 600;
-  font-size: 24px;
-  color: var(--card-text, #0a0a0a);
+  font-size: 34px;
+  color: #222222;
+  letter-spacing: 0.5px;
 }
 
 .input-group {
@@ -45,18 +44,18 @@
 
 .input-group input {
   padding: 10px 12px;
-  border: 1px solid var(--input-border, #cccccc);
-  border-radius: 6px;
-  background: var(--input-bg, #ffffff);
-  color: var(--card-text, #0a0a0a);
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #222222;
   font-size: 15px;
   outline: none;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .input-group input:focus {
-  border-color: #888;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+  border-color: #ff69b4; /* Rosa sutil al focus */
+  box-shadow: 0 0 0 3px rgba(255,105,180,0.15);
 }
 
 .actions {
@@ -67,17 +66,18 @@
 .actions button {
   width: 100%;
   padding: 12px;
-  background: var(--primary);
-  color: #fff;
+  background: #ff69b4; /* Botón rosa */
+  color: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease-in-out, transform 0.06s;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .actions button:hover:not(:disabled) {
-  background: #111;
+  background: #ff85c1; /* Rosa más claro al hover */
   transform: translateY(-1px);
 }
 
@@ -98,19 +98,6 @@
   font-size: 14px;
 }
 
-/* Fallback: ensure the card remains white even if other styles collide */
-app-root .auth-container .auth-card {
-  background: var(--card-bg, #ffffff) !important;
-  color: var(--card-text, #0a0a0a) !important;
-}
-
-app-root .auth-container .input-group input {
-  background: var(--input-bg, #ffffff) !important;
-  color: var(--card-text, #0a0a0a) !important;
-  border-color: var(--input-border, #cccccc) !important;
-}
-
-/* Small footer link in the bottom-left of the card */
 .card-footer-link {
   position: absolute;
   left: 20px;
@@ -125,4 +112,12 @@ app-root .auth-container .input-group input {
 
 .card-footer-link .small-link:hover {
   text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2rem;
+    max-width: 90%;
+  }
 }
