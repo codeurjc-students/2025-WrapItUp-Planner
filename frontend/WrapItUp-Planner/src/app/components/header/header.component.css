@@ -5,8 +5,8 @@
   width: 100%;
   z-index: 100;
   font-family: 'Poppins', sans-serif;
-  background: rgba(30, 30, 30, 0.7); /* gris oscuro semi-transparente */
-  backdrop-filter: blur(6px); /* suaviza la mezcla con la landing */
+  background: rgba(30, 30, 30, 0.7); 
+  backdrop-filter: blur(6px); 
   display: flex;
   align-items: center;
   padding: 0 2rem;
@@ -16,7 +16,7 @@
 }
 
 .app-header.solid {
-  background: rgba(30, 30, 30, 0.85); /* más sólido al hacer scroll */
+  background: rgba(30, 30, 30, 0.85); 
 }
 
 .logo {
