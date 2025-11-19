@@ -1,0 +1,98 @@
+.about-container {
+  background: linear-gradient(135deg, #3a3a3a, #555); /* Fondo un poco más claro y profesional */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 6rem 2rem 4rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.about-card {
+  width: 100%;
+  max-width: 1400px;
+  border-radius: 24px;
+  padding: 3rem;
+  background: rgba(30, 30, 30, 0.85); /* Card oscuro para contraste */
+  backdrop-filter: blur(15px);
+  box-shadow: 0 12px 50px rgba(0,0,0,0.6);
+  color: #f5f5f0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.about-header {
+  text-align: center;
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.7);
+  }
+
+  p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+}
+
+.about-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.about-section {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+
+  .about-text {
+    flex: 1;
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+  }
+
+  .about-image {
+    flex: 1;
+    img {
+      width: 100%;
+      max-width: 450px;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &.reverse {
+    flex-direction: row-reverse;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .about-section, .about-section.reverse {
+    flex-direction: column;
+    text-align: center;
+
+    .about-image {
+      margin-top: 1.5rem;
+    }
+  }
+}
