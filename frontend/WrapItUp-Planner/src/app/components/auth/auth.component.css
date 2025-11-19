@@ -4,15 +4,15 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, #3a3a3a, #555); /* Fondo igual que About Us */
+  background: linear-gradient(135deg, #3a3a3a, #555);
 }
 
 .auth-card {
   background: #ffffff;
   color: #222222;
-  padding: 2.5rem 3rem; /* Padding más compacto y profesional */
+  padding: 2.5rem 3rem; 
   width: 100%;
-  max-width: 380px; /* Tamaño proporcionado */
+  max-width: 380px; 
   border-radius: 24px;
   box-shadow: 0 12px 50px rgba(0,0,0,0.2);
   display: flex;
@@ -54,7 +54,7 @@
 }
 
 .input-group input:focus {
-  border-color: #ff69b4; /* Rosa sutil al focus */
+  border-color: #ff69b4; 
   box-shadow: 0 0 0 3px rgba(255,105,180,0.15);
 }
 
@@ -66,7 +66,7 @@
 .actions button {
   width: 100%;
   padding: 12px;
-  background: #ff69b4; /* Botón rosa */
+  background: #ff69b4; 
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -77,7 +77,7 @@
 }
 
 .actions button:hover:not(:disabled) {
-  background: #ff85c1; /* Rosa más claro al hover */
+  background: #ff85c1; 
   transform: translateY(-1px);
 }
 
