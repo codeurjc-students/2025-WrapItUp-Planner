@@ -13,9 +13,10 @@ import { LandingPageComponent } from './components/landing-page/landing-page.com
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { HeaderComponent } from './components/header/header.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import { AboutUsComponent } from './components/about-us/about-us.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AINoteDetailComponent,
     AuthComponent,
     LandingPageComponent,
-    HeaderComponent
+    HeaderComponent,
+    AboutUsComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +35,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     RouterModule.forRoot(routes),
     MatToolbarModule,
     MatButtonModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatCardModule
   ],
   providers: [AINoteService, AuthService, provideAnimationsAsync()],
   bootstrap: [AppComponent]
