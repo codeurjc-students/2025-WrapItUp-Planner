@@ -15,6 +15,7 @@ describe('AINoteService', () => {
   });
 
 
+  // Integration test - requires backend running on https://localhost:443
   it('should fetch note from real API', (done) => {
     const testId = 1;
 

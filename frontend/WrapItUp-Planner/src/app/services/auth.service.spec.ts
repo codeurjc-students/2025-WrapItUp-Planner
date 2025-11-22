@@ -24,6 +24,7 @@ describe('AuthService (integration with real API)', () => {
     expect(service).toBeTruthy();
   });
 
+  // Integration tests - require backend running on https://localhost:443
   it('register and then login should work', (done) => {
     const payload: UserModelDTO = { username: TEST_USER, email: TEST_EMAIL, password: 'pwd12345' };
 

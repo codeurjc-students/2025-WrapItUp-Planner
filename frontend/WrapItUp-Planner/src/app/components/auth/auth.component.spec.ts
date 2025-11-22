@@ -39,7 +39,7 @@ describe('AuthComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('login: should call AuthService.login and navigate to root on success', (done) => {
+  it('login: should call AuthService.login and navigate to profile on success', (done) => {
     component.mode = 'login';
     component.username = 'testuser';
     component.password = 'password123';
@@ -52,9 +52,9 @@ describe('AuthComponent', () => {
 
     setTimeout(() => {
       expect(authSpy.login).toHaveBeenCalledWith('testuser', 'password123');
-      expect(navSpy).toHaveBeenCalledWith(['/']);
+      expect(navSpy).toHaveBeenCalledWith(['/profile']);
       done();
-    }, 0);
+    }, 600);
   });
 
   it('register: should call AuthService.register and navigate to /login on success', (done) => {
