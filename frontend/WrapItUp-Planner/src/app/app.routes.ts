@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { AuthComponent } from './components/auth/auth.component';
 import { LandingPageComponent } from './components/landing-page/landing-page.component';
 import { AboutUsComponent } from './components/about-us/about-us.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { AuthGuard } from './guards/auth.guard';
 
 
 export const routes: Routes = [
@@ -13,6 +15,7 @@ export const routes: Routes = [
   , { path: 'register', component: AuthComponent }
   , { path: '', component: LandingPageComponent }
   , { path: 'about-us', component: AboutUsComponent }
+  , { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] }
 ]; 
 
 @NgModule({

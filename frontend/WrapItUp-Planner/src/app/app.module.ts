@@ -17,6 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { HeaderComponent } from './components/header/header.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AboutUsComponent } from './components/about-us/about-us.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { AboutUsComponent } from './components/about-us/about-us.component';
     AuthComponent,
     LandingPageComponent,
     HeaderComponent,
-    AboutUsComponent
+    AboutUsComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

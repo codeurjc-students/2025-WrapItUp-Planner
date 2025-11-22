@@ -1,6 +1,15 @@
 <mat-toolbar color="primary" class="app-header">
   <span class="logo" (click)="goHome()">WrapItUp Planner</span>
   <span class="spacer"></span>
-  <button [routerLink]="['/about-us']"mat-button>About Us</button>
-  <button [routerLink]="['/login']" mat-raised-button color="accent">Sign In</button>
+  
+  <!-- Buttons when NOT authenticated -->
+  <ng-container *ngIf="!isAuthenticated">
+    <button [routerLink]="['/about-us']" mat-button>About Us</button>
+    <button [routerLink]="['/login']" mat-raised-button color="accent">Sign In</button>
+  </ng-container>
+  
+  <!-- Buttons when authenticated -->
+  <ng-container *ngIf="isAuthenticated">
+    <button [routerLink]="['/profile']" mat-raised-button color="accent">Dashboard</button>
+  </ng-container>
 </mat-toolbar>

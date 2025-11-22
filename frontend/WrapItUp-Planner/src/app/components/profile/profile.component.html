@@ -1,0 +1,79 @@
+<app-header></app-header>
+<div class="profile-container">
+  <div class="profile-card" *ngIf="!loading">
+    <h2>Profile</h2>
+    
+    <div class="profile-content" *ngIf="user">
+      <div class="avatar-container" (click)="isEditing && fileInput.click()">
+        <img [src]="getImageUrl()" alt="User Avatar" class="avatar-image">
+        <div class="avatar-overlay" *ngIf="isEditing">
+          <span class="change-photo-text">Change Photo</span>
+        </div>
+      </div>
+      <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+      
+      <div class="role-badge">{{ getRoleName() }}</div>
+      
+      <!-- View Mode -->
+      <div class="profile-info" *ngIf="!isEditing">
+        <div class="info-group">
+          <label>Username (Login)</label>
+          <div class="info-value">{{ user.username }}</div>
+        </div>
+
+        <div class="info-group">
+          <label>Display Name</label>
+          <div class="info-value">{{ user.displayName || user.username }}</div>
+        </div>
+        
+        <div class="info-group">
+          <label>Email</label>
+          <div class="info-value">{{ user.email }}</div>
+        </div>
+        
+        <div class="info-group" *ngIf="user.status">
+          <label>Status</label>
+          <div class="info-value">{{ user.status }}</div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <div class="profile-edit" *ngIf="isEditing && editedUser">
+        <div class="input-group">
+          <label for="username">Username (Login - Cannot be changed)</label>
+          <input id="username" name="username" [value]="editedUser.username" readonly disabled />
+        </div>
+
+        <div class="input-group">
+          <label for="displayName">Display Name</label>
+          <input id="displayName" name="displayName" [(ngModel)]="editedUser.displayName" required />
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" [(ngModel)]="editedUser.email" required />
+        </div>
+      </div>
+      
+      <div class="success-message" *ngIf="success">
+        {{ success }}
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <div class="profile-actions">
+        <button class="edit-button" *ngIf="!isEditing" (click)="toggleEdit()">Edit Profile</button>
+        <button class="save-button" *ngIf="isEditing" (click)="saveChanges()">Save Changes</button>
+        <button class="cancel-button" *ngIf="isEditing" (click)="toggleEdit()">Cancel</button>
+        <button class="notes-button" *ngIf="!isEditing" routerLink="/">My Notes</button>
+        <button class="logout-button" *ngIf="!isEditing" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <p>Loading...</p>
+  </div>
+</div>

@@ -1,13 +1,44 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { UserService } from '../../services/user.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
-  constructor(private router: Router) {}
+export class HeaderComponent implements OnInit {
+  isAuthenticated: boolean = false;
+
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {}
+
+  ngOnInit(): void {
+    // Check authentication on init
+    this.checkAuthentication();
+
+    // Check authentication on every navigation
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.checkAuthentication();
+    });
+  }
+
+  checkAuthentication(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.isAuthenticated = !!user;
+      },
+      error: () => {
+        this.isAuthenticated = false;
+      }
+    });
+  }
+
   goHome() {
     this.router.navigate(['/']);
   }

@@ -56,8 +56,10 @@ export class AuthComponent implements OnInit {
             this.error = res.message || 'Login failed';
             return;
           }
-          // successful login
-          this.router.navigate(['/']);
+          // successful login - wait a moment for cookies to be set before redirecting
+          setTimeout(() => {
+            this.router.navigate(['/profile']);
+          }, 300);
         },
         error: (err) => {
           this.error = err?.error?.message || 'Login error';
