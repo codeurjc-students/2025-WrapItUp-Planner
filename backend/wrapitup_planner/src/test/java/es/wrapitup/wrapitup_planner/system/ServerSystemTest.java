@@ -1,12 +1,14 @@
 package es.wrapitup.wrapitup_planner.system;
 
 import es.wrapitup.wrapitup_planner.dto.AINoteDTO;
+import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
 import es.wrapitup.wrapitup_planner.model.AINote;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.AINoteService;
+import es.wrapitup.wrapitup_planner.service.UserService;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,12 @@ import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
 import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse.Status;
+import jakarta.servlet.http.Cookie;
 
+import java.sql.Blob;
+import javax.sql.rowset.serial.SerialBlob;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +45,9 @@ public class ServerSystemTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -97,4 +106,157 @@ public class ServerSystemTest {
         assertEquals(Status.SUCCESS, body.getStatus());
         assertTrue(response.getCookies().length >= 1);
     }
+
+    @Test
+    void testCreateUserPersistsToDatabase() {
+        UserModelDTO dto = new UserModelDTO();
+        dto.setUsername("newdbuser");
+        dto.setEmail("newdb@example.com");
+        dto.setPassword("password123");
+
+        userService.createUser(dto);
+
+        Optional<UserModel> savedUser = userRepository.findByUsername("newdbuser");
+        assertTrue(savedUser.isPresent());
+        assertEquals("newdbuser", savedUser.get().getUsername());
+        assertEquals("newdb@example.com", savedUser.get().getEmail());
+        assertEquals("newdbuser", savedUser.get().getDisplayName()); // displayName defaults to username
+        assertEquals(UserStatus.ACTIVE, savedUser.get().getStatus());
+        assertTrue(passwordEncoder.matches("password123", savedUser.get().getPassword()));
+    }
+
+    @Test
+    void testUpdateUserPersistsChanges() {
+        UserModel user = new UserModel();
+        user.setUsername("updatetest");
+        user.setEmail("old@example.com");
+        user.setDisplayName("Old Name");
+        user.setRoles(Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(user);
+
+        UserModelDTO updateDTO = new UserModelDTO();
+        updateDTO.setDisplayName("New Name");
+        updateDTO.setEmail("new@example.com");
+
+        UserModelDTO result = userService.updateUser(user.getId(), updateDTO);
+
+        assertNotNull(result);
+        assertEquals("New Name", result.getDisplayName());
+        assertEquals("new@example.com", result.getEmail());
+
+        // Verify in database
+        UserModel updatedUser = userRepository.findById(user.getId()).orElse(null);
+        assertNotNull(updatedUser);
+        assertEquals("New Name", updatedUser.getDisplayName());
+        assertEquals("new@example.com", updatedUser.getEmail());
+        assertEquals("updatetest", updatedUser.getUsername()); // username should not change
+    }
+
+
+    @Test
+    void testFindByNameReturnsCorrectUser() {
+        UserModel user = new UserModel();
+        user.setUsername("findmeuser");
+        user.setEmail("findme@example.com");
+        user.setRoles(Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(user);
+
+        UserModelDTO result = userService.findByName("findmeuser");
+
+        assertNotNull(result);
+        assertEquals("findmeuser", result.getUsername());
+        assertEquals("findme@example.com", result.getEmail());
+    }
+
+    @Test
+    void testUsernameExistsChecksDatabase() {
+        UserModel user = new UserModel();
+        user.setUsername("existinguser");
+        user.setEmail("existing@example.com");
+        user.setRoles(Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(user);
+
+        assertTrue(userService.usernameExists("existinguser"));
+        assertFalse(userService.usernameExists("nonexistentuser"));
+    }
+
+    @Test
+    void testUpdateUserWithBlobSavesImageToDatabase() throws Exception {
+        UserModel user = new UserModel();
+        user.setUsername("imageuser");
+        user.setEmail("image@example.com");
+        user.setRoles(Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(user);
+
+        byte[] imageData = "fake-image-data".getBytes();
+        Blob imageBlob = new SerialBlob(imageData);
+
+        UserModelDTO updateDTO = new UserModelDTO();
+        updateDTO.setImage("/api/v1/users/profile-image/" + user.getId());
+
+        userService.updateUserWithBlob(user.getId(), updateDTO, imageBlob);
+
+        // Verify in database
+        UserModel updatedUser = userRepository.findById(user.getId()).orElse(null);
+        assertNotNull(updatedUser);
+        assertNotNull(updatedUser.getProfilePic());
+        
+        byte[] savedImageData = updatedUser.getProfilePic().getBytes(1, (int) updatedUser.getProfilePic().length());
+        assertArrayEquals(imageData, savedImageData);
+    }
+
+    @Test
+    void testGetProfileImageRetrievesFromDatabase() throws Exception {
+        UserModel user = new UserModel();
+        user.setUsername("picuser");
+        user.setEmail("pic@example.com");
+        user.setRoles(Arrays.asList("USER"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPassword(passwordEncoder.encode("password"));
+        
+        byte[] imageData = "test-image".getBytes();
+        user.setProfilePic(new SerialBlob(imageData));
+        userRepository.save(user);
+
+        Blob result = userService.getProfileImage(user.getId());
+
+        assertNotNull(result);
+        byte[] resultData = result.getBytes(1, (int) result.length());
+        assertArrayEquals(imageData, resultData);
+    }
+
+    @Test
+    void testLogoutClearsCookies() {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        userLoginService.logout(response);
+
+        Cookie[] cookies = response.getCookies();
+        assertTrue(cookies.length >= 2);
+        
+        boolean authTokenCleared = false;
+        boolean refreshTokenCleared = false;
+        
+        for (Cookie cookie : cookies) {
+            if ("AuthToken".equals(cookie.getName())) {
+                authTokenCleared = cookie.getMaxAge() == 0;
+            }
+            if ("RefreshToken".equals(cookie.getName())) {
+                refreshTokenCleared = cookie.getMaxAge() == 0;
+            }
+        }
+        
+        assertTrue(authTokenCleared);
+        assertTrue(refreshTokenCleared);
+    }
+
 }
+

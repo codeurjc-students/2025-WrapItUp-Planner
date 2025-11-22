@@ -3,6 +3,7 @@ package es.wrapitup.wrapitup_planner.model;
 import java.util.List;
 
 import jakarta.persistence.*;
+import java.sql.Blob;
 
 @Entity
 public class UserModel {
@@ -10,8 +11,12 @@ public class UserModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    private String displayName;
     private String email;
     private String password;
+    private String image;
+    @Lob
+    private Blob profilePic;
     private List<String> roles; 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
@@ -70,6 +75,24 @@ public class UserModel {
     }
     public void setNotes(List<AINote> notes) {
         this.notes = notes;
+    }
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
+    }
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+    public Blob getProfilePic() {
+        return profilePic;
+    }
+    public void setProfilePic(Blob profilePic) {
+        this.profilePic = profilePic;
     }
 
 }

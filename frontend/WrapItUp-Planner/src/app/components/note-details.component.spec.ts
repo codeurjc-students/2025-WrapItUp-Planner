@@ -51,9 +51,11 @@ describe('AINoteDetailComponent', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('div')?.textContent).toContain('Id: 1');
-
     expect(mockService.getNoteById).toHaveBeenCalledWith(1);
+    expect(component.note).toEqual(testNote);
+    
+    const compiled = fixture.nativeElement as HTMLElement;
+    const idParagraph = compiled.querySelector('p');
+    expect(idParagraph?.textContent).toContain('Id: 1');
   });
 });
