@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
-import { AINoteDetailComponent } from './components/notes-details.component';
-import { AINoteService } from './services/ainote.service';
+import { NoteDetailComponent } from './components/notes-details.component';
+import { NoteService } from './services/note.service';
 import { AuthComponent } from './components/auth/auth.component';
 import { AuthService } from './services/auth.service';
 import { routes } from './app.routes';
@@ -23,7 +23,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 @NgModule({
   declarations: [
     AppComponent,
-    AINoteDetailComponent,
+    NoteDetailComponent,
     AuthComponent,
     LandingPageComponent,
     HeaderComponent,
@@ -40,7 +40,7 @@ import { ProfileComponent } from './components/profile/profile.component';
     BrowserAnimationsModule,
     MatCardModule
   ],
-  providers: [AINoteService, AuthService, provideAnimationsAsync()],
+  providers: [NoteService, AuthService, provideAnimationsAsync()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

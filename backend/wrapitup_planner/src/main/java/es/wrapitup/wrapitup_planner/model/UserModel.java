@@ -22,7 +22,7 @@ public class UserModel {
     private UserStatus status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AINote> notes;
+    private List<Note> notes;
     public UserModel(String username, String email, String password, UserStatus status, String... roles) {
         this.username = username;
         this.email = email;
@@ -70,10 +70,10 @@ public class UserModel {
     public void setStatus(UserStatus status) {
         this.status = status;
     }
-    public List<AINote> getNotes() {
+    public List<Note> getNotes() {
         return notes;
     }
-    public void setNotes(List<AINote> notes) {
+    public void setNotes(List<Note> notes) {
         this.notes = notes;
     }
     public String getImage() {
