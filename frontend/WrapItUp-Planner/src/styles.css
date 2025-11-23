@@ -6,7 +6,7 @@ html, body, app-root {
 }
 
 body {
-	background: #1a1a1a;
+	background: linear-gradient(135deg, #3a3a3a, #555);
 	font-family: Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

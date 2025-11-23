@@ -16,6 +16,10 @@ export class NoteService {
     return this.http.get<NoteDTO>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
+  createNote(note: NoteDTO): Observable<NoteDTO> {
+    return this.http.post<NoteDTO>(this.apiUrl, note, { withCredentials: true });
+  }
+
   updateNote(id: number, note: NoteDTO): Observable<NoteDTO> {
     return this.http.put<NoteDTO>(`${this.apiUrl}/${id}`, note, { withCredentials: true });
   }

@@ -49,6 +49,25 @@ public class NoteRestController {
                 .body(new ErrorResponse("You do not have permission to view this note"));
     }
 
+    @PostMapping
+    public ResponseEntity<?> createNote(@RequestBody NoteDTO noteDTO, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to create a note"));
+        }
+        
+        try {
+            NoteDTO created = noteService.createNote(noteDTO, username);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(@PathVariable Long id, @RequestBody NoteDTO noteDTO, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
@@ -80,8 +99,16 @@ public class NoteRestController {
     }
 
     @PostMapping("/{id}/share-username")
-    public ResponseEntity<?> shareNoteByUsername(@PathVariable Long id, @RequestBody ShareRequest request) {
-        Optional<NoteDTO> updated = noteService.shareNoteWithUsername(id, request.getUsername());
+    public ResponseEntity<?> shareNoteByUsername(@PathVariable Long id, @RequestBody ShareRequest request, HttpServletRequest httpRequest) {
+        Principal principal = httpRequest.getUserPrincipal();
+        String ownerUsername = principal != null ? principal.getName() : null;
+        
+        if (ownerUsername == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to share notes"));
+        }
+        
+        Optional<NoteDTO> updated = noteService.shareNoteWithUsername(id, request.getUsername(), ownerUsername);
         if (updated.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse("User not found"));

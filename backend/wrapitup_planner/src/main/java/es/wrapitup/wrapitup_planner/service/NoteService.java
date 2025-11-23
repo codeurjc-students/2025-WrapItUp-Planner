@@ -31,6 +31,34 @@ public class NoteService {
                                .map(noteMapper::toDto);
     }
 
+    public NoteDTO createNote(NoteDTO noteDTO, String username) {
+        
+        if (noteDTO.getTitle() == null || noteDTO.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Title is required");
+        }
+        
+        
+        Optional<UserModel> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        
+        UserModel user = userOpt.get();
+        
+        
+        Note note = new Note(
+            user,
+            noteDTO.getTitle(),
+            noteDTO.getOverview() != null ? noteDTO.getOverview() : "",
+            noteDTO.getSummary() != null ? noteDTO.getSummary() : "",
+            noteDTO.getJsonQuestions() != null ? noteDTO.getJsonQuestions() : "",
+            noteDTO.getVisibility() != null ? noteDTO.getVisibility() : NoteVisibility.PRIVATE
+        );
+        
+        Note saved = noteRepository.save(note);
+        return noteMapper.toDto(saved);
+    }
+
     public Optional<NoteDTO> findByIdWithPermissions(Long id, String username) {
         Optional<Note> noteOpt = noteRepository.findById(id);
         
@@ -101,15 +129,9 @@ public class NoteService {
             note.setTitle(noteDTO.getTitle());
         }
         if (noteDTO.getOverview() != null) {
-            if (noteDTO.getOverview().trim().isEmpty()) {
-                throw new IllegalArgumentException("Overview cannot be empty");
-            }
             note.setOverview(noteDTO.getOverview());
         }
         if (noteDTO.getSummary() != null) {
-            if (noteDTO.getSummary().trim().isEmpty()) {
-                throw new IllegalArgumentException("Summary cannot be empty");
-            }
             note.setSummary(noteDTO.getSummary());
         }
         if (noteDTO.getVisibility() != null) {
@@ -142,10 +164,15 @@ public class NoteService {
         return Optional.of(noteMapper.toDto(updated));
     }
 
-    public Optional<NoteDTO> shareNoteWithUsername(Long noteId, String username) {
+    public Optional<NoteDTO> shareNoteWithUsername(Long noteId, String username, String ownerUsername) {
         Optional<Note> existingNote = noteRepository.findById(noteId);
         
         if (existingNote.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        
+        if (username.equals(ownerUsername)) {
             return Optional.empty();
         }
         

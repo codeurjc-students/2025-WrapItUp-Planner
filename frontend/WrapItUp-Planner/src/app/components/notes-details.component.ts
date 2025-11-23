@@ -133,6 +133,12 @@ export class NoteDetailComponent implements OnInit {
       return;
     }
 
+    
+    if (this.currentUser && this.shareUsername.trim() === this.currentUser.username) {
+      this.shareError = 'You cannot share a note with yourself';
+      return;
+    }
+
     this.noteService.shareNoteByUsername(this.noteId, this.shareUsername.trim()).subscribe({
       next: (data) => {
         this.note = data;
@@ -168,14 +174,6 @@ export class NoteDetailComponent implements OnInit {
     
     if (!this.editedTitle.trim()) {
       alert('Title cannot be empty');
-      return;
-    }
-    if (!this.editedOverview.trim()) {
-      alert('Overview cannot be empty');
-      return;
-    }
-    if (!this.editedSummary.trim()) {
-      alert('Summary cannot be empty');
       return;
     }
 

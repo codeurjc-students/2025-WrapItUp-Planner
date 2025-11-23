@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { NoteDetailComponent } from './components/notes-details.component';
+import { CreateNoteComponent } from './components/create-note.component';
 import { NoteService } from './services/note.service';
 import { AuthComponent } from './components/auth/auth.component';
 import { AuthService } from './services/auth.service';
@@ -24,6 +25,7 @@ import { ProfileComponent } from './components/profile/profile.component';
   declarations: [
     AppComponent,
     NoteDetailComponent,
+    CreateNoteComponent,
     AuthComponent,
     LandingPageComponent,
     HeaderComponent,
