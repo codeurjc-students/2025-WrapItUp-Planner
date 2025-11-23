@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AINoteService } from '../services/ainote.service';
-import { AINoteDTO } from '../dtos/ainote.dto';
+import { NoteService } from '../services/note.service';
+import { NoteDTO } from '../dtos/note.dto';
 
 @Component({
-  selector: 'app-ainote-detail',
+  selector: 'app-note-detail',
   templateUrl: './notes-details.component.html'
 })
-export class AINoteDetailComponent implements OnInit {
+export class NoteDetailComponent implements OnInit {
 
   noteId!: number;
-  note?: AINoteDTO;
+  note?: NoteDTO;
 
   constructor(
     private route: ActivatedRoute,
-    private noteService: AINoteService
+    private noteService: NoteService
   ) {}
 
   ngOnInit(): void {

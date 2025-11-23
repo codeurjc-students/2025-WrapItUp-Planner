@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AINoteDTO } from '../dtos/ainote.dto';
+import { NoteDTO } from '../dtos/note.dto';
 
 
 
@@ -10,14 +10,14 @@ import { AINoteDTO } from '../dtos/ainote.dto';
   providedIn: 'root'
 })
 
-export class AINoteService {
+export class NoteService {
 
   private apiUrl = 'https://localhost:443/api/v1/notes';
 
   constructor(private http: HttpClient) { }
 
-  getNoteById(id: number): Observable<AINoteDTO> {
-    return this.http.get<AINoteDTO>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  getNoteById(id: number): Observable<NoteDTO> {
+    return this.http.get<NoteDTO>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
 }

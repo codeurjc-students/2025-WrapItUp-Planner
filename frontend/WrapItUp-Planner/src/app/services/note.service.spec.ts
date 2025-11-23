@@ -1,17 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { AINoteService } from './ainote.service';
-import { AINoteDTO } from '../dtos/ainote.dto';
+import { NoteService } from './note.service';
+import { NoteDTO } from '../dtos/note.dto';
 
-describe('AINoteService', () => {
-  let service: AINoteService;
+describe('NoteService', () => {
+  let service: NoteService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule],
-      providers: [AINoteService]
+      providers: [NoteService]
     });
-    service = TestBed.inject(AINoteService);
+    service = TestBed.inject(NoteService);
   });
 
 
@@ -20,7 +20,7 @@ describe('AINoteService', () => {
     const testId = 1;
 
     service.getNoteById(testId).subscribe({
-      next: (note: AINoteDTO) => {
+      next: (note: NoteDTO) => {
         expect(note).toBeTruthy();
         expect(note.id).toBe(testId);
         console.log('Noted received', note);

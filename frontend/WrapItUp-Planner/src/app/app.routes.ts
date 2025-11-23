@@ -1,5 +1,5 @@
 import { RouterModule, Routes } from '@angular/router';
-import { AINoteDetailComponent } from './components/notes-details.component';
+import { NoteDetailComponent } from './components/notes-details.component';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthComponent } from './components/auth/auth.component';
@@ -10,7 +10,7 @@ import { AuthGuard } from './guards/auth.guard';
 
 
 export const routes: Routes = [
-    { path: 'notes/:id', component: AINoteDetailComponent }
+    { path: 'notes/:id', component: NoteDetailComponent }
   , { path: 'login', component: AuthComponent } 
   , { path: 'register', component: AuthComponent }
   , { path: '', component: LandingPageComponent }

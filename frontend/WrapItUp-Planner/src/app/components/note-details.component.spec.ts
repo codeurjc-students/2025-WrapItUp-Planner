@@ -2,23 +2,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { convertToParamMap, ActivatedRoute } from '@angular/router';
-import { AINoteDetailComponent } from './notes-details.component'; 
-import { AINoteService } from '../services/ainote.service';
-import { AINoteDTO } from '../dtos/ainote.dto';
+import { NoteDetailComponent } from './notes-details.component'; 
+import { NoteService } from '../services/note.service';
+import { NoteDTO } from '../dtos/note.dto';
 
-describe('AINoteDetailComponent', () => {
-  let component: AINoteDetailComponent;
-  let fixture: ComponentFixture<AINoteDetailComponent>;
-  let mockService: jasmine.SpyObj<AINoteService>;
+describe('NoteDetailComponent', () => {
+  let component: NoteDetailComponent;
+  let fixture: ComponentFixture<NoteDetailComponent>;
+  let mockService: jasmine.SpyObj<NoteService>;
 
   beforeEach(async () => {
-    mockService = jasmine.createSpyObj('AINoteService', ['getNoteById']);
+    mockService = jasmine.createSpyObj('NoteService', ['getNoteById']);
 
     await TestBed.configureTestingModule({
-      declarations: [AINoteDetailComponent],
+      declarations: [NoteDetailComponent],
       imports: [FormsModule],
       providers: [
-        { provide: AINoteService, useValue: mockService },
+        { provide: NoteService, useValue: mockService },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -28,7 +28,7 @@ describe('AINoteDetailComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AINoteDetailComponent);
+    fixture = TestBed.createComponent(NoteDetailComponent);
     component = fixture.componentInstance;
   });
 
@@ -37,11 +37,11 @@ describe('AINoteDetailComponent', () => {
   });
 
   it('should fetch note from route param and display it', () => {
-    const testNote: AINoteDTO = {
+    const testNote: NoteDTO = {
       id: 1,
-      overview: 'Resumen general de la sesión de IA',
+      overview: 'Resumen general de la sesión',
       summary: 'Este es el contenido detallado del resumen',
-      jsonQuestions: '{"questions": ["¿Qué es IA?", "¿Cómo funciona?"]}',
+      jsonQuestions: '{"questions": ["¿Qué es esto?", "¿Cómo funciona?"]}',
       visibility: true,
       userId: 1
     };

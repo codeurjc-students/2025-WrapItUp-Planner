@@ -3,10 +3,10 @@ package es.wrapitup.wrapitup_planner.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.wrapitup.wrapitup_planner.model.AINote;
+import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
-import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
+import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -17,7 +17,7 @@ public class DatabaseInitizalizer {
 	private UserRepository userRepository;
 
 	@Autowired
-	private AINoteRepository aiNoteRepository;
+	private NoteRepository noteRepository;
 
     @PostConstruct
     public void init(){
@@ -30,16 +30,16 @@ public class DatabaseInitizalizer {
         "USER"
         );
 
-        AINote note = new AINote(
+        Note note = new Note(
         user,
-        "Resumen general de la sesión de IA",
+        "Resumen general de la sesión",
         "Este es el contenido detallado del resumen",
-        "{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}",
+        "{\"questions\": [\"¿Qué es esto?\", \"¿Cómo funciona?\"]}",
         true
         );
 
         userRepository.save(user);
-        aiNoteRepository.save(note);
+        noteRepository.save(note);
 
     }
 

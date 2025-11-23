@@ -26,15 +26,15 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
-import es.wrapitup.wrapitup_planner.dto.AINoteDTO;
-import es.wrapitup.wrapitup_planner.dto.AINoteMapper;
-import es.wrapitup.wrapitup_planner.model.AINote;
-import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
+import es.wrapitup.wrapitup_planner.dto.NoteDTO;
+import es.wrapitup.wrapitup_planner.dto.NoteMapper;
+import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
 import es.wrapitup.wrapitup_planner.security.jwt.JwtTokenProvider;
 import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
 import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
-import es.wrapitup.wrapitup_planner.service.AINoteService;
+import es.wrapitup.wrapitup_planner.service.NoteService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -42,10 +42,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ServiceUnitTest {
 
     @Mock
-    private AINoteRepository aiNoteRepository;
+    private NoteRepository noteRepository;
 
     @Mock
-    private AINoteMapper aiNoteMapper;
+    private NoteMapper noteMapper;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -60,7 +60,7 @@ public class ServiceUnitTest {
     private UserLoginService userLoginService;
 
     @InjectMocks
-    private AINoteService aiNoteService;
+    private NoteService noteService;
 
     @BeforeEach
     void setUp() {
@@ -69,24 +69,24 @@ public class ServiceUnitTest {
 
     @Test
     void testFindByIdReturnsDTO() {
-        AINote note = new AINote();
+        Note note = new Note();
         note.setId(1L);
         note.setOverview("Resumen general de la sesión de IA");
         note.setSummary("Este es el contenido detallado del resumen");
         note.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
         note.setVisibility(true);
 
-        AINoteDTO dto = new AINoteDTO();
+        NoteDTO dto = new NoteDTO();
         dto.setId(1L);
         dto.setOverview("Resumen general de la sesión de IA");
         dto.setSummary("Este es el contenido detallado del resumen");
         dto.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
         dto.setVisibility(true);
 
-        when(aiNoteRepository.findById(1L)).thenReturn(Optional.of(note));
-        when(aiNoteMapper.toDto(note)).thenReturn(dto);
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(note));
+        when(noteMapper.toDto(note)).thenReturn(dto);
 
-        Optional<AINoteDTO> result = aiNoteService.findById(1L);
+        Optional<NoteDTO> result = noteService.findById(1L);
 
         assertEquals(true, result.isPresent());
         assertEquals(dto.getId(), result.get().getId());

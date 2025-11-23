@@ -1,4 +1,4 @@
-export interface AINoteDTO {
+export interface NoteDTO {
   id: number;
   overview: string;
   summary: string;

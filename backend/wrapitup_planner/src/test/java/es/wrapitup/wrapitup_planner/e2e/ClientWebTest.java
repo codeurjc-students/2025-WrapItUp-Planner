@@ -92,7 +92,7 @@ public class ClientWebTest {
         driver.get(getBaseUrl() + "notes/1");
 
         WebElement detailDiv = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-ainote-detail div")));
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-note-detail div")));
 
         String detailText = detailDiv.getText();
 

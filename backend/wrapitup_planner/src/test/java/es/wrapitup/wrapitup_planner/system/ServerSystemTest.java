@@ -1,13 +1,13 @@
 package es.wrapitup.wrapitup_planner.system;
 
-import es.wrapitup.wrapitup_planner.dto.AINoteDTO;
+import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
-import es.wrapitup.wrapitup_planner.model.AINote;
+import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
-import es.wrapitup.wrapitup_planner.repository.AINoteRepository;
+import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
-import es.wrapitup.wrapitup_planner.service.AINoteService;
+import es.wrapitup.wrapitup_planner.service.NoteService;
 import es.wrapitup.wrapitup_planner.service.UserService;
 
 import org.junit.jupiter.api.Tag;
@@ -38,10 +38,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerSystemTest {
 
     @Autowired
-    private AINoteService aiNoteService;
+    private NoteService noteService;
 
     @Autowired
-    private AINoteRepository aiNoteRepository;
+    private NoteRepository noteRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -67,14 +67,14 @@ public class ServerSystemTest {
 
         userRepository.save(user);
 
-        AINote note = new AINote();
+        Note note = new Note();
         note.setOverview("Resumen general de la sesión de IA");
         note.setSummary("Este es el contenido detallado del resumen");
         note.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
         note.setVisibility(true);
         note.setUser(user);
-        aiNoteRepository.save(note);
-        Optional<AINoteDTO> result = aiNoteService.findById(note.getId());
+        noteRepository.save(note);
+        Optional<NoteDTO> result = noteService.findById(note.getId());
 
         assertEquals(true, result.isPresent());
         assertEquals("Resumen general de la sesión de IA", result.get().getOverview());

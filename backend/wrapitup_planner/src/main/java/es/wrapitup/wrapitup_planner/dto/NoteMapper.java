@@ -2,14 +2,14 @@ package es.wrapitup.wrapitup_planner.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import es.wrapitup.wrapitup_planner.model.AINote;
+import es.wrapitup.wrapitup_planner.model.Note;
 
 @Mapper(componentModel = "spring")
-public interface AINoteMapper {
+public interface NoteMapper {
 
     @Mapping(source = "user.id", target = "userId")
-    AINoteDTO toDto(AINote aiNote);
+    NoteDTO toDto(Note note);
 
     @Mapping(source = "userId", target = "user.id")
-    AINote toEntity(AINoteDTO dto);
+    Note toEntity(NoteDTO dto);
 }

@@ -1,19 +1,39 @@
-package es.wrapitup.wrapitup_planner.dto;
+package es.wrapitup.wrapitup_planner.model;
 
-public class AINoteDTO {
+import jakarta.persistence.*;
+
+@Entity
+public class Note {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String overview;
     private String summary;
     private String jsonQuestions;
     private Boolean visibility;
-    private Long userId;
-    
-    
-    public Long getUserId() {
-        return userId;
+    @ManyToOne
+    @JoinColumn(name = "id_user", nullable = false)
+    private UserModel user;
+
+
+    public Note(UserModel user, String overview, String summary, String jsonQuestions, boolean visibility) {
+        this.user = user;
+        this.overview = overview;
+        this.summary = summary;
+        this.jsonQuestions = jsonQuestions;
+        this.visibility = visibility;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+
+
+
+    public Note() {
+    }
+    
+    public UserModel getUser() {
+        return user;
+    }
+    public void setUser(UserModel user) {
+        this.user = user;
     }
     public String getOverview() {
         return overview;
@@ -39,9 +59,11 @@ public class AINoteDTO {
     public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
     }
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
