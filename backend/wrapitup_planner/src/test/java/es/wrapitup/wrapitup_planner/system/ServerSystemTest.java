@@ -3,6 +3,7 @@ package es.wrapitup.wrapitup_planner.system;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
@@ -71,7 +72,7 @@ public class ServerSystemTest {
         note.setOverview("Resumen general de la sesión de IA");
         note.setSummary("Este es el contenido detallado del resumen");
         note.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
-        note.setVisibility(true);
+        note.setVisibility(NoteVisibility.PUBLIC);
         note.setUser(user);
         noteRepository.save(note);
         Optional<NoteDTO> result = noteService.findById(note.getId());
@@ -80,7 +81,7 @@ public class ServerSystemTest {
         assertEquals("Resumen general de la sesión de IA", result.get().getOverview());
         assertEquals("Este es el contenido detallado del resumen", result.get().getSummary());
         assertEquals("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}", result.get().getJsonQuestions());
-        assertEquals(true, result.get().getVisibility());
+        assertEquals(NoteVisibility.PUBLIC, result.get().getVisibility());
     }
 
     @Test

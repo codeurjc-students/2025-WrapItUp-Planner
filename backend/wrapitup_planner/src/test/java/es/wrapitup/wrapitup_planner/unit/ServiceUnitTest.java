@@ -29,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
 import es.wrapitup.wrapitup_planner.security.jwt.JwtTokenProvider;
@@ -74,14 +75,14 @@ public class ServiceUnitTest {
         note.setOverview("Resumen general de la sesión de IA");
         note.setSummary("Este es el contenido detallado del resumen");
         note.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
-        note.setVisibility(true);
+        note.setVisibility(NoteVisibility.PUBLIC);
 
         NoteDTO dto = new NoteDTO();
         dto.setId(1L);
         dto.setOverview("Resumen general de la sesión de IA");
         dto.setSummary("Este es el contenido detallado del resumen");
         dto.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
-        dto.setVisibility(true);
+        dto.setVisibility(NoteVisibility.PUBLIC);
 
         when(noteRepository.findById(1L)).thenReturn(Optional.of(note));
         when(noteMapper.toDto(note)).thenReturn(dto);

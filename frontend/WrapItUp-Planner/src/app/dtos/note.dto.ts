@@ -1,8 +1,10 @@
 export interface NoteDTO {
-  id: number;
-  overview: string;
-  summary: string;
-  jsonQuestions: string;
-  visibility: boolean;
-  userId: number;
+  id?: number;
+  title?: string;
+  overview?: string;
+  summary?: string;
+  jsonQuestions?: string;
+  visibility?: 'PUBLIC' | 'PRIVATE';
+  userId?: number;
+  sharedWithUserIds?: number[];
 }

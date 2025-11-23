@@ -6,7 +6,7 @@ html, body, app-root {
 }
 
 body {
-	background: #000000;
+	background: #1a1a1a;
 	font-family: Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -24,7 +24,7 @@ button { font-family: inherit; }
 
 /* Theme variables (global) */
 :root {
-	--bg-color: #000000;
+	--bg-color: #1a1a1a;
 	--card-bg: #ffffff;
 	--card-text: #0a0a0a;
 	--input-bg: #ffffff;

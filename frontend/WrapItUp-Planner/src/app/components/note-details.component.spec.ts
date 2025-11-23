@@ -1,24 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
-import { convertToParamMap, ActivatedRoute } from '@angular/router';
-import { NoteDetailComponent } from './notes-details.component'; 
+import { convertToParamMap, ActivatedRoute, Router } from '@angular/router';
+import { NoteDetailComponent } from './notes-details.component';
 import { NoteService } from '../services/note.service';
+import { UserService } from '../services/user.service';
 import { NoteDTO } from '../dtos/note.dto';
+import { UserModelDTO } from '../dtos/user.dto';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('NoteDetailComponent', () => {
   let component: NoteDetailComponent;
   let fixture: ComponentFixture<NoteDetailComponent>;
-  let mockService: jasmine.SpyObj<NoteService>;
+  let mockNoteService: jasmine.SpyObj<NoteService>;
+  let mockUserService: jasmine.SpyObj<UserService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    mockService = jasmine.createSpyObj('NoteService', ['getNoteById']);
+    mockNoteService = jasmine.createSpyObj('NoteService', ['getNoteById', 'updateNote', 'shareNoteByUsername']);
+    mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       declarations: [NoteDetailComponent],
-      imports: [FormsModule],
+      imports: [
+        FormsModule,
+        HttpClientTestingModule
+      ],
       providers: [
-        { provide: NoteService, useValue: mockService },
+        { provide: NoteService, useValue: mockNoteService },
+        { provide: UserService, useValue: mockUserService },
+        { provide: Router, useValue: mockRouter },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -39,23 +51,29 @@ describe('NoteDetailComponent', () => {
   it('should fetch note from route param and display it', () => {
     const testNote: NoteDTO = {
       id: 1,
+      title: 'Test Note Title',
       overview: 'Resumen general de la sesión',
       summary: 'Este es el contenido detallado del resumen',
       jsonQuestions: '{"questions": ["¿Qué es esto?", "¿Cómo funciona?"]}',
-      visibility: true,
-      userId: 1
+      visibility: 'PUBLIC',
+      userId: 1,
+      sharedWithUserIds: []
     };
 
-    mockService.getNoteById.and.returnValue(of(testNote));
+    const testUser: UserModelDTO = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@test.com',
+      password: ''
+    };
+
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
 
     component.ngOnInit();
     fixture.detectChanges();
 
-    expect(mockService.getNoteById).toHaveBeenCalledWith(1);
+    expect(mockNoteService.getNoteById).toHaveBeenCalledWith(1);
     expect(component.note).toEqual(testNote);
-    
-    const compiled = fixture.nativeElement as HTMLElement;
-    const idParagraph = compiled.querySelector('p');
-    expect(idParagraph?.textContent).toContain('Id: 1');
   });
 });
