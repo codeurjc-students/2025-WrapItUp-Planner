@@ -8,6 +8,7 @@ import { UserService } from '../services/user.service';
 import { NoteDTO } from '../dtos/note.dto';
 import { UserModelDTO } from '../dtos/user.dto';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('NoteDetailComponent', () => {
   let component: NoteDetailComponent;
@@ -37,7 +38,8 @@ describe('NoteDetailComponent', () => {
             paramMap: of(convertToParamMap({ id: '1' }))
           }
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(NoteDetailComponent);
