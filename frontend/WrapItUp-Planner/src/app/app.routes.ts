@@ -18,6 +18,7 @@ export const routes: Routes = [
   , { path: '', component: LandingPageComponent }
   , { path: 'about-us', component: AboutUsComponent }
   , { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] }
+  , { path: '**', redirectTo: '/' }
 ]; 
 
 @NgModule({

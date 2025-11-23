@@ -24,12 +24,12 @@ export class NoteService {
     return this.http.put<NoteDTO>(`${this.apiUrl}/${id}`, note, { withCredentials: true });
   }
 
-  shareNoteWithUsers(id: number, userIds: number[]): Observable<NoteDTO> {
-    return this.http.put<NoteDTO>(`${this.apiUrl}/${id}/share`, userIds, { withCredentials: true });
+  shareNoteByUsername(id: number, username: string): Observable<NoteDTO> {
+    return this.http.put<NoteDTO>(`${this.apiUrl}/${id}/share`, { username }, { withCredentials: true });
   }
 
-  shareNoteByUsername(id: number, username: string): Observable<NoteDTO> {
-    return this.http.post<NoteDTO>(`${this.apiUrl}/${id}/share-username`, { username }, { withCredentials: true });
+  deleteNote(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 }
 

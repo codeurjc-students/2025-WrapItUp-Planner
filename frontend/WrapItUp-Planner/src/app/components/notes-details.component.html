@@ -8,6 +8,9 @@
       <button class="btn-share" (click)="openShareModal()" *ngIf="canShare && !editMode">
         Share
       </button>
+      <button class="btn-delete" (click)="deleteNote()" *ngIf="canEdit && !editMode">
+        Delete
+      </button>
       <span class="visibility-badge" [class.public]="note.visibility === 'PUBLIC'">
         {{ note.visibility }}
       </span>

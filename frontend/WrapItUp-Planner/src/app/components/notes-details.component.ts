@@ -207,5 +207,31 @@ export class NoteDetailComponent implements OnInit {
     }
     return `Compartida con ${this.note.sharedWithUserIds.length} usuario(s)`;
   }
+
+  deleteNote(): void {
+    if (!this.canEdit) {
+      alert('You do not have permission to delete this note');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+      return;
+    }
+
+    this.noteService.deleteNote(this.noteId).subscribe({
+      next: () => {
+        alert('Note deleted successfully');
+        this.router.navigate(['/profile']);
+      },
+      error: (err) => {
+        console.error('Error deleting note:', err);
+        if (err.error && err.error.message) {
+          alert(err.error.message);
+        } else {
+          alert('Error deleting note');
+        }
+      }
+    });
+  }
 }
 

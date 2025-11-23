@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { convertToParamMap, ActivatedRoute, Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { NoteDetailComponent } from './notes-details.component';
 import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
@@ -26,7 +27,8 @@ describe('NoteDetailComponent', () => {
       declarations: [NoteDetailComponent],
       imports: [
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([])
       ],
       providers: [
         { provide: NoteService, useValue: mockNoteService },

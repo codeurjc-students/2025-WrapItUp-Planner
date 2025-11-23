@@ -36,7 +36,8 @@
 }
 
 .btn-edit,
-.btn-share {
+.btn-share,
+.btn-delete {
   padding: 0.5rem 1.5rem;
   color: white;
   border: none;
@@ -70,6 +71,15 @@
   background: #6c757d;
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Botón Delete */
+.btn-delete {
+  background: #dc3545;
+}
+
+.btn-delete:hover {
+  background: #c82333;
 }
 
 .visibility-badge {

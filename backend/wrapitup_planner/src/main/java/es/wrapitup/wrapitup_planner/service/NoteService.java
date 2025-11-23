@@ -145,25 +145,6 @@ public class NoteService {
         return Optional.of(noteMapper.toDto(updated));
     }
 
-    public Optional<NoteDTO> shareNoteWithUsers(Long noteId, Long[] userIds) {
-        Optional<Note> existingNote = noteRepository.findById(noteId);
-        
-        if (existingNote.isEmpty()) {
-            return Optional.empty();
-        }
-        
-        Note note = existingNote.get();
-        Set<UserModel> sharedUsers = new HashSet<>(note.getSharedWith());
-        
-        for (Long userId : userIds) {
-            userRepository.findById(userId).ifPresent(sharedUsers::add);
-        }
-        
-        note.setSharedWith(sharedUsers);
-        Note updated = noteRepository.save(note);
-        return Optional.of(noteMapper.toDto(updated));
-    }
-
     public Optional<NoteDTO> shareNoteWithUsername(Long noteId, String username, String ownerUsername) {
         Optional<Note> existingNote = noteRepository.findById(noteId);
         
@@ -188,6 +169,30 @@ public class NoteService {
         note.setSharedWith(sharedUsers);
         Note updated = noteRepository.save(note);
         return Optional.of(noteMapper.toDto(updated));
+    }
+
+    public boolean deleteNote(Long noteId, String username) {
+        Optional<Note> existingNote = noteRepository.findById(noteId);
+        
+        if (existingNote.isEmpty()) {
+            return false;
+        }
+        
+        Note note = existingNote.get();
+        
+        
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return false;
+        }
+        
+        UserModel currentUser = currentUserOpt.get();
+        if (!note.getUser().getId().equals(currentUser.getId())) {
+            return false; 
+        }
+        
+        noteRepository.delete(note);
+        return true;
     }
 }
 

@@ -92,13 +92,6 @@ public class NoteRestController {
     }
 
     @PutMapping("/{id}/share")
-    public ResponseEntity<NoteDTO> shareNote(@PathVariable Long id, @RequestBody Long[] userIds) {
-        Optional<NoteDTO> updated = noteService.shareNoteWithUsers(id, userIds);
-        return updated.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/{id}/share-username")
     public ResponseEntity<?> shareNoteByUsername(@PathVariable Long id, @RequestBody ShareRequest request, HttpServletRequest httpRequest) {
         Principal principal = httpRequest.getUserPrincipal();
         String ownerUsername = principal != null ? principal.getName() : null;
@@ -114,6 +107,24 @@ public class NoteRestController {
                     .body(new ErrorResponse("User not found"));
         }
         return ResponseEntity.ok(updated.get());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteNote(@PathVariable Long id, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to delete this note"));
+        }
+        
+        boolean deleted = noteService.deleteNote(id, username);
+        if (!deleted) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse("You do not have permission to delete this note"));
+        }
+        return ResponseEntity.ok().build();
     }
 
     static class ShareRequest {
