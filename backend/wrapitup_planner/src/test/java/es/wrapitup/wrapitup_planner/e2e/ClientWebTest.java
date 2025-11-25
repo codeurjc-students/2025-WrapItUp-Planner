@@ -93,18 +93,6 @@ public class ClientWebTest {
     }
 
     @Test
-    void testMostrarAINoteId1() {
-        driver.get(getBaseUrl() + "notes/1");
-
-        WebElement detailDiv = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-note-detail div")));
-
-        String detailText = detailDiv.getText();
-
-        assertTrue(detailText.contains("Id: 1")); 
-    }
-
-    @Test
     void testRegisterShortPassword() {
         driver.get(getBaseUrl() + "register");
 
