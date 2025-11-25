@@ -31,8 +31,26 @@ public class UserApiIntegrationTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
+    private void registerUser(String username, String email, String password) {
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"" + username + "\", \"email\":\"" + email + "\", \"password\":\"" + password + "\"}")
+        .when()
+            .post("/api/v1/auth/user");
+    }
+
+    private String loginUser(String username, String password) {
+        Response loginResponse = given()
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}")
+        .when()
+            .post("/api/v1/auth/login");
+
+        return loginResponse.getCookie("AuthToken");
+    }
+
     @Test
-    void testRegisterUserWithValidData() {
+    void registerUserWithValidData() {
         String username = "validuser_" + System.currentTimeMillis();
 
         given()
@@ -46,7 +64,7 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testRegisterUserWithShortPassword() {
+    void registerUserWithShortPassword() {
         String username = "shortpass_" + System.currentTimeMillis();
 
         given()
@@ -60,7 +78,7 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testRegisterUserWithMissingFields() {
+    void registerUserWithMissingFields() {
         given()
             .contentType(ContentType.JSON)
             .body("{\"username\":\"\", \"email\":\"test@example.com\", \"password\":\"password123\"}")
@@ -72,19 +90,12 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testRegisterDuplicateUsername() {
+    void registerDuplicateUsername() {
         String username = "duplicate_" + System.currentTimeMillis();
 
-        // First registration
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user")
-        .then()
-            .statusCode(CREATED.value());
+        registerUser(username, username + "@example.com", "password123");
 
-        // Second registration with same username
+        // Second user attempts to use used username
         given()
             .contentType(ContentType.JSON)
             .body("{\"username\":\"" + username + "\", \"email\":\"different@example.com\", \"password\":\"password123\"}")
@@ -96,7 +107,7 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testGetCurrentUserWithoutAuthentication() {
+    void getCurrentUserWithoutAuthentication() {
         given()
         .when()
             .get("/api/v1/users")
@@ -105,26 +116,11 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testGetCurrentUserWithAuthentication() {
+    void getCurrentUserWithAuthentication() {
         String username = "authuser_" + System.currentTimeMillis();
 
-        // Register
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user")
-        .then()
-            .statusCode(CREATED.value());
-
-        // Login to get auth token
-        Response loginResponse = given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/login");
-
-        authToken = loginResponse.getCookie("AuthToken");
+        registerUser(username, username + "@example.com", "password123");
+        authToken = loginUser(username, "password123");
 
         // Get current user
         given()
@@ -139,23 +135,11 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testUpdateUserWithValidData() {
+    void updateUserWithValidData() {
         String username = "updateuser_" + System.currentTimeMillis();
 
-        // Register and login
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user");
-
-        Response loginResponse = given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/login");
-
-        authToken = loginResponse.getCookie("AuthToken");
+        registerUser(username, username + "@example.com", "password123");
+        authToken = loginUser(username, "password123");
 
         // Update user
         given()
@@ -172,25 +156,13 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testUpdateUserWithBlankEmail() {
+    void updateUserWithBlankEmail() {
         String username = "blankemail_" + System.currentTimeMillis();
 
-        // Register and login
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user");
+        registerUser(username, username + "@example.com", "password123");
+        authToken = loginUser(username, "password123");
 
-        Response loginResponse = given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/login");
-
-        authToken = loginResponse.getCookie("AuthToken");
-
-        // Try to update with blank email
+        
         given()
             .cookie("AuthToken", authToken)
             .contentType(ContentType.JSON)
@@ -203,16 +175,11 @@ public class UserApiIntegrationTest {
     }
 
     @Test
-    void testLogout() {
+    void testLogoutAndRefreshToken() {
         String username = "logoutuser_" + System.currentTimeMillis();
 
-        // Register and login
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user");
-
+        registerUser(username, username + "@example.com", "password123");
+        
         Response loginResponse = given()
             .contentType(ContentType.JSON)
             .body("{\"username\":\"" + username + "\", \"password\":\"password123\"}")
@@ -220,6 +187,7 @@ public class UserApiIntegrationTest {
             .post("/api/v1/auth/login");
 
         authToken = loginResponse.getCookie("AuthToken");
+        refreshToken = loginResponse.getCookie("RefreshToken");
 
         // Logout
         given()
@@ -229,26 +197,6 @@ public class UserApiIntegrationTest {
         .then()
             .statusCode(OK.value())
             .body("status", equalTo("SUCCESS"));
-    }
-
-    @Test
-    void testRefreshToken() {
-        String username = "refreshuser_" + System.currentTimeMillis();
-
-        // Register and login
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"email\":\"" + username + "@example.com\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/user");
-
-        Response loginResponse = given()
-            .contentType(ContentType.JSON)
-            .body("{\"username\":\"" + username + "\", \"password\":\"password123\"}")
-        .when()
-            .post("/api/v1/auth/login");
-
-        refreshToken = loginResponse.getCookie("RefreshToken");
 
         // Refresh token
         given()

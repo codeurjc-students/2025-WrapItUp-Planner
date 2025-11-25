@@ -3,7 +3,6 @@ package es.wrapitup.wrapitup_planner.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.wrapitup.wrapitup_planner.dto.UserMapper;
@@ -91,7 +90,6 @@ public class UserService {
         
         UserModel user = existingUser.get();
         
-        // Update fields
         if (userDTO.getDisplayName() != null && !userDTO.getDisplayName().isEmpty()) {
             user.setDisplayName(userDTO.getDisplayName());
         }
