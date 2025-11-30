@@ -357,4 +357,103 @@ public class NoteWebTest extends BaseWebTest {
         assertFalse(driver.findElements(By.cssSelector(".modal-overlay")).stream()
                 .anyMatch(WebElement::isDisplayed), "Modal should be closed");
     }
+
+    @Test
+    void testCreateComment() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Note with Comments " + ts;
+        String commentText = "This is a test comment";
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Test overview");
+        driver.findElement(By.id("summary")).sendKeys("Test summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement commentsSection = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".comments-section")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", commentsSection);
+
+        // Add a comment
+        WebElement commentInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".comment-input")));
+        commentInput.sendKeys(commentText);
+
+        WebElement sendButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-send-comment")));
+        sendButton.click();
+
+        //Verify comment appears
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".comment-item")));
+        
+        WebElement commentContent = driver.findElement(By.cssSelector(".comment-content"));
+        assertEquals(commentText, commentContent.getText());
+
+        //Verify comment author
+        WebElement commentAuthor = driver.findElement(By.cssSelector(".comment-author"));
+        assertTrue(commentAuthor.getText().contains(username) || 
+                   commentAuthor.getText().length() > 0);
+    }
+
+    @Test
+    void testDeleteComment() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Note for Comment Deletion " + ts;
+        String commentText = "This comment will be deleted";
+
+        registerAndLogin(username, email, password);
+
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Test overview");
+        driver.findElement(By.id("summary")).sendKeys("Test summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement commentsSection = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".comments-section")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", commentsSection);
+
+        WebElement commentInput = driver.findElement(By.cssSelector(".comment-input"));
+        commentInput.sendKeys(commentText);
+        driver.findElement(By.cssSelector(".btn-send-comment")).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".comment-item")));
+
+        //Delete comment
+        WebElement menuButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".menu-toggle")));
+        menuButton.click();
+
+        WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".menu-item.delete")));
+        deleteButton.click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.xpath("//p[@class='comment-content' and text()='" + commentText + "']")));
+
+        //Verify no comments
+        assertTrue(driver.findElements(By.cssSelector(".comment-item")).isEmpty() ||
+                   driver.findElement(By.cssSelector(".comments-section")).getText().contains("No comments"));
+    }
 }

@@ -60,6 +60,11 @@ public class UserRestController {
         }
 
         Optional<UserModelDTO> user = userService.findById(id);
+        
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
 
         return ResponseEntity.ok(user.get());
     }

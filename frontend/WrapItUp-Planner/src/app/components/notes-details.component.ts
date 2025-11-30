@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
+import { CommentService } from '../services/comment.service';
 import { NoteDTO } from '../dtos/note.dto';
 import { UserModelDTO } from '../dtos/user.dto';
+import { CommentDTO } from '../dtos/comment.dto';
 
 @Component({
   selector: 'app-note-detail',
@@ -29,10 +31,21 @@ export class NoteDetailComponent implements OnInit {
   shareUsername = '';
   shareError = '';
 
+  // Comments
+  comments: CommentDTO[] = [];
+  newCommentContent = '';
+  currentPage = 0;
+  pageSize = 10;
+  totalComments = 0;
+  hasMoreComments = false;
+  loadingComments = false;
+  showCommentMenu: number | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private noteService: NoteService,
     private userService: UserService,
+    private commentService: CommentService,
     private router: Router
   ) {}
 
@@ -69,6 +82,7 @@ export class NoteDetailComponent implements OnInit {
         this.editedVisibility = data.visibility || 'PRIVATE';
         
         this.loadCurrentUser();
+        this.loadComments();
       },
       error: (err) => {
         console.error('Error loading note:', err);
@@ -234,5 +248,95 @@ export class NoteDetailComponent implements OnInit {
       }
     });
   }
-}
 
+  loadComments(reset: boolean = true): void {
+    if (reset) {
+      this.currentPage = 0;
+      this.comments = [];
+    }
+
+    this.loadingComments = true;
+    this.commentService.getCommentsByNote(this.noteId, this.currentPage, this.pageSize).subscribe({
+      next: (response) => {
+        if (reset) {
+          this.comments = response.content;
+        } else {
+          this.comments = [...this.comments, ...response.content];
+        }
+        
+        this.totalComments = response.totalElements;
+        this.hasMoreComments = !response.last;
+        this.loadingComments = false;
+      },
+      error: (err) => {
+        console.error('Error loading comments:', err);
+        this.loadingComments = false;
+      }
+    });
+  }
+
+  getProfilePicUrl(comment: CommentDTO): string {
+    if (!comment.userProfilePicUrl) {
+      return '';
+    }
+
+    return `https://localhost${comment.userProfilePicUrl}`;
+  }
+
+  loadMoreComments(): void {
+    this.currentPage++;
+    this.loadComments(false);
+  }
+
+  addComment(): void {
+    if (!this.newCommentContent.trim()) {
+      return;
+    }
+
+    const comment: CommentDTO = {
+      content: this.newCommentContent.trim()
+    };
+
+    this.commentService.createComment(this.noteId, comment).subscribe({
+      next: (createdComment) => {
+        this.newCommentContent = '';
+        this.loadComments(true);
+      },
+      error: (err) => {
+        console.error('Error creating comment:', err);
+        if (err.status === 401) {
+          alert('You must log in to comment');
+        } else if (err.status === 403) {
+          alert('You do not have permission to comment on this note');
+        } else {
+          alert('Error creating comment');
+        }
+      }
+    });
+  }
+
+  toggleCommentMenu(commentId: number): void {
+    this.showCommentMenu = this.showCommentMenu === commentId ? null : commentId;
+  }
+
+  canDeleteComment(comment: CommentDTO): boolean {
+    return this.currentUser?.username === comment.username;
+  }
+
+  deleteComment(commentId: number): void {
+    if (!confirm('Are you sure you want to delete this comment?')) {
+      return;
+    }
+
+    this.commentService.deleteComment(this.noteId, commentId).subscribe({
+      next: () => {
+        this.showCommentMenu = null;
+        this.loadComments(true);
+      },
+      error: (err) => {
+        console.error('Error deleting comment:', err);
+        alert('Error deleting comment');
+      }
+    });
+  }
+}
