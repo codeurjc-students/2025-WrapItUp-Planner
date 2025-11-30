@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.sql.rowset.serial.SerialBlob;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserRestController {
-    @Autowired
-    private UserService userService;
+    
+    private final UserService userService;
+    
+    public UserRestController(UserService userService) {
+        this.userService = userService;
+    }
 
 
     @GetMapping("/{id}")
@@ -57,6 +60,11 @@ public class UserRestController {
         }
 
         Optional<UserModelDTO> user = userService.findById(id);
+        
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
 
         return ResponseEntity.ok(user.get());
     }

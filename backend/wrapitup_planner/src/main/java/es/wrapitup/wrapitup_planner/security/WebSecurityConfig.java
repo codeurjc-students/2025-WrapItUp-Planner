@@ -2,7 +2,6 @@ package es.wrapitup.wrapitup_planner.security;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,14 +26,16 @@ import es.wrapitup.wrapitup_planner.security.jwt.UnauthorizedHandlerJwt;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-	@Autowired
-	private JwtRequestFilter jwtRequestFilter;
-
-	@Autowired
-	private UnauthorizedHandlerJwt unauthorizedHandlerJwt;
-
-	@Autowired
-    public RepositoryUserDetailsService userDetailService;
+	private final JwtRequestFilter jwtRequestFilter;
+	private final UnauthorizedHandlerJwt unauthorizedHandlerJwt;
+	private final RepositoryUserDetailsService userDetailService;
+	
+	public WebSecurityConfig(JwtRequestFilter jwtRequestFilter, UnauthorizedHandlerJwt unauthorizedHandlerJwt,
+							 RepositoryUserDetailsService userDetailService) {
+		this.jwtRequestFilter = jwtRequestFilter;
+		this.unauthorizedHandlerJwt = unauthorizedHandlerJwt;
+		this.userDetailService = userDetailService;
+	}
 
 	@Bean
 	public static PasswordEncoder passwordEncoder() {

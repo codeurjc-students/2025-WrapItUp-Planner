@@ -3,7 +3,6 @@ package es.wrapitup.wrapitup_planner.security;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,8 +18,11 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 @Service
 public class RepositoryUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    
+    public RepositoryUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

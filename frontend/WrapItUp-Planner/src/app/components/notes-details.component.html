@@ -29,6 +29,77 @@
       <h3>Summary</h3>
       <p class="summary-text preserve-whitespace">{{ note.summary }}</p>
     </div>
+
+    <!-- Comments Section -->
+    <div class="section comments-section">
+      <h3>Comments ({{ totalComments }})</h3>
+      
+      <!-- Add Comment -->
+      <div class="add-comment">
+        <textarea
+          [(ngModel)]="newCommentContent"
+          class="comment-input"
+          placeholder="Add a comment..."
+          rows="3"></textarea>
+        <button 
+          class="btn-send-comment" 
+          (click)="addComment()"
+          [disabled]="!newCommentContent.trim()"
+          title="Send comment">
+          ➤
+        </button>
+      </div>
+
+      <!-- Comments List -->
+      <div class="comments-list" *ngIf="comments.length > 0">
+        <div class="comment-item" *ngFor="let comment of comments">
+          <div class="comment-header">
+            <div class="comment-avatar-wrapper">
+              <img 
+                *ngIf="comment.userProfilePicUrl" 
+                [src]="getProfilePicUrl(comment)" 
+                alt="Profile picture"
+                class="comment-avatar"
+                (error)="$any($event.target).src=''">
+              <div *ngIf="!comment.userProfilePicUrl" class="comment-avatar-default">
+                {{ (comment.displayName || comment.username || 'U').charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            <div class="comment-info">
+              <span class="comment-author">{{ comment.displayName || comment.username }}</span>
+              <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+            </div>
+            
+            <!-- Three dots menu -->
+            <div class="comment-menu" *ngIf="canDeleteComment(comment)">
+              <button class="menu-toggle" (click)="toggleCommentMenu(comment.id!)">⋮</button>
+              <div class="menu-dropdown" *ngIf="showCommentMenu === comment.id">
+                <button class="menu-item delete" (click)="deleteComment(comment.id!)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="comment-content">{{ comment.content }}</p>
+        </div>
+      </div>
+
+      <!-- Load More Button -->
+      <button 
+        class="btn-load-more" 
+        *ngIf="hasMoreComments && !loadingComments"
+        (click)="loadMoreComments()">
+        Load More
+      </button>
+
+      <div class="loading-comments" *ngIf="loadingComments">
+        Loading comments...
+      </div>
+
+      <div class="no-comments" *ngIf="comments.length === 0 && !loadingComments">
+        No comments yet. Be the first to comment!
+      </div>
+    </div>
   </div>
 
 

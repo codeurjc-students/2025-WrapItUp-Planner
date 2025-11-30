@@ -123,7 +123,7 @@ The final thesis defense will be carried out.
 |--------------------|---------|
 | Unregistered Users  | - Register and log in to the platform.<br>- View notes if they have access to the link and the notes are not set as private.|
 | Registered Users    | - Access a personal profile page.<br>- Access to their personal list of notes.<br>- View notes, whether their own or another user's.<br>- Leave comments on notes they have access to.<br>- Communicate with other authorized users through a comment section associated with each note. |
-| Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments.<br>- Ability to ban a user from accessing the platform. |
+| Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments. |
 
 
 **Intermediate Functionality**
@@ -133,7 +133,7 @@ The final thesis defense will be carried out.
 | User Type           | Features |
 |--------------------|---------|
 | Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. |
-| Administrators      | - Review user-reported comments in a ticket-based format. |
+| Administrators      | - Review user-reported comments in a ticket-based format. <br>- Ability to ban a user from accessing the platform. |
 
 **Advanced Functionality**
 
