@@ -227,10 +227,19 @@ public class NoteWebTest extends BaseWebTest {
 
         driver.get(noteUrl);
         
+        // Verify "Note not found" alert appears when accessing deleted note
+        wait.until(ExpectedConditions.alertIsPresent());
+        String alertText = driver.switchTo().alert().getText();
+        assertEquals("Note not found", alertText, "Should show 'Note not found' alert for deleted note");
+        driver.switchTo().alert().accept();
+        
         wait.until(ExpectedConditions.or(
             ExpectedConditions.presenceOfElementLocated(By.cssSelector(".loading")),
             ExpectedConditions.urlContains("/")
         ));
+        
+        String finalUrl = driver.getCurrentUrl();
+        assertFalse(finalUrl.equals(noteUrl), "Should have been redirected away from deleted note URL");
     }
 
     @Test
@@ -342,5 +351,10 @@ public class NoteWebTest extends BaseWebTest {
 
         wait.until(ExpectedConditions.alertIsPresent()).accept();
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".modal-overlay")));
+        
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.contains("/notes/"), "Should still be on note page after sharing");
+        assertFalse(driver.findElements(By.cssSelector(".modal-overlay")).stream()
+                .anyMatch(WebElement::isDisplayed), "Modal should be closed");
     }
 }
