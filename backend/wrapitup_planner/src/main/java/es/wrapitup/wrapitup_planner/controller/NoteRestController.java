@@ -3,7 +3,6 @@ package es.wrapitup.wrapitup_planner.controller;
 import java.security.Principal;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/api/v1/notes")
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:9876"})
 public class NoteRestController {
-    @Autowired
-    NoteService noteService;
+    
+    private final NoteService noteService;
+    
+    public NoteRestController(NoteService noteService) {
+        this.noteService = noteService;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getNote(@PathVariable Long id, HttpServletRequest request) {

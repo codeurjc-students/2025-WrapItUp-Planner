@@ -2,7 +2,6 @@ package es.wrapitup.wrapitup_planner.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -23,11 +22,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/api/v1/auth")
 public class LoginController {
 
-    @Autowired
-	private UserService userService;
-
-    @Autowired
-	private UserLoginService userLoginService;
+    private final UserService userService;
+    private final UserLoginService userLoginService;
+    
+    public LoginController(UserService userService, UserLoginService userLoginService) {
+        this.userService = userService;
+        this.userLoginService = userLoginService;
+    }
 
     @PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(

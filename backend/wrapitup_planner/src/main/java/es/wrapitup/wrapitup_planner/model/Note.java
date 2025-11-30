@@ -1,7 +1,9 @@
 package es.wrapitup.wrapitup_planner.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,6 +38,9 @@ public class Note {
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<UserModel> sharedWith = new HashSet<>();
+    
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
 
     public Note(UserModel user, String title, String overview, String summary, String jsonQuestions, NoteVisibility visibility) {
@@ -46,6 +51,7 @@ public class Note {
         this.jsonQuestions = jsonQuestions;
         this.visibility = visibility;
         this.sharedWith = new HashSet<>();
+        this.comments = new ArrayList<>();
     }
 
 
@@ -103,5 +109,13 @@ public class Note {
 
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public List<Comment> getComments() {
+        return comments;
+    }
+    
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

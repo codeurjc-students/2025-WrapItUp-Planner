@@ -1,6 +1,7 @@
 package es.wrapitup.wrapitup_planner.dto;
 
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NoteDTO {
@@ -12,6 +13,7 @@ public class NoteDTO {
     private NoteVisibility visibility;
     private Long userId;
     private List<Long> sharedWithUserIds;
+    private List<CommentDTO> comments = new ArrayList<>();
     
     
     public Long getUserId() {
@@ -61,5 +63,11 @@ public class NoteDTO {
     }
     public void setId(Long id) {
         this.id = id;
+    }
+    public List<CommentDTO> getComments() {
+        return comments;
+    }
+    public void setComments(List<CommentDTO> comments) {
+        this.comments = comments;
     }
 }

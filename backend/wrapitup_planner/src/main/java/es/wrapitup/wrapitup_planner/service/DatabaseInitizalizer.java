@@ -1,6 +1,5 @@
 package es.wrapitup.wrapitup_planner.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +14,16 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class DatabaseInitizalizer {
 
-    @Autowired
-	private UserRepository userRepository;
-
-	@Autowired
-	private NoteRepository noteRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final NoteRepository noteRepository;
+    private final PasswordEncoder passwordEncoder;
+    
+    public DatabaseInitizalizer(UserRepository userRepository, NoteRepository noteRepository, 
+                                PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.noteRepository = noteRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostConstruct
     public void init(){
