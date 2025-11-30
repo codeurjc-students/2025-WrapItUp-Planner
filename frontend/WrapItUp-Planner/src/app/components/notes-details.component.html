@@ -1,10 +1,116 @@
-<h2>Notes Details</h2>
+<app-header></app-header>
+<div class="note-container" *ngIf="note">
+  <div class="note-header">
+    <div class="actions">
+      <button class="btn-edit" (click)="toggleEditMode()" *ngIf="canEdit">
+        {{ editMode ? 'Cancel' : 'Edit' }}
+      </button>
+      <button class="btn-share" (click)="openShareModal()" *ngIf="canShare && !editMode">
+        Share
+      </button>
+      <button class="btn-delete" (click)="deleteNote()" *ngIf="canEdit && !editMode">
+        Delete
+      </button>
+      <span class="visibility-badge" [class.public]="note.visibility === 'PUBLIC'">
+        {{ note.visibility }}
+      </span>
+    </div>
+  </div>
+  <h2 class="note-title">{{ note.title }}</h2>
 
-<div *ngIf="note">
-  <p>Id: {{note.id}}</p>
-  <p>Overview: {{note.overview}}</p>
-  <p>Summary: {{note.summary}}</p>
-  <p>JSON Questions: {{note.jsonQuestions}}</p>
-  <p>Visibility: {{note.visibility}}</p>
-  <p>UserId: {{note.userId}}</p>
+
+  <div *ngIf="!editMode" class="note-content">
+    <div class="section">
+      <h3>Overview</h3>
+      <p class="preserve-whitespace">{{ note.overview }}</p>
+    </div>
+
+    <div class="section">
+      <h3>Summary</h3>
+      <p class="summary-text preserve-whitespace">{{ note.summary }}</p>
+    </div>
+  </div>
+
+
+  <div *ngIf="editMode" class="edit-mode">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input 
+        type="text" 
+        id="title" 
+        [(ngModel)]="editedTitle"
+        class="form-control"
+        maxlength="100"
+        placeholder="Note title (max 100 characters)">
+    </div>
+
+    <div class="form-group">
+      <label for="overview">Overview</label>
+      <textarea 
+        id="overview" 
+        [(ngModel)]="editedOverview"
+        class="form-control"
+        rows="3"
+        placeholder="Brief overview of the note"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="summary">Summary</label>
+      <textarea 
+        id="summary" 
+        [(ngModel)]="editedSummary"
+        class="form-control"
+        rows="10"
+        placeholder="Detailed content of the note"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="visibility">Visibility</label>
+      <select 
+        id="visibility" 
+        [(ngModel)]="editedVisibility"
+        class="form-control">
+        <option value="PUBLIC">Public</option>
+        <option value="PRIVATE">Private</option>
+      </select>
+    </div>
+
+    <button class="btn-save" (click)="saveChanges()">Save Changes</button>
+  </div>
+</div>
+
+
+<div class="modal-overlay" *ngIf="showShareModal" (click)="closeShareModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Share Note</h3>
+      <button class="close-btn" (click)="closeShareModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="shareUsername">User's username</label>
+        <input 
+          type="text" 
+          id="shareUsername"
+          [(ngModel)]="shareUsername"
+          class="form-control"
+          placeholder="Enter the username"
+          (keyup.enter)="shareWithUsername()">
+      </div>
+      
+      <div class="error-message" *ngIf="shareError">
+        {{ shareError }}
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeShareModal()">Cancel</button>
+      <button class="btn-confirm" (click)="shareWithUsername()">Share</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!note" class="loading">
+  Loading note...
 </div>

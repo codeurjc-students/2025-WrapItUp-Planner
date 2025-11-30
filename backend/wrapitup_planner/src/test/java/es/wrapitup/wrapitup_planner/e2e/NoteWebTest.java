@@ -1,0 +1,346 @@
+package es.wrapitup.wrapitup_planner.e2e;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+public class NoteWebTest extends BaseWebTest {
+
+    @Test
+    void testCreateNote() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Test Note " + ts;
+        String noteOverview = "This is a test overview";
+        String noteSummary = "This is a detailed test summary";
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        WebElement titleInput = driver.findElement(By.id("title"));
+        WebElement overviewInput = driver.findElement(By.id("overview"));
+        WebElement summaryInput = driver.findElement(By.id("summary"));
+        WebElement visibilitySelect = driver.findElement(By.id("visibility"));
+
+        titleInput.sendKeys(noteTitle);
+        overviewInput.sendKeys(noteOverview);
+        summaryInput.sendKeys(noteSummary);
+        visibilitySelect.sendKeys("PUBLIC");
+
+        WebElement createButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-create")));
+        createButton.click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.contains("/notes/"), "URL should contain /notes/ but was: " + currentUrl);
+
+        WebElement noteHeading = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".note-title")));
+        assertEquals(noteTitle, noteHeading.getText());
+
+        WebElement visibilityBadge = driver.findElement(By.cssSelector(".visibility-badge"));
+        assertEquals("PUBLIC", visibilityBadge.getText());
+    }
+
+    @Test
+    void testCreatePrivateNote() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Private Note " + ts;
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Private overview");
+        driver.findElement(By.id("summary")).sendKeys("Private summary");
+        driver.findElement(By.id("visibility")).sendKeys("PRIVATE");
+
+        WebElement createButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-create")));
+        createButton.click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement visibilityBadge = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".visibility-badge")));
+        assertEquals("PRIVATE", visibilityBadge.getText());
+    }
+
+    @Test
+    void testEditNote() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String originalTitle = "Original Title " + ts;
+        String updatedTitle = "Updated Title " + ts;
+        String updatedOverview = "Updated overview content";
+        String updatedSummary = "Updated summary content";
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(originalTitle);
+        driver.findElement(By.id("overview")).sendKeys("Original overview");
+        driver.findElement(By.id("summary")).sendKeys("Original summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement editButton = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".btn-edit")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editButton);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        WebElement titleInput = driver.findElement(By.id("title"));
+        WebElement overviewInput = driver.findElement(By.id("overview"));
+        WebElement summaryInput = driver.findElement(By.id("summary"));
+
+        titleInput.clear();
+        titleInput.sendKeys(updatedTitle);
+        overviewInput.clear();
+        overviewInput.sendKeys(updatedOverview);
+        summaryInput.clear();
+        summaryInput.sendKeys(updatedSummary);
+
+        WebElement saveButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-save")));
+        saveButton.click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        WebElement noteTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".note-title")));
+        assertEquals(updatedTitle, noteTitle.getText());
+
+        String pageContent = driver.findElement(By.cssSelector(".note-content")).getText();
+        assertTrue(pageContent.contains(updatedOverview));
+        assertTrue(pageContent.contains(updatedSummary));
+    }
+
+    @Test
+    void testEditNoteChangeVisibility() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Visibility Test Note " + ts;
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Test overview");
+        driver.findElement(By.id("summary")).sendKeys("Test summary");
+        driver.findElement(By.id("visibility")).sendKeys("PUBLIC");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement visibilityBadge = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".visibility-badge")));
+        assertEquals("PUBLIC", visibilityBadge.getText());
+
+        WebElement editButton = driver.findElement(By.cssSelector(".btn-edit"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editButton);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        WebElement visibilitySelect = driver.findElement(By.id("visibility"));
+        visibilitySelect.sendKeys("PRIVATE");
+
+        driver.findElement(By.cssSelector(".btn-save")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        visibilityBadge = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".visibility-badge")));
+        assertEquals("PRIVATE", visibilityBadge.getText());
+    }
+
+    @Test
+    void testDeleteNote() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Note to Delete " + ts;
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Will be deleted");
+        driver.findElement(By.id("summary")).sendKeys("This note will be deleted");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+        String noteUrl = driver.getCurrentUrl();
+
+        WebElement deleteButton = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".btn-delete")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteButton);
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        
+        try {
+            Thread.sleep(500);
+            if (ExpectedConditions.alertIsPresent().apply(driver) != null) {
+                driver.switchTo().alert().accept();
+            }
+        } catch (Exception e) {
+            
+        }
+
+        driver.get(noteUrl);
+        
+        wait.until(ExpectedConditions.or(
+            ExpectedConditions.presenceOfElementLocated(By.cssSelector(".loading")),
+            ExpectedConditions.urlContains("/")
+        ));
+    }
+
+    @Test
+    void testCancelNoteCreation() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys("This will be cancelled");
+        driver.findElement(By.id("overview")).sendKeys("Cancel test");
+
+        WebElement cancelButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-cancel")));
+        cancelButton.click();
+
+        wait.until(ExpectedConditions.or(
+            ExpectedConditions.urlToBe(getBaseUrl()),
+            ExpectedConditions.urlContains("/profile")
+        ));
+        
+        assertFalse(driver.getCurrentUrl().contains("/notes/create"));
+    }
+
+    @Test
+    void testCancelNoteEdit() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String originalTitle = "Original Title " + ts;
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(originalTitle);
+        driver.findElement(By.id("overview")).sendKeys("Original overview");
+        driver.findElement(By.id("summary")).sendKeys("Original summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement editButton = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".btn-edit")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editButton);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        WebElement titleInput = driver.findElement(By.id("title"));
+        titleInput.clear();
+        titleInput.sendKeys("This change will be cancelled");
+
+        editButton = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".btn-edit")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editButton);
+
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".edit-mode")));
+
+        WebElement noteTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".note-title")));
+        assertEquals(originalTitle, noteTitle.getText());
+    }
+
+    @Test
+    void testShareNoteWorkflow() {
+        long ts = System.currentTimeMillis();
+        String ownerUsername = "genericUser" + ts;
+        String ownerEmail = "genericUser+" + ts + "@example.com";
+        String sharedUsername = "genericUser2" + ts;
+        String sharedEmail = "genericUser2+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Shared Note " + ts;
+
+        registerUser(sharedUsername, sharedEmail, password);
+
+        driver.get(getBaseUrl() + "login");
+        registerAndLogin(ownerUsername, ownerEmail, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("This will be shared");
+        driver.findElement(By.id("summary")).sendKeys("Shared note content");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+        WebElement shareButton = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".btn-share")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", shareButton);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".modal-overlay")));
+
+        WebElement usernameInput = driver.findElement(By.id("shareUsername"));
+        usernameInput.sendKeys(sharedUsername);
+
+        WebElement confirmButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-confirm")));
+        confirmButton.click();
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".modal-overlay")));
+    }
+}

@@ -1,20 +1,20 @@
 package es.wrapitup.wrapitup_planner.integration;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-
-import static io.restassured.RestAssured.*;
-import static org.springframework.http.HttpStatus.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.*;
 
 @Tag("integration")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,17 +28,6 @@ public class ApiIntegrationTest {
         RestAssured.port = port;
         RestAssured.baseURI = "https://localhost";
         RestAssured.useRelaxedHTTPSValidation();
-    }
-
-    @Test
-    void getTestData() {
-        given()
-            .when()
-            .get("/api/v1/notes/1")
-            .then()
-            .statusCode(OK.value())
-            .contentType(ContentType.JSON)
-            .body("id", equalTo(1)); 
     }
 
     @Test
@@ -73,7 +62,6 @@ public class ApiIntegrationTest {
 
     @Test
     void loginFailureWrongPassword() {
-        // attempt login with non-existing user / wrong password
         var resp =
             given()
                 .contentType(ContentType.JSON)

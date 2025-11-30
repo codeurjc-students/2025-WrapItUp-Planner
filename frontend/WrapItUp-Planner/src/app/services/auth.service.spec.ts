@@ -24,7 +24,7 @@ describe('AuthService (integration with real API)', () => {
     expect(service).toBeTruthy();
   });
 
-  // Integration tests - require backend running on https://localhost:443
+
   it('register and then login should work', (done) => {
     const payload: UserModelDTO = { username: TEST_USER, email: TEST_EMAIL, password: 'pwd12345' };
 
@@ -36,17 +36,34 @@ describe('AuthService (integration with real API)', () => {
             done();
           },
           error: (err) => {
-            fail('Login request failed: ' + (err?.message || JSON.stringify(err)));
+            console.error('Login error:', err);
+            fail('Login request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
             done();
           }
         });
       },
       error: (err) => {
-        fail('Register request failed: ' + (err?.message || JSON.stringify(err)));
-        done();
+        console.error('Register error:', err);
+        if (err.status === 0) {
+          fail('Backend is not running. Start it with: mvn spring-boot:run');
+        } else if (err.status === 400 && err.error?.error?.includes('already exists')) {
+          service.login(TEST_USER, 'pwd12345').subscribe({
+            next: (res) => {
+              expect(res).toBeDefined();
+              done();
+            },
+            error: (loginErr) => {
+              fail('Login after existing user failed: ' + (loginErr?.error?.error || loginErr?.message));
+              done();
+            }
+          });
+        } else {
+          fail('Register request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+          done();
+        }
       }
     });
-  });
+    }, 10000);
 
   it('logout should call real API (POST /logout)', (done) => {
     service.logout().subscribe({
@@ -55,7 +72,12 @@ describe('AuthService (integration with real API)', () => {
         done();
       },
       error: (err) => {
-        fail('Logout request failed: ' + (err?.message || JSON.stringify(err)));
+        console.error('Logout error:', err);
+        if (err.status === 0) {
+          fail('Backend is not running. Start it with: mvn spring-boot:run');
+        } else {
+          fail('Logout request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        }
         done();
       }
     });

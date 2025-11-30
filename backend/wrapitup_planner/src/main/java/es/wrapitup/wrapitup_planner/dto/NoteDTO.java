@@ -1,12 +1,17 @@
 package es.wrapitup.wrapitup_planner.dto;
 
+import es.wrapitup.wrapitup_planner.model.NoteVisibility;
+import java.util.List;
+
 public class NoteDTO {
     private Long id;
+    private String title;
     private String overview;
     private String summary;
     private String jsonQuestions;
-    private Boolean visibility;
+    private NoteVisibility visibility;
     private Long userId;
+    private List<Long> sharedWithUserIds;
     
     
     public Long getUserId() {
@@ -14,6 +19,12 @@ public class NoteDTO {
     }
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
     public String getOverview() {
         return overview;
@@ -33,11 +44,17 @@ public class NoteDTO {
     public void setJsonQuestions(String jsonQuestions) {
         this.jsonQuestions = jsonQuestions;
     }
-    public Boolean getVisibility() {
+    public NoteVisibility getVisibility() {
         return visibility;
     }
-    public void setVisibility(Boolean visibility) {
+    public void setVisibility(NoteVisibility visibility) {
         this.visibility = visibility;
+    }
+    public List<Long> getSharedWithUserIds() {
+        return sharedWithUserIds;
+    }
+    public void setSharedWithUserIds(List<Long> sharedWithUserIds) {
+        this.sharedWithUserIds = sharedWithUserIds;
     }
     public Long getId() {
         return id;

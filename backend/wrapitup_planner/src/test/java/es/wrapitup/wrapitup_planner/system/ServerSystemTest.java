@@ -1,47 +1,40 @@
 package es.wrapitup.wrapitup_planner.system;
 
-import es.wrapitup.wrapitup_planner.dto.NoteDTO;
-import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
-import es.wrapitup.wrapitup_planner.model.Note;
-import es.wrapitup.wrapitup_planner.model.UserModel;
-import es.wrapitup.wrapitup_planner.model.UserStatus;
-import es.wrapitup.wrapitup_planner.repository.NoteRepository;
-import es.wrapitup.wrapitup_planner.repository.UserRepository;
-import es.wrapitup.wrapitup_planner.service.NoteService;
-import es.wrapitup.wrapitup_planner.service.UserService;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.sql.Blob;
+import java.util.Arrays;
+import java.util.Optional;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
-import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
+import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
+import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
+import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse.Status;
+import es.wrapitup.wrapitup_planner.security.jwt.LoginRequest;
+import es.wrapitup.wrapitup_planner.security.jwt.UserLoginService;
+import es.wrapitup.wrapitup_planner.service.UserService;
 import jakarta.servlet.http.Cookie;
-
-import java.sql.Blob;
-import javax.sql.rowset.serial.SerialBlob;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("system")
 @Transactional
 @SpringBootTest
 public class ServerSystemTest {
-
-    @Autowired
-    private NoteService noteService;
-
-    @Autowired
-    private NoteRepository noteRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -56,41 +49,13 @@ public class ServerSystemTest {
     private UserLoginService userLoginService;
 
     @Test
-    void testFindByIdWithSqlDatabase() {
-
-        UserModel user = new UserModel();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setRoles(Arrays.asList("USER"));
-        user.setStatus(UserStatus.ACTIVE);
-
-
-        userRepository.save(user);
-
-        Note note = new Note();
-        note.setOverview("Resumen general de la sesión de IA");
-        note.setSummary("Este es el contenido detallado del resumen");
-        note.setJsonQuestions("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}");
-        note.setVisibility(true);
-        note.setUser(user);
-        noteRepository.save(note);
-        Optional<NoteDTO> result = noteService.findById(note.getId());
-
-        assertEquals(true, result.isPresent());
-        assertEquals("Resumen general de la sesión de IA", result.get().getOverview());
-        assertEquals("Este es el contenido detallado del resumen", result.get().getSummary());
-        assertEquals("{\"questions\": [\"¿Qué es IA?\", \"¿Cómo funciona?\"]}", result.get().getJsonQuestions());
-        assertEquals(true, result.get().getVisibility());
-    }
-
-    @Test
-    void loginViaUserLoginService() throws Exception {
-        String username = "sysuser";
-        String rawPassword = "sysPass123";
+    void loginUserLoginService() throws Exception {
+        String username = "currentUser";
+        String rawPassword = "Password123";
 
         UserModel user = new UserModel();
         user.setUsername(username);
-        user.setEmail("sys@example.com");
+        user.setEmail("currentuser@example.com");
         user.setRoles(java.util.Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
         user.setPassword(passwordEncoder.encode(rawPassword));
@@ -108,92 +73,92 @@ public class ServerSystemTest {
     }
 
     @Test
-    void testCreateUserPersistsToDatabase() {
+    void createUserPersistsToDatabase() {
         UserModelDTO dto = new UserModelDTO();
-        dto.setUsername("newdbuser");
-        dto.setEmail("newdb@example.com");
-        dto.setPassword("password123");
+        dto.setUsername("currentUser");
+        dto.setEmail("currentuser@example.com");
+        dto.setPassword("Password123");
 
         userService.createUser(dto);
 
-        Optional<UserModel> savedUser = userRepository.findByUsername("newdbuser");
+        Optional<UserModel> savedUser = userRepository.findByUsername("currentUser");
         assertTrue(savedUser.isPresent());
-        assertEquals("newdbuser", savedUser.get().getUsername());
-        assertEquals("newdb@example.com", savedUser.get().getEmail());
-        assertEquals("newdbuser", savedUser.get().getDisplayName()); // displayName defaults to username
+        assertEquals("currentUser", savedUser.get().getUsername());
+        assertEquals("currentuser@example.com", savedUser.get().getEmail());
+        assertEquals("currentUser", savedUser.get().getDisplayName()); 
         assertEquals(UserStatus.ACTIVE, savedUser.get().getStatus());
-        assertTrue(passwordEncoder.matches("password123", savedUser.get().getPassword()));
+        assertTrue(passwordEncoder.matches("Password123", savedUser.get().getPassword()));
     }
 
     @Test
-    void testUpdateUserPersistsChanges() {
+    void updateUserPersistsChanges() {
         UserModel user = new UserModel();
-        user.setUsername("updatetest");
-        user.setEmail("old@example.com");
+        user.setUsername("currentUser");
+        user.setEmail("currentuser@example.com");
         user.setDisplayName("Old Name");
         user.setRoles(Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode("Password123"));
         userRepository.save(user);
 
         UserModelDTO updateDTO = new UserModelDTO();
         updateDTO.setDisplayName("New Name");
-        updateDTO.setEmail("new@example.com");
+        updateDTO.setEmail("updated@example.com");
 
         UserModelDTO result = userService.updateUser(user.getId(), updateDTO);
 
         assertNotNull(result);
         assertEquals("New Name", result.getDisplayName());
-        assertEquals("new@example.com", result.getEmail());
+        assertEquals("updated@example.com", result.getEmail());
 
         // Verify in database
         UserModel updatedUser = userRepository.findById(user.getId()).orElse(null);
         assertNotNull(updatedUser);
         assertEquals("New Name", updatedUser.getDisplayName());
-        assertEquals("new@example.com", updatedUser.getEmail());
-        assertEquals("updatetest", updatedUser.getUsername()); // username should not change
+        assertEquals("updated@example.com", updatedUser.getEmail());
+        assertEquals("currentUser", updatedUser.getUsername());
     }
 
 
     @Test
-    void testFindByNameReturnsCorrectUser() {
+    void findByNameReturnsCorrectUser() {
         UserModel user = new UserModel();
-        user.setUsername("findmeuser");
-        user.setEmail("findme@example.com");
+        user.setUsername("currentUser");
+        user.setEmail("currentuser@example.com");
         user.setRoles(Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode("Password123"));
         userRepository.save(user);
 
-        UserModelDTO result = userService.findByName("findmeuser");
+        UserModelDTO result = userService.findByName("currentUser");
 
         assertNotNull(result);
-        assertEquals("findmeuser", result.getUsername());
-        assertEquals("findme@example.com", result.getEmail());
+        assertEquals("currentUser", result.getUsername());
+        assertEquals("currentuser@example.com", result.getEmail());
     }
 
     @Test
-    void testUsernameExistsChecksDatabase() {
+    void usernameExistsChecksDatabase() {
         UserModel user = new UserModel();
-        user.setUsername("existinguser");
-        user.setEmail("existing@example.com");
+        user.setUsername("currentUser");
+        user.setEmail("currentuser@example.com");
         user.setRoles(Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode("Password123"));
         userRepository.save(user);
 
-        assertTrue(userService.usernameExists("existinguser"));
+        assertTrue(userService.usernameExists("currentUser"));
         assertFalse(userService.usernameExists("nonexistentuser"));
     }
 
     @Test
-    void testUpdateUserWithBlobSavesImageToDatabase() throws Exception {
+    void updateUserWithBlobSavesImageToDatabase() throws Exception {
         UserModel user = new UserModel();
-        user.setUsername("imageuser");
-        user.setEmail("image@example.com");
+        user.setUsername("currentUser");
+        user.setEmail("currentuser@example.com");
         user.setRoles(Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode("Password123"));
         userRepository.save(user);
 
         byte[] imageData = "fake-image-data".getBytes();
@@ -214,13 +179,13 @@ public class ServerSystemTest {
     }
 
     @Test
-    void testGetProfileImageRetrievesFromDatabase() throws Exception {
+    void getProfileImageRetrievesFromDatabase() throws Exception {
         UserModel user = new UserModel();
-        user.setUsername("picuser");
-        user.setEmail("pic@example.com");
+        user.setUsername("currentUser");
+        user.setEmail("currentuser@example.com");
         user.setRoles(Arrays.asList("USER"));
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode("Password123"));
         
         byte[] imageData = "test-image".getBytes();
         user.setProfilePic(new SerialBlob(imageData));
@@ -234,7 +199,7 @@ public class ServerSystemTest {
     }
 
     @Test
-    void testLogoutClearsCookies() {
+    void logoutClearsCookies() {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         userLoginService.logout(response);

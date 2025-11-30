@@ -44,9 +44,10 @@ public class UserServiceUnitTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+    
 
     @Test
-    void testFindByIdReturnsDTO() {
+    void findByIdReturnsDTO() {
         UserModel user = new UserModel();
         user.setId(1L);
         user.setUsername("testuser");
@@ -69,7 +70,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testFindByIdReturnsEmptyWhenNotFound() {
+    void findByIdReturnsEmptyWhenNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         Optional<UserModelDTO> result = userService.findById(99L);
@@ -78,7 +79,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testGetAllUsers() {
+    void getAllUsers() {
         UserModel user1 = new UserModel();
         user1.setId(1L);
         user1.setUsername("user1");
@@ -107,7 +108,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testFindByNameReturnsDTO() {
+    void findByNameReturnsDTO() {
         UserModel user = new UserModel();
         user.setUsername("testuser");
         user.setEmail("test@example.com");
@@ -126,7 +127,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testFindByNameReturnsNullWhenNotFound() {
+    void findByNameReturnsNullWhenNotFound() {
         when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
         UserModelDTO result = userService.findByName("nonexistent");
@@ -135,7 +136,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testCreateUserEncodesPasswordAndSetsDefaults() {
+    void createUserEncodesPasswordAndSetsDefaults() {
         UserModelDTO dto = new UserModelDTO();
         dto.setUsername("newuser");
         dto.setEmail("new@example.com");
@@ -157,7 +158,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUpdateUserUpdatesFields() {
+    void updateUserUpdatesFields() {
         UserModel existingUser = new UserModel();
         existingUser.setId(1L);
         existingUser.setUsername("testuser");
@@ -196,7 +197,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUpdateUserReturnsNullWhenUserNotFound() {
+    void updateUserReturnsNullWhenUserNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         UserModelDTO updateDTO = new UserModelDTO();
@@ -208,7 +209,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUpdateUserDoesNotUpdateEmptyFields() {
+    void updateUserDoesNotUpdateEmptyFields() {
         UserModel existingUser = new UserModel();
         existingUser.setId(1L);
         existingUser.setUsername("testuser");
@@ -233,7 +234,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUsernameExistsReturnsTrue() {
+    void usernameExistsReturnsTrue() {
         when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new UserModel()));
 
         boolean result = userService.usernameExists("existinguser");
@@ -242,7 +243,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUsernameExistsReturnsFalse() {
+    void usernameExistsReturnsFalse() {
         when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
 
         boolean result = userService.usernameExists("newuser");
@@ -251,7 +252,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testUpdateUserWithBlobUpdatesProfilePic() throws Exception {
+    void updateUserWithBlobUpdatesProfilePic() throws Exception {
         UserModel existingUser = new UserModel();
         existingUser.setId(1L);
         existingUser.setUsername("testuser");
@@ -272,7 +273,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testGetProfileImageReturnsBlob() throws Exception {
+    void getProfileImageReturnsBlob() throws Exception {
         Blob mockBlob = mock(Blob.class);
         UserModel user = new UserModel();
         user.setId(1L);
@@ -286,7 +287,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testGetProfileImageReturnsNullWhenUserNotFound() {
+    void getProfileImageReturnsNullWhenUserNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         Blob result = userService.getProfileImage(99L);
@@ -295,7 +296,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void testGetProfileImageReturnsNullWhenNoPicture() {
+    void getProfileImageReturnsNullWhenNoPicture() {
         UserModel user = new UserModel();
         user.setId(1L);
         user.setProfilePic(null);
