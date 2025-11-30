@@ -5,92 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import es.wrapitup.wrapitup_planner.WrapitupPlannerApplication;
-
-@Tag("client-e2e")
-@SpringBootTest(classes = WrapitupPlannerApplication.class)
-public class ClientWebTest {
-
-    private WebDriver driver;
-    private WebDriverWait wait;
-
-    @BeforeEach
-    void setup() {
-        ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless=new"); 
-    options.addArguments("--no-sandbox");
-    options.addArguments("--disable-dev-shm-usage");
-    options.addArguments("--disable-gpu");
-    options.addArguments("--ignore-certificate-errors");
-    options.addArguments("--remote-allow-origins=*");
-    options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis());
-        this.driver = new ChromeDriver(options);
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }
-
-    @AfterEach
-    void teardown() {
-        if (driver != null)
-            driver.quit();
-    }
-
-    private String getBaseUrl() {
-        return "http://localhost:4200/";
-    }
-
-
-    private void registerUser(String username, String email, String password) {
-        driver.get(getBaseUrl() + "register");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".auth-card")));
-
-        driver.findElement(By.id("username")).sendKeys(username);
-        driver.findElement(By.id("email")).sendKeys(email);
-        driver.findElement(By.id("password")).sendKeys(password);
-        driver.findElement(By.id("repeatPassword")).sendKeys(password);
-
-        WebElement submitRegister = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".actions button[type='submit']")));
-        submitRegister.click();
-
-        wait.until(ExpectedConditions.urlContains("/login"));
-    }
-
-
-    private void loginUser(String username, String password) {
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("usernameLogin"))).sendKeys(username);
-        driver.findElement(By.id("passwordLogin")).sendKeys(password);
-
-        WebElement submitLogin = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".actions button[type='submit']")));
-        submitLogin.click();
-
-        wait.until(ExpectedConditions.or(
-            ExpectedConditions.urlToBe(getBaseUrl() + "profile"),
-            ExpectedConditions.urlToBe(getBaseUrl())
-        ));
-    }
-
-
-    private void registerAndLogin(String username, String email, String password) {
-        registerUser(username, email, password);
-        loginUser(username, password);
-    }
+public class UserWebTest extends BaseWebTest {
 
     @Test
     void testRegisterShortPassword() {
@@ -116,8 +36,8 @@ public class ClientWebTest {
     @Test
     void testRegisterNewUser() {
         long ts = System.currentTimeMillis();
-        String username = "e2e_user_" + ts;
-        String email = "e2e+" + ts + "@example.com";
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
         String password = "Password123";
 
         registerUser(username, email, password);
@@ -129,8 +49,8 @@ public class ClientWebTest {
     @Test
     void testProfilePageAccessAndDisplay() {
         long ts = System.currentTimeMillis();
-        String username = "profile_user_" + ts;
-        String email = "profile+" + ts + "@example.com";
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
         String password = "Password123";
 
         registerAndLogin(username, email, password);
@@ -156,8 +76,8 @@ public class ClientWebTest {
     @Test
     void testProfileEditAndSave() {
         long ts = System.currentTimeMillis();
-        String username = "edit_user_" + ts;
-        String email = "edit+" + ts + "@example.com";
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
         String password = "Password123";
         String newDisplayName = "Updated Name " + ts;
         String newEmail = "updated+" + ts + "@example.com";
@@ -166,14 +86,11 @@ public class ClientWebTest {
         
         driver.get(getBaseUrl() + "profile");
 
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".profile-card")));
-
 
         WebElement editButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(), 'Edit Profile')]")));
         editButton.click();
-
 
         WebElement displayNameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.id("displayName")));
@@ -200,6 +117,4 @@ public class ClientWebTest {
                 By.xpath("//label[text()='Email']/following-sibling::div[@class='info-value']")));
         assertTrue(emailValue.getText().equals(newEmail));
     }
-
-
 }

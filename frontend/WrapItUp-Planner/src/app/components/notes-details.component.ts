@@ -203,9 +203,10 @@ export class NoteDetailComponent implements OnInit {
 
   getSharedUsernames(): string {
     if (!this.note?.sharedWithUserIds || this.note.sharedWithUserIds.length === 0) {
-      return 'No compartida';
+      return 'Not shared';
     }
-    return `Compartida con ${this.note.sharedWithUserIds.length} usuario(s)`;
+    const count = this.note.sharedWithUserIds.length;
+    return `Shared with ${count} user${count > 1 ? 's' : ''}`;
   }
 
   deleteNote(): void {
