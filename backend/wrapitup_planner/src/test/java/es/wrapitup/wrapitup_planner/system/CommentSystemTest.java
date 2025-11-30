@@ -217,7 +217,7 @@ public class CommentSystemTest {
     void cannotAccessPrivateNoteCommentsWithoutAuth() {
         boolean result = commentService.canUserAccessComments(testNote.getId(), null);
 
-        assert(result);
+        assertFalse(result);
     }
 
     @Test
