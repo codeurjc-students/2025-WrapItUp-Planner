@@ -119,10 +119,23 @@ export class NoteDetailComponent implements OnInit {
       return;
     }
 
-    
+    const isAdmin = this.isUserAdmin();
     const isOwner = this.note.userId === this.currentUser.id;
-    this.canEdit = isOwner;
-    this.canShare = isOwner;
+    
+    // admins cannot share notes nor edit them
+    this.canEdit = !isAdmin && isOwner;
+    this.canShare = !isAdmin && isOwner; 
+  }
+
+  isUserAdmin(): boolean {
+    return this.currentUser?.roles?.includes('ADMIN') ?? false;
+  }
+
+  canDeleteNote(): boolean {
+    if (!this.currentUser || !this.note) {
+      return false;
+    }
+    return this.isUserAdmin() || this.note.userId === this.currentUser.id;
   }
 
   openShareModal(): void {
@@ -224,7 +237,7 @@ export class NoteDetailComponent implements OnInit {
   }
 
   deleteNote(): void {
-    if (!this.canEdit) {
+    if (!this.canDeleteNote()) {
       alert('You do not have permission to delete this note');
       return;
     }
@@ -320,7 +333,10 @@ export class NoteDetailComponent implements OnInit {
   }
 
   canDeleteComment(comment: CommentDTO): boolean {
-    return this.currentUser?.username === comment.username;
+    if (!this.currentUser) {
+      return false;
+    }
+    return this.isUserAdmin() || this.currentUser.username === comment.username;
   }
 
   deleteComment(commentId: number): void {

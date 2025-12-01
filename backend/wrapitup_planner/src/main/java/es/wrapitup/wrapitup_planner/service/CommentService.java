@@ -35,6 +35,10 @@ public class CommentService {
         this.userRepository = userRepository;
     }
     
+    private boolean isAdmin(UserModel user) {
+        return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
+    }
+    
     public Optional<CommentDTO> findById(Long id) {
         return commentRepository.findById(id)
                                 .map(commentMapper::toDto);
@@ -97,8 +101,9 @@ public class CommentService {
         
         UserModel user = userOpt.get();
         
-        if (!comment.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Only the comment owner can delete their comment");
+        
+        if (!isAdmin(user) && !comment.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Only the comment owner or an admin can delete this comment");
         }
         
         commentRepository.deleteById(commentId);
@@ -126,6 +131,11 @@ public class CommentService {
         }
         
         UserModel user = userOpt.get();
+        
+        
+        if (isAdmin(user)) {
+            return true;
+        }
         
         if (note.getUser().getId().equals(user.getId())) {
             return true;

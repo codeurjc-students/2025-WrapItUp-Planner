@@ -28,12 +28,22 @@ public class DatabaseInitizalizer {
     @PostConstruct
     public void init(){
 
+        // regular user
         UserModel user = new UserModel(
         "genericUser", 
         "genericUser@example.com", 
         passwordEncoder.encode("12345678"), 
         UserStatus.ACTIVE, 
         "USER"
+        );
+
+        // admin
+        UserModel admin = new UserModel(
+        "admin", 
+        "admin@example.com", 
+        passwordEncoder.encode("admin123"), 
+        UserStatus.ACTIVE, 
+        "ADMIN", "USER"
         );
 
         Note note = new Note(
@@ -46,6 +56,7 @@ public class DatabaseInitizalizer {
         );
 
         userRepository.save(user);
+        userRepository.save(admin);
         noteRepository.save(note);
 
     }

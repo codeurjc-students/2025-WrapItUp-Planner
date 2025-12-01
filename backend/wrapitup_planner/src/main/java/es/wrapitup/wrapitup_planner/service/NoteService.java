@@ -26,6 +26,10 @@ public class NoteService {
         this.userRepository = userRepository;
     }
 
+    private boolean isAdmin(UserModel user) {
+        return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
+    }
+
     public Optional<NoteDTO> findById(Long id) {
         return noteRepository.findById(id)
                                .map(noteMapper::toDto);
@@ -44,6 +48,11 @@ public class NoteService {
         }
         
         UserModel user = userOpt.get();
+        
+        // admins cannot create notes
+        if (isAdmin(user)) {
+            throw new IllegalArgumentException("Admins cannot create notes");
+        }
         
         
         Note note = new Note(
@@ -86,6 +95,11 @@ public class NoteService {
         UserModel currentUser = currentUserOpt.get();
         
         
+        if (isAdmin(currentUser)) {
+            return Optional.of(noteMapper.toDto(note));
+        }
+        
+        
         if (note.getUser().getId().equals(currentUser.getId())) {
             return Optional.of(noteMapper.toDto(note));
         }
@@ -117,7 +131,9 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
-        if (!note.getUser().getId().equals(currentUser.getId())) {
+        
+        // Admins CANNOT edit notes, only owners can
+        if (isAdmin(currentUser) || !note.getUser().getId().equals(currentUser.getId())) {
             return Optional.empty(); 
         }
         
@@ -187,7 +203,8 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
-        if (!note.getUser().getId().equals(currentUser.getId())) {
+        
+        if (!isAdmin(currentUser) && !note.getUser().getId().equals(currentUser.getId())) {
             return false; 
         }
         

@@ -39,6 +39,7 @@ public class NoteSystemTest {
 
     private UserModel testUser;
     private UserModel otherUser;
+    private UserModel adminUser;
 
     @BeforeEach
     void setUp() {
@@ -58,6 +59,13 @@ public class NoteSystemTest {
         otherUser.setRoles(Arrays.asList("USER"));
         otherUser.setStatus(UserStatus.ACTIVE);
         otherUser = userRepository.save(otherUser);
+
+        adminUser = new UserModel();
+        adminUser.setUsername("adminuser");
+        adminUser.setEmail("admin@test.com");
+        adminUser.setRoles(Arrays.asList("USER", "ADMIN"));
+        adminUser.setStatus(UserStatus.ACTIVE);
+        adminUser = userRepository.save(adminUser);
     }
 
     // note creation tests
@@ -302,6 +310,49 @@ public class NoteSystemTest {
         boolean result = noteService.deleteNote(999999L, "systemuser");
 
         assertFalse(result);
+    }
+
+    // admin tests
+
+    @Test
+    void adminCanDeleteAnyNote() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("User's Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note = noteRepository.save(note);
+
+        Long noteId = note.getId();
+
+
+        boolean result = noteService.deleteNote(noteId, "adminuser");
+
+        assertTrue(result);
+        Optional<Note> deletedNote = noteRepository.findById(noteId);
+        assertFalse(deletedNote.isPresent());
+    }
+
+    @Test
+    void adminCanAccessPrivateNote() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Private Note");
+        note.setOverview("Private Overview");
+        note.setSummary("Private Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note = noteRepository.save(note);
+
+        Long noteId = note.getId();
+
+       
+        Optional<NoteDTO> retrieved = noteService.findByIdWithPermissions(noteId, "adminuser");
+
+        assertTrue(retrieved.isPresent());
+        assertEquals("Private Note", retrieved.get().getTitle());
     }
 
 }

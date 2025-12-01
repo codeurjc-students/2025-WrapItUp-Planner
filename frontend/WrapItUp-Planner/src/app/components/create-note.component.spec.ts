@@ -4,24 +4,40 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CreateNoteComponent } from './create-note.component';
 import { NoteService } from '../services/note.service';
+import { UserService } from '../services/user.service';
 import { NoteDTO } from '../dtos/note.dto';
+import { UserModelDTO } from '../dtos/user.dto';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('CreateNoteComponent', () => {
   let component: CreateNoteComponent;
   let fixture: ComponentFixture<CreateNoteComponent>;
   let mockNoteService: jasmine.SpyObj<NoteService>;
+  let mockUserService: jasmine.SpyObj<UserService>;
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
     mockNoteService = jasmine.createSpyObj('NoteService', ['createNote']);
+    mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
+    
+    const mockUser: UserModelDTO = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@test.com',
+      displayName: 'Test User',
+      password: '',
+      roles: ['USER']
+    };
+    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
 
     await TestBed.configureTestingModule({
       declarations: [CreateNoteComponent],
       imports: [FormsModule],
       providers: [
         { provide: NoteService, useValue: mockNoteService },
+        { provide: UserService, useValue: mockUserService },
         { provide: Router, useValue: mockRouter }
       ],
       schemas: [NO_ERRORS_SCHEMA]

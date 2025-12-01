@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NoteService } from '../services/note.service';
+import { UserService } from '../services/user.service';
 import { NoteDTO } from '../dtos/note.dto';
 
 @Component({
@@ -8,7 +9,7 @@ import { NoteDTO } from '../dtos/note.dto';
   templateUrl: './create-note.component.html',
   styleUrls: ['./create-note.component.css']
 })
-export class CreateNoteComponent {
+export class CreateNoteComponent implements OnInit {
 
   title = '';
   overview = '';
@@ -17,8 +18,23 @@ export class CreateNoteComponent {
 
   constructor(
     private noteService: NoteService,
+    private userService: UserService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        if (user?.roles?.includes('ADMIN')) {
+          alert('Administrators cannot create notes');
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
+      }
+    });
+  }
 
   createNote(): void {
     

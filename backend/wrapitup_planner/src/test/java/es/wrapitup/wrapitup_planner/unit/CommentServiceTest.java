@@ -62,10 +62,12 @@ public class CommentServiceTest {
         testUser = new UserModel();
         testUser.setId(1L);
         testUser.setUsername("testuser");
+        testUser.setRoles(java.util.List.of("USER"));
 
         otherUser = new UserModel();
         otherUser.setId(2L);
         otherUser.setUsername("otheruser");
+        otherUser.setRoles(java.util.List.of("USER"));
 
         testNote = new Note();
         testNote.setId(1L);
@@ -256,5 +258,35 @@ public class CommentServiceTest {
         boolean result = commentService.canUserAccessComments(999L, "testuser");
 
         assertFalse(result);
+    }
+
+    // admin tests
+    @Test
+    void adminCanDeleteAnyComment() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        assertDoesNotThrow(() -> commentService.deleteComment(1L, "admin"));
+        verify(commentRepository).deleteById(1L);
+    }
+
+    @Test
+    void adminCanAccessPrivateNoteComments() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        boolean result = commentService.canUserAccessComments(1L, "admin");
+
+        assertTrue(result);
     }
 }

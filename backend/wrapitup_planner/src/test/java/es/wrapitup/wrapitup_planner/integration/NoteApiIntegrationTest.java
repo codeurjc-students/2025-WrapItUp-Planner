@@ -48,7 +48,9 @@ public class NoteApiIntegrationTest {
 
     private UserModel testUser;
     private UserModel otherUser;
+    private UserModel adminUser;
     private String authToken;
+    private String adminToken;
 
     @BeforeEach
     void setUp() {
@@ -56,12 +58,11 @@ public class NoteApiIntegrationTest {
         RestAssured.baseURI = "https://localhost";
         RestAssured.useRelaxedHTTPSValidation();
 
-        // Create unique usernames for each test
         String timestamp = String.valueOf(System.currentTimeMillis());
         String ownerUsername = "noteowner_" + timestamp;
         String otherUsername = "otheruser_" + timestamp;
 
-        // Create test users
+        // create test users
         testUser = new UserModel();
         testUser.setUsername(ownerUsername);
         testUser.setEmail(ownerUsername + "@test.com");
@@ -80,7 +81,17 @@ public class NoteApiIntegrationTest {
         otherUser.setStatus(UserStatus.ACTIVE);
         otherUser = userRepository.save(otherUser);
 
-        // Login and get auth token
+        // create admin user
+        adminUser = new UserModel();
+        adminUser.setUsername("admin_" + timestamp);
+        adminUser.setEmail("admin_" + timestamp + "@test.com");
+        adminUser.setDisplayName("Admin");
+        adminUser.setPassword(passwordEncoder.encode("admin123"));
+        adminUser.setRoles(Arrays.asList("USER", "ADMIN"));
+        adminUser.setStatus(UserStatus.ACTIVE);
+        adminUser = userRepository.save(adminUser);
+
+        
         Response loginResponse = given()
             .contentType(ContentType.JSON)
             .body("{\"username\":\"" + ownerUsername + "\", \"password\":\"password123\"}")
@@ -88,6 +99,15 @@ public class NoteApiIntegrationTest {
             .post("/api/v1/auth/login");
 
         authToken = loginResponse.getCookie("AuthToken");
+
+        
+        Response adminLoginResponse = given()
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"admin_" + timestamp + "\", \"password\":\"admin123\"}")
+        .when()
+            .post("/api/v1/auth/login");
+
+        adminToken = adminLoginResponse.getCookie("AuthToken");
     }
 
     // Note creation tests
@@ -500,6 +520,97 @@ public class NoteApiIntegrationTest {
             .delete("/api/v1/notes/999999")
         .then()
             .statusCode(FORBIDDEN.value());
+    }
+
+    // Admin tests
+    @Test
+    void adminCannotCreateNote() {
+        String noteJson = """
+            {
+                "title": "Admin Note",
+                "overview": "Admin Overview",
+                "summary": "Admin Summary",
+                "visibility": "PUBLIC"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", adminToken)
+            .contentType(ContentType.JSON)
+            .body(noteJson)
+        .when()
+            .post("/api/v1/notes")
+        .then()
+            .statusCode(BAD_REQUEST.value())
+            .body("message", equalTo("Administrators cannot create notes"));
+    }
+
+    @Test
+    void adminCanDeleteAnyNote() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("User Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note = noteRepository.save(note);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .delete("/api/v1/notes/" + note.getId())
+        .then()
+            .statusCode(OK.value());
+    }
+
+    @Test
+    void adminCannotEditNote() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("User Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note = noteRepository.save(note);
+
+        String updateJson = """
+            {
+                "title": "Updated by Admin",
+                "overview": "Updated Overview",
+                "summary": "Updated Summary"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", adminToken)
+            .contentType(ContentType.JSON)
+            .body(updateJson)
+        .when()
+            .put("/api/v1/notes/" + note.getId())
+        .then()
+            .statusCode(FORBIDDEN.value());
+    }
+
+    @Test
+    void adminCanAccessPrivateNote() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Private Note");
+        note.setOverview("Private Overview");
+        note.setSummary("Private Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note = noteRepository.save(note);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .get("/api/v1/notes/" + note.getId())
+        .then()
+            .statusCode(OK.value())
+            .body("title", equalTo("Private Note"));
     }
 
 }

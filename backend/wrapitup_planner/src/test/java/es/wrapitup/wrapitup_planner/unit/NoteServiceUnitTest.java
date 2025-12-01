@@ -52,11 +52,13 @@ public class NoteServiceUnitTest {
         testUser.setId(1L);
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
+        testUser.setRoles(java.util.List.of("USER"));
 
         otherUser = new UserModel();
         otherUser.setId(2L);
         otherUser.setUsername("otheruser");
         otherUser.setEmail("other@example.com");
+        otherUser.setRoles(java.util.List.of("USER"));
 
         testNote = new Note();
         testNote.setId(1L);
@@ -328,6 +330,63 @@ public class NoteServiceUnitTest {
 
         assertFalse(result);
         verify(noteRepository, never()).delete(any(Note.class));
+    }
+
+    // admin tests
+
+    @Test
+    void adminCanDeleteAnyNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        boolean result = noteService.deleteNote(1L, "admin");
+
+        assertTrue(result);
+        verify(noteRepository).delete(testNote);
+    }
+
+    @Test
+    void adminCannotEditNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        NoteDTO updateDTO = new NoteDTO();
+        updateDTO.setTitle("Updated Title");
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        Optional<NoteDTO> result = noteService.updateNote(1L, updateDTO, "admin");
+
+        assertTrue(result.isEmpty());
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void adminCanAccessPrivateNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(noteMapper.toDto(testNote)).thenReturn(testNoteDTO);
+
+        Optional<NoteDTO> result = noteService.findByIdWithPermissions(1L, "admin");
+
+        assertTrue(result.isPresent());
+        assertEquals(testNoteDTO, result.get());
     }
 
 }

@@ -147,6 +147,10 @@ export class ProfileComponent implements OnInit {
     return this.user.roles[0];
   }
 
+  isAdmin(): boolean {
+    return this.user?.roles?.includes('ADMIN') ?? false;
+  }
+
   getImageUrl(): string {
     if (this.imagePreview) {
       return this.imagePreview;
