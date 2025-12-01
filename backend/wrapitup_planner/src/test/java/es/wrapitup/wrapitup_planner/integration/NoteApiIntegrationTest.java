@@ -542,7 +542,7 @@ public class NoteApiIntegrationTest {
             .post("/api/v1/notes")
         .then()
             .statusCode(BAD_REQUEST.value())
-            .body("message", equalTo("Administrators cannot create notes"));
+            .body("message", equalTo("Admins cannot create notes"));
     }
 
     @Test
