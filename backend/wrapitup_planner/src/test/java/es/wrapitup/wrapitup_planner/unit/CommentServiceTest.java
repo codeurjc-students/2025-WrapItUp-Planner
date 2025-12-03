@@ -164,7 +164,7 @@ public class CommentServiceTest {
         Page<Comment> commentPage = new PageImpl<>(Arrays.asList(testComment));
         Pageable pageable = PageRequest.of(0, 10);
         
-        when(commentRepository.findByNoteId(1L, pageable)).thenReturn(commentPage);
+        when(commentRepository.findByNoteIdOrderByCreatedAtDesc(1L, pageable)).thenReturn(commentPage);
         when(commentMapper.toDto(testComment)).thenReturn(testCommentDTO);
 
         Page<CommentDTO> result = commentService.getCommentsByNoteIdPaginated(1L, pageable);

@@ -14,5 +14,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     List<Comment> findByNoteIdOrderByCreatedAtDesc(Long noteId);
     
-    Page<Comment> findByNoteId(Long noteId, Pageable pageable);
+    Page<Comment> findByNoteIdOrderByCreatedAtDesc(Long noteId, Pageable pageable);
 }

@@ -1,12 +1,17 @@
 package es.wrapitup.wrapitup_planner.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import es.wrapitup.wrapitup_planner.dto.CommentDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.service.NoteService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +55,25 @@ public class NoteRestController {
         
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse("You do not have permission to view this note"));
+    }
+
+
+    @GetMapping("")
+    public ResponseEntity<?> getCommentsByNote(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("You do not have permission to view this note"));
+            }
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoteDTO> usersNotes = noteService.findUsersNotesPaginated(username, pageable);
+        return ResponseEntity.ok(usersNotes);
     }
 
     @PostMapping

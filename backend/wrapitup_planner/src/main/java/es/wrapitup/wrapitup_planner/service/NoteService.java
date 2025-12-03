@@ -1,11 +1,16 @@
 package es.wrapitup.wrapitup_planner.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import es.wrapitup.wrapitup_planner.dto.CommentDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
@@ -66,6 +71,29 @@ public class NoteService {
         
         Note saved = noteRepository.save(note);
         return noteMapper.toDto(saved);
+    }
+
+    public List<NoteDTO> findUsersNotesById (String username) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return null;
+        }
+    
+        Long userLong = currentUserOpt.get().getId();
+        return noteRepository.findByUserId(userLong)
+                                .stream()
+                                .map(noteMapper::toDto)
+                                .collect(Collectors.toList());
+    }
+
+    public Page<NoteDTO> findUsersNotesPaginated(String username, Pageable pageable) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return null;
+        }
+        Long userLong = currentUserOpt.get().getId();
+        return noteRepository.findByUserId(userLong, pageable)
+                                .map(noteMapper::toDto);
     }
 
     public Optional<NoteDTO> findByIdWithPermissions(Long id, String username) {

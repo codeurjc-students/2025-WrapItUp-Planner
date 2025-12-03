@@ -81,7 +81,7 @@ public class CommentService {
     }
     
     public Page<CommentDTO> getCommentsByNoteIdPaginated(Long noteId, Pageable pageable) {
-        return commentRepository.findByNoteId(noteId, pageable)
+        return commentRepository.findByNoteIdOrderByCreatedAtDesc(noteId, pageable)
                                 .map(commentMapper::toDto);
     }
     
