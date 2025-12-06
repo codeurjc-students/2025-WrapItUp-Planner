@@ -8,11 +8,13 @@ import { LandingPageComponent } from './components/landing-page/landing-page.com
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { AuthGuard } from './guards/auth.guard';
+import { MyNotesComponent } from './components/my-notes/my-notes.component';
 
 
 export const routes: Routes = [
     { path: 'notes/create', component: CreateNoteComponent, canActivate: [AuthGuard] },
-    { path: 'notes/:id', component: NoteDetailComponent }
+    { path: 'notes/:id', component: NoteDetailComponent },
+    { path: 'my-notes', component: MyNotesComponent, canActivate: [AuthGuard] }
   , { path: 'login', component: AuthComponent } 
   , { path: 'register', component: AuthComponent }
   , { path: '', component: LandingPageComponent }

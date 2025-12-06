@@ -67,7 +67,7 @@
         <button class="edit-button" *ngIf="!isEditing" (click)="toggleEdit()">Edit Profile</button>
         <button class="save-button" *ngIf="isEditing" (click)="saveChanges()">Save Changes</button>
         <button class="cancel-button" *ngIf="isEditing" (click)="toggleEdit()">Cancel</button>
-        <button class="notes-button" *ngIf="!isEditing && !isAdmin()" routerLink="/">My Notes</button>
+        <button class="notes-button" *ngIf="!isEditing && !isAdmin()" routerLink="/my-notes">My Notes</button>
         <button class="logout-button" *ngIf="!isEditing" (click)="logout()">Logout</button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NoteDTO } from '../dtos/note.dto';
+import { Page } from '../dtos/page.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,17 @@ export class NoteService {
 
   deleteNote(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  }
+
+  getRecentNotes(page: number = 0, size: number = 10, category?: string, search?: string): Observable<Page<NoteDTO>> {
+    let params = `page=${page}&size=${size}`;
+    if (category) {
+      params += `&category=${category}`;
+    }
+    if (search) {
+      params += `&search=${encodeURIComponent(search)}`;
+    }
+    return this.http.get<Page<NoteDTO>>(`${this.apiUrl}?${params}`, { withCredentials: true });
   }
 }
 

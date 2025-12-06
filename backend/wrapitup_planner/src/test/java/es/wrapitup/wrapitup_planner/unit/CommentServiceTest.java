@@ -12,6 +12,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CommentService;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,6 +76,8 @@ public class CommentServiceTest {
         testNote.setTitle("Test Note");
         testNote.setUser(testUser);
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote.setSharedWith(new HashSet<>());
 
         testComment = new Comment();

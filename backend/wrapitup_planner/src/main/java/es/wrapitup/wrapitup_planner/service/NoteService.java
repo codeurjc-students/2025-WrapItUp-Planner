@@ -1,5 +1,6 @@
 package es.wrapitup.wrapitup_planner.service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -10,10 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import es.wrapitup.wrapitup_planner.dto.CommentDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
@@ -69,6 +70,11 @@ public class NoteService {
             noteDTO.getVisibility() != null ? noteDTO.getVisibility() : NoteVisibility.PRIVATE
         );
         
+        
+        if (noteDTO.getCategory() != null) {
+            note.setCategory(noteDTO.getCategory());
+        }
+        
         Note saved = noteRepository.save(note);
         return noteMapper.toDto(saved);
     }
@@ -94,6 +100,38 @@ public class NoteService {
         Long userLong = currentUserOpt.get().getId();
         return noteRepository.findByUserId(userLong, pageable)
                                 .map(noteMapper::toDto);
+    }
+    
+    public Page<NoteDTO> findRecentNotesByUser(String username, Pageable pageable, String category, String search) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return Page.empty();
+        }
+        Long userId = currentUserOpt.get().getId();
+        
+        Page<Note> notes;
+        
+        
+        boolean hasCategory = category != null && !category.isEmpty();
+        boolean hasSearch = search != null && !search.isEmpty();
+        
+        if (hasCategory && hasSearch) {
+            // Both filters
+            NoteCategory noteCategory = NoteCategory.valueOf(category.toUpperCase());
+            notes = noteRepository.findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(userId, noteCategory, search, pageable);
+        } else if (hasCategory) {
+            // Category only
+            NoteCategory noteCategory = NoteCategory.valueOf(category.toUpperCase());
+            notes = noteRepository.findByUserIdAndCategoryOrderByLastModifiedDesc(userId, noteCategory, pageable);
+        } else if (hasSearch) {
+            // Search only
+            notes = noteRepository.findByUserIdAndTitleContainingOrderByLastModifiedDesc(userId, search, pageable);
+        } else {
+            // No filters
+            notes = noteRepository.findByUserIdOrderByLastModifiedDesc(userId, pageable);
+        }
+        
+        return notes.map(noteMapper::toDto);
     }
 
     public Optional<NoteDTO> findByIdWithPermissions(Long id, String username) {
@@ -184,6 +222,12 @@ public class NoteService {
         if (noteDTO.getJsonQuestions() != null) {
             note.setJsonQuestions(noteDTO.getJsonQuestions());
         }
+        if (noteDTO.getCategory() != null) {
+            note.setCategory(noteDTO.getCategory());
+        }
+        
+        // Update lastModified timestamp
+        note.setLastModified(LocalDateTime.now());
         
         Note updated = noteRepository.save(note);
         return Optional.of(noteMapper.toDto(updated));

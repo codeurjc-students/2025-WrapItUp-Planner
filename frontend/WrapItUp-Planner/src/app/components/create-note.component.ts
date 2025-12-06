@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
-import { NoteDTO } from '../dtos/note.dto';
+import { NoteDTO, NoteCategory } from '../dtos/note.dto';
 
 @Component({
   selector: 'app-create-note',
@@ -15,6 +15,9 @@ export class CreateNoteComponent implements OnInit {
   overview = '';
   summary = '';
   visibility: 'PUBLIC' | 'PRIVATE' = 'PRIVATE';
+  category: NoteCategory = 'OTHERS';
+  
+  categories: NoteCategory[] = ['MATHS', 'SCIENCE', 'HISTORY', 'ART', 'LANGUAGES', 'OTHERS'];
 
   constructor(
     private noteService: NoteService,
@@ -47,7 +50,8 @@ export class CreateNoteComponent implements OnInit {
       title: this.title,
       overview: this.overview || '',
       summary: this.summary || '',
-      visibility: this.visibility
+      visibility: this.visibility,
+      category: this.category
     };
 
     this.noteService.createNote(newNote).subscribe({

@@ -12,6 +12,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CommentService;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +81,8 @@ public class CommentSystemTest {
         testNote.setOverview("Overview");
         testNote.setSummary("Summary");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote = noteRepository.save(testNote);
     }
 

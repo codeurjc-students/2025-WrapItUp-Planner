@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
@@ -67,6 +69,8 @@ public class NoteServiceUnitTest {
         testNote.setSummary("Test Summary");
         testNote.setJsonQuestions("{}");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote.setUser(testUser);
         testNote.setSharedWith(new HashSet<>());
 
@@ -77,6 +81,8 @@ public class NoteServiceUnitTest {
         testNoteDTO.setSummary("Test Summary");
         testNoteDTO.setJsonQuestions("{}");
         testNoteDTO.setVisibility(NoteVisibility.PRIVATE);
+        testNoteDTO.setCategory(NoteCategory.OTHERS);
+        testNoteDTO.setLastModified(LocalDateTime.now());
         testNoteDTO.setUserId(1L);
     }
 

@@ -1,6 +1,7 @@
 package es.wrapitup.wrapitup_planner.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,13 @@ public class Note {
     @Enumerated(EnumType.STRING)
     private NoteVisibility visibility;
     
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NoteCategory category;
+    
+    @Column(name = "last_modified", nullable = false)
+    private LocalDateTime lastModified;
+    
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
     private UserModel user;
@@ -50,6 +58,8 @@ public class Note {
         this.summary = summary;
         this.jsonQuestions = jsonQuestions;
         this.visibility = visibility;
+        this.category = NoteCategory.OTHERS;
+        this.lastModified = LocalDateTime.now();
         this.sharedWith = new HashSet<>();
         this.comments = new ArrayList<>();
     }
@@ -57,6 +67,7 @@ public class Note {
 
 
     public Note() {
+        this.lastModified = LocalDateTime.now();
     }
     
     public UserModel getUser() {
@@ -117,5 +128,21 @@ public class Note {
     
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+    
+    public NoteCategory getCategory() {
+        return category;
+    }
+    
+    public void setCategory(NoteCategory category) {
+        this.category = category;
+    }
+    
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+    
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
     }
 }

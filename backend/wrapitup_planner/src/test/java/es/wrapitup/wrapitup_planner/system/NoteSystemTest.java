@@ -2,6 +2,7 @@ package es.wrapitup.wrapitup_planner.system;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
@@ -10,6 +11,7 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.NoteService;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,12 +80,15 @@ public class NoteSystemTest {
         noteDTO.setSummary("System Summary");
         noteDTO.setJsonQuestions("{\"q\":\"test\"}");
         noteDTO.setVisibility(NoteVisibility.PRIVATE);
+        noteDTO.setCategory(NoteCategory.SCIENCE);
 
         NoteDTO created = noteService.createNote(noteDTO, "systemuser");
 
         assertNotNull(created);
         assertNotNull(created.getId());
         assertEquals("System Test Note", created.getTitle());
+        assertNotNull(created.getLastModified());
+        assertEquals(NoteCategory.SCIENCE, created.getCategory());
 
         
         Optional<Note> savedNote = noteRepository.findById(created.getId());
@@ -91,6 +96,8 @@ public class NoteSystemTest {
         assertEquals("System Test Note", savedNote.get().getTitle());
         assertEquals("System Overview", savedNote.get().getOverview());
         assertEquals(testUser.getId(), savedNote.get().getUser().getId());
+        assertEquals(NoteCategory.SCIENCE, savedNote.get().getCategory());
+        assertNotNull(savedNote.get().getLastModified());
     }
 
 
@@ -115,6 +122,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PUBLIC);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         Optional<NoteDTO> result = noteService.findById(note.getId());
@@ -133,6 +142,8 @@ public class NoteSystemTest {
         publicNote.setSummary("Summary");
         publicNote.setJsonQuestions("{}");
         publicNote.setVisibility(NoteVisibility.PUBLIC);
+        publicNote.setCategory(NoteCategory.OTHERS);
+        publicNote.setLastModified(LocalDateTime.now());
         publicNote = noteRepository.save(publicNote);
 
         Optional<NoteDTO> result = noteService.findByIdWithPermissions(publicNote.getId(), null);
@@ -150,6 +161,8 @@ public class NoteSystemTest {
         privateNote.setSummary("Summary");
         privateNote.setJsonQuestions("{}");
         privateNote.setVisibility(NoteVisibility.PRIVATE);
+        privateNote.setCategory(NoteCategory.OTHERS);
+        privateNote.setLastModified(LocalDateTime.now());
         privateNote = noteRepository.save(privateNote);
 
         // Owner has access
@@ -174,6 +187,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         
         Set<UserModel> sharedWith = new HashSet<>();
         sharedWith.add(otherUser);
@@ -197,6 +212,8 @@ public class NoteSystemTest {
         note.setSummary("Original Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         NoteDTO updateDTO = new NoteDTO();
@@ -228,6 +245,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note.setSharedWith(new HashSet<>());
         note = noteRepository.save(note);
 
@@ -251,6 +270,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note.setSharedWith(new HashSet<>());
         note = noteRepository.save(note);
 
@@ -272,6 +293,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         Long noteId = note.getId();
@@ -293,6 +316,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         Long noteId = note.getId();
@@ -323,6 +348,8 @@ public class NoteSystemTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         Long noteId = note.getId();
@@ -344,6 +371,8 @@ public class NoteSystemTest {
         note.setSummary("Private Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         Long noteId = note.getId();
@@ -354,5 +383,7 @@ public class NoteSystemTest {
         assertTrue(retrieved.isPresent());
         assertEquals("Private Note", retrieved.get().getTitle());
     }
+
+    
 
 }

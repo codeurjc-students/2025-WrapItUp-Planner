@@ -1,0 +1,80 @@
+<app-header></app-header>
+
+<div class="my-notes-wrapper">
+  <div class="my-notes-container">
+    
+    <div class="welcome-section">
+      <h1>My Notes Dashboard</h1>
+      <p class="subtitle">Manage and organize your notes</p>
+    </div>
+
+    <div class="search-create-section">
+      <button class="btn-create-note" (click)="createNote()">
+        +
+      </button>
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Search notes by title..."
+          class="search-input">
+      </div>
+    </div>
+
+    <div class="categories-section">
+      <h3 class="section-title">Filter by Category</h3>
+      <div class="categories-container">
+        <div 
+          *ngFor="let category of categories"
+          class="category-card"
+          [class.active]="selectedCategory === category"
+          (click)="selectCategory(category)">
+          <span class="category-icon">{{ getCategoryIcon(category) }}</span>
+          <span class="category-name">{{ getCategoryDisplayName(category) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="section-header-bar">
+        <h3 class="section-title">Recent Activity</h3>
+        <span class="notes-count">{{ filteredNotes.length }} notes</span>
+      </div>
+      
+      <div class="notes-grid">
+        <div 
+          *ngFor="let note of filteredNotes"
+          class="note-card"
+          (click)="viewNote(note.id)">
+          <h4 class="note-title">{{ note.title }}</h4>
+          <div class="note-info">
+            <span class="note-date">
+              <span class="date-icon">🕒</span>
+              {{ formatDate(note.lastModified) }}
+            </span>
+            <div class="note-category-badge">{{ getCategoryDisplayName(note.category) }}</div>
+            <span class="note-visibility" [class.public]="note.visibility === 'PUBLIC'">
+              {{ note.visibility === 'PUBLIC' ? '🌐 Public' : '🔒 Private' }}
+            </span>
+            <button class="btn-options" (click)="deleteNote(note.id, $event)">✕</button>
+          </div>
+        </div>
+
+        <div *ngIf="filteredNotes.length === 0" class="no-notes-message">
+          <div class="no-notes-icon">📝</div>
+          <h3>No notes found</h3>
+          <p>Create your first note or adjust your search filters</p>
+          <button class="btn-create-first" (click)="createNote()">Create Note</button>
+        </div>
+      </div>
+
+      <div *ngIf="hasMore && filteredNotes.length > 0" class="load-more-container">
+        <button class="btn-load-more" (click)="loadMore()">
+          Load More Notes
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

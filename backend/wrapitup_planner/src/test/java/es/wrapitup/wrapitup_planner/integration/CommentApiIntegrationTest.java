@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
+import java.time.LocalDateTime;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
@@ -98,6 +100,8 @@ public class CommentApiIntegrationTest {
         testNote.setOverview("Private Overview");
         testNote.setSummary("Private Summary");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote = noteRepository.save(testNote);
 
         publicNote = new Note();
@@ -106,6 +110,8 @@ public class CommentApiIntegrationTest {
         publicNote.setOverview("Public Overview");
         publicNote.setSummary("Public Summary");
         publicNote.setVisibility(NoteVisibility.PUBLIC);
+        publicNote.setCategory(NoteCategory.OTHERS);
+        publicNote.setLastModified(LocalDateTime.now());
         publicNote = noteRepository.save(publicNote);
 
         Response loginResponse = given()

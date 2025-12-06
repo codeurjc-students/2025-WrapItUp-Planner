@@ -3,6 +3,7 @@ package es.wrapitup.wrapitup_planner.integration;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -10,6 +11,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
@@ -119,7 +122,8 @@ public class NoteApiIntegrationTest {
                 "title": "Integration Test Note",
                 "overview": "Test Overview",
                 "summary": "Test Summary",
-                "visibility": "PRIVATE"
+                "visibility": "PRIVATE",
+                "category": "SCIENCE"
             }
             """;
 
@@ -133,7 +137,9 @@ public class NoteApiIntegrationTest {
             .statusCode(CREATED.value())
             .body("title", equalTo("Integration Test Note"))
             .body("overview", equalTo("Test Overview"))
-            .body("visibility", equalTo("PRIVATE"));
+            .body("visibility", equalTo("PRIVATE"))
+            .body("category", equalTo("SCIENCE"))
+            .body("lastModified", notNullValue());
     }
 
     @Test
@@ -185,6 +191,8 @@ public class NoteApiIntegrationTest {
         publicNote.setSummary("Public Summary");
         publicNote.setJsonQuestions("{}");
         publicNote.setVisibility(NoteVisibility.PUBLIC);
+        publicNote.setCategory(NoteCategory.OTHERS);
+        publicNote.setLastModified(LocalDateTime.now());
         publicNote = noteRepository.save(publicNote);
 
         given()
@@ -205,6 +213,8 @@ public class NoteApiIntegrationTest {
         privateNote.setSummary("Private Summary");
         privateNote.setJsonQuestions("{}");
         privateNote.setVisibility(NoteVisibility.PRIVATE);
+        privateNote.setCategory(NoteCategory.OTHERS);
+        privateNote.setLastModified(LocalDateTime.now());
         privateNote = noteRepository.save(privateNote);
 
         given()
@@ -224,6 +234,8 @@ public class NoteApiIntegrationTest {
         privateNote.setSummary("My Summary");
         privateNote.setJsonQuestions("{}");
         privateNote.setVisibility(NoteVisibility.PRIVATE);
+        privateNote.setCategory(NoteCategory.OTHERS);
+        privateNote.setLastModified(LocalDateTime.now());
         privateNote = noteRepository.save(privateNote);
 
         given()
@@ -257,6 +269,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Original Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String updateJson = """
@@ -287,6 +301,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String updateJson = """
@@ -315,6 +331,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String updateJson = """
@@ -341,6 +359,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String updateJson = """
@@ -371,6 +391,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String shareJson = """
@@ -398,6 +420,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String shareJson = """
@@ -425,6 +449,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String shareJson = """
@@ -456,6 +482,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         given()
@@ -483,6 +511,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         given()
@@ -503,6 +533,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         given()
@@ -554,6 +586,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         given()
@@ -573,6 +607,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         String updateJson = """
@@ -602,6 +638,8 @@ public class NoteApiIntegrationTest {
         note.setSummary("Private Summary");
         note.setJsonQuestions("{}");
         note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
         note = noteRepository.save(note);
 
         given()
