@@ -53,7 +53,7 @@ export class AuthComponent implements OnInit {
       this.authService.login(this.username, this.password).subscribe({
         next: (res) => {
           if (res && res.status && res.status !== 'SUCCESS') {
-            this.error = res.message || 'Login failed';
+            this.error = 'Bad credentials';
             return;
           }
           // successful login - wait a moment for cookies to be set before redirecting
@@ -62,7 +62,7 @@ export class AuthComponent implements OnInit {
           }, 300);
         },
         error: (err) => {
-          this.error = err?.error?.message || 'Login error';
+          this.error = 'Bad credentials';
         }
       });
     } else {
@@ -87,7 +87,13 @@ export class AuthComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.error = err?.error?.error || err?.error?.message || 'Register error';
+          // Mostrar solo si es "usuario ya existe", sino mensaje genérico
+          const serverError = err?.error?.error || err?.error?.message || '';
+          if (serverError.toLowerCase().includes('already exists')) {
+            this.error = serverError;
+          } else {
+            this.error = 'Registration error. Please try again.';
+          }
         }
       });
     }

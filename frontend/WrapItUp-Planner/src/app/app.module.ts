@@ -19,6 +19,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { MyNotesComponent } from './components/my-notes/my-notes.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { ProfileComponent } from './components/profile/profile.component';
     LandingPageComponent,
     HeaderComponent,
     AboutUsComponent,
-    ProfileComponent
+    ProfileComponent,
+    MyNotesComponent
   ],
   imports: [
     BrowserModule,

@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
+import java.time.LocalDateTime;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
@@ -47,10 +49,12 @@ public class CommentApiIntegrationTest {
 
     private UserModel testUser;
     private UserModel otherUser;
+    private UserModel adminUser;
     private Note testNote;
     private Note publicNote;
     private String authToken;
     private String otherAuthToken;
+    private String adminToken;
 
     @BeforeEach
     void setUp() {
@@ -61,6 +65,7 @@ public class CommentApiIntegrationTest {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String ownerUsername = "commentowner_" + timestamp;
         String otherUsername = "commentother_" + timestamp;
+        String adminUsername = "commentadmin_" + timestamp;
 
         testUser = new UserModel();
         testUser.setUsername(ownerUsername);
@@ -80,12 +85,23 @@ public class CommentApiIntegrationTest {
         otherUser.setStatus(UserStatus.ACTIVE);
         otherUser = userRepository.save(otherUser);
 
+        adminUser = new UserModel();
+        adminUser.setUsername(adminUsername);
+        adminUser.setEmail(adminUsername + "@test.com");
+        adminUser.setDisplayName(adminUsername);
+        adminUser.setPassword(passwordEncoder.encode("admin123"));
+        adminUser.setRoles(Arrays.asList("USER", "ADMIN"));
+        adminUser.setStatus(UserStatus.ACTIVE);
+        adminUser = userRepository.save(adminUser);
+
         testNote = new Note();
         testNote.setUser(testUser);
         testNote.setTitle("Private Note for Comments");
         testNote.setOverview("Private Overview");
         testNote.setSummary("Private Summary");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote = noteRepository.save(testNote);
 
         publicNote = new Note();
@@ -94,6 +110,8 @@ public class CommentApiIntegrationTest {
         publicNote.setOverview("Public Overview");
         publicNote.setSummary("Public Summary");
         publicNote.setVisibility(NoteVisibility.PUBLIC);
+        publicNote.setCategory(NoteCategory.OTHERS);
+        publicNote.setLastModified(LocalDateTime.now());
         publicNote = noteRepository.save(publicNote);
 
         Response loginResponse = given()
@@ -109,6 +127,13 @@ public class CommentApiIntegrationTest {
         .when()
             .post("/api/v1/auth/login");
         otherAuthToken = otherLoginResponse.getCookie("AuthToken");
+
+        Response adminLoginResponse = given()
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"" + adminUsername + "\", \"password\":\"admin123\"}")
+        .when()
+            .post("/api/v1/auth/login");
+        adminToken = adminLoginResponse.getCookie("AuthToken");
     }
 
     // create comment tests
@@ -329,5 +354,35 @@ public class CommentApiIntegrationTest {
             .delete("/api/v1/notes/" + testNote.getId() + "/comments/999")
         .then()
             .statusCode(FORBIDDEN.value());
+    }
+
+    // admin tests
+
+    @Test
+    void adminCanDeleteAnyComment() {
+
+        Comment comment = new Comment("User's comment", testNote, testUser);
+        comment = commentRepository.save(comment);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .delete("/api/v1/notes/" + testNote.getId() + "/comments/" + comment.getId())
+        .then()
+            .statusCode(NO_CONTENT.value());
+    }
+
+    @Test
+    void adminCanAccessPrivateNoteComments() {
+
+        Comment comment = new Comment("Private comment", testNote, testUser);
+        comment = commentRepository.save(comment);
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .get("/api/v1/notes/" + testNote.getId() + "/comments")
+        .then()
+            .statusCode(OK.value())
+            .body("content[0].content", equalTo("Private comment"));
     }
 }

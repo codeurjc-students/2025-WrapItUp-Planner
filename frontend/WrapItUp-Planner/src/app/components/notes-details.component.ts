@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
 import { CommentService } from '../services/comment.service';
-import { NoteDTO } from '../dtos/note.dto';
+import { NoteDTO, NoteCategory } from '../dtos/note.dto';
 import { UserModelDTO } from '../dtos/user.dto';
 import { CommentDTO } from '../dtos/comment.dto';
 
@@ -21,6 +21,9 @@ export class NoteDetailComponent implements OnInit {
   editedOverview = '';
   editedSummary = '';
   editedVisibility: 'PUBLIC' | 'PRIVATE' = 'PRIVATE';
+  editedCategory: NoteCategory = 'OTHERS';
+  
+  categories: NoteCategory[] = ['MATHS', 'SCIENCE', 'HISTORY', 'ART', 'LANGUAGES', 'OTHERS'];
   
   currentUser?: UserModelDTO;
   canEdit = false;
@@ -80,6 +83,9 @@ export class NoteDetailComponent implements OnInit {
         this.editedOverview = data.overview || '';
         this.editedSummary = data.summary || '';
         this.editedVisibility = data.visibility || 'PRIVATE';
+        this.editedCategory = data.category || 'OTHERS';
+        this.editedSummary = data.summary || '';
+        this.editedVisibility = data.visibility || 'PRIVATE';
         
         this.loadCurrentUser();
         this.loadComments();
@@ -119,10 +125,23 @@ export class NoteDetailComponent implements OnInit {
       return;
     }
 
-    
+    const isAdmin = this.isUserAdmin();
     const isOwner = this.note.userId === this.currentUser.id;
-    this.canEdit = isOwner;
-    this.canShare = isOwner;
+    
+    // admins cannot share notes nor edit them
+    this.canEdit = !isAdmin && isOwner;
+    this.canShare = !isAdmin && isOwner; 
+  }
+
+  isUserAdmin(): boolean {
+    return this.currentUser?.roles?.includes('ADMIN') ?? false;
+  }
+
+  canDeleteNote(): boolean {
+    if (!this.currentUser || !this.note) {
+      return false;
+    }
+    return this.isUserAdmin() || this.note.userId === this.currentUser.id;
   }
 
   openShareModal(): void {
@@ -181,6 +200,7 @@ export class NoteDetailComponent implements OnInit {
       this.editedOverview = this.note.overview || '';
       this.editedSummary = this.note.summary || '';
       this.editedVisibility = this.note.visibility || 'PRIVATE';
+      this.editedCategory = this.note.category || 'OTHERS';
     }
   }
 
@@ -195,7 +215,8 @@ export class NoteDetailComponent implements OnInit {
       title: this.editedTitle,
       overview: this.editedOverview,
       summary: this.editedSummary,
-      visibility: this.editedVisibility
+      visibility: this.editedVisibility,
+      category: this.editedCategory
     };
 
     this.noteService.updateNote(this.noteId, updatedNote).subscribe({
@@ -224,7 +245,7 @@ export class NoteDetailComponent implements OnInit {
   }
 
   deleteNote(): void {
-    if (!this.canEdit) {
+    if (!this.canDeleteNote()) {
       alert('You do not have permission to delete this note');
       return;
     }
@@ -320,7 +341,10 @@ export class NoteDetailComponent implements OnInit {
   }
 
   canDeleteComment(comment: CommentDTO): boolean {
-    return this.currentUser?.username === comment.username;
+    if (!this.currentUser) {
+      return false;
+    }
+    return this.isUserAdmin() || this.currentUser.username === comment.username;
   }
 
   deleteComment(commentId: number): void {

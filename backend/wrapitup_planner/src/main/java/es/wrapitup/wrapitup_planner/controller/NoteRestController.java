@@ -3,6 +3,9 @@ package es.wrapitup.wrapitup_planner.controller;
 import java.security.Principal;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +53,45 @@ public class NoteRestController {
         
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse("You do not have permission to view this note"));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getRecentNotes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to view notes"));
+        }
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoteDTO> recentNotes = noteService.findRecentNotesByUser(username, pageable, category, search);
+        return ResponseEntity.ok(recentNotes);
+    }
+    
+    @GetMapping("/shared")
+    public ResponseEntity<?> getSharedNotes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to view shared notes"));
+        }
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoteDTO> sharedNotes = noteService.findNotesSharedWithUser(username, pageable, search);
+        return ResponseEntity.ok(sharedNotes);
     }
 
     @PostMapping

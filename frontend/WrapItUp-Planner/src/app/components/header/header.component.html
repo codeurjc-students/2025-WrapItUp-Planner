@@ -10,6 +10,7 @@
   
   <!-- Buttons when authenticated -->
   <ng-container *ngIf="isAuthenticated">
-    <button [routerLink]="['/profile']" mat-raised-button color="accent">Dashboard</button>
+    <button [routerLink]="['/my-notes']" mat-button>My Notes</button>
+    <button [routerLink]="['/profile']" mat-raised-button color="accent">Profile</button>
   </ng-container>
 </mat-toolbar>

@@ -456,4 +456,137 @@ public class NoteWebTest extends BaseWebTest {
         assertTrue(driver.findElements(By.cssSelector(".comment-item")).isEmpty() ||
                    driver.findElement(By.cssSelector(".comments-section")).getText().contains("No comments"));
     }
+
+    @Test
+    void testAccessMyNotesPage() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "my-notes");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".my-notes-container")));
+
+        WebElement pageTitle = driver.findElement(By.cssSelector("h1"));
+        assertTrue(pageTitle.getText().contains("My Notes") || pageTitle.getText().contains("Mis Notas"));
+    }
+
+    @Test
+    void testFilterNotesByCategory() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String mathNoteTitle = "Math Note " + ts;
+
+        registerAndLogin(username, email, password);
+
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(mathNoteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Math overview");
+        driver.findElement(By.id("summary")).sendKeys("Math summary");
+        
+        WebElement categorySelect = driver.findElement(By.id("category"));
+        categorySelect.sendKeys("MATHS");
+        
+        driver.findElement(By.cssSelector(".btn-create")).click();
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+
+        driver.get(getBaseUrl() + "my-notes");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".my-notes-container")));
+
+        // Click on MATHS category
+        WebElement mathsCategory = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[contains(@class, 'category-card')]//span[contains(@class, 'category-name') and contains(text(), 'Maths')]")));
+        mathsCategory.click();
+
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-card")));
+        
+        WebElement noteCard = driver.findElement(By.cssSelector(".note-card"));
+        assertTrue(noteCard.getText().contains(mathNoteTitle));
+    }
+
+    @Test
+    void testSearchNotesInMyNotes() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String searchableTitle = "Searchable Note " + ts;
+
+        registerAndLogin(username, email, password);
+
+        // Create a note
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(searchableTitle);
+        driver.findElement(By.id("overview")).sendKeys("Overview");
+        driver.findElement(By.id("summary")).sendKeys("Summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+        
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+
+        driver.get(getBaseUrl() + "my-notes");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".my-notes-container")));
+
+        WebElement searchInput = driver.findElement(By.cssSelector("input[type='text']"));
+        searchInput.sendKeys("Searchable");
+
+ 
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-card")));
+        
+        WebElement noteCard = driver.findElement(By.cssSelector(".note-card"));
+        assertTrue(noteCard.getText().contains(searchableTitle));
+    }
+
+    @Test
+    void testDeleteNoteFromMyNotes() {
+        long ts = System.currentTimeMillis();
+        String username = "genericUser" + ts;
+        String email = "genericUser+" + ts + "@example.com";
+        String password = "Password123";
+        String noteTitle = "Note to Delete " + ts;
+
+        registerAndLogin(username, email, password);
+
+        // Create a note
+        driver.get(getBaseUrl() + "notes/create");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+        driver.findElement(By.id("title")).sendKeys(noteTitle);
+        driver.findElement(By.id("overview")).sendKeys("Overview");
+        driver.findElement(By.id("summary")).sendKeys("Summary");
+        driver.findElement(By.cssSelector(".btn-create")).click();
+        
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+        wait.until(ExpectedConditions.urlContains("/notes/"));
+
+
+        driver.get(getBaseUrl() + "my-notes");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".my-notes-container")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-card")));
+
+        // Delete the note
+        WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".btn-options")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteButton);
+
+
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+
+ 
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.xpath("//div[contains(@class, 'note-card') and contains(., '" + noteTitle + "')]")));
+    }
 }

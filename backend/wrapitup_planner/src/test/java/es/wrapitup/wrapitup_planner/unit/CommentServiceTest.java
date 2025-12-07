@@ -12,6 +12,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CommentService;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,16 +64,20 @@ public class CommentServiceTest {
         testUser = new UserModel();
         testUser.setId(1L);
         testUser.setUsername("testuser");
+        testUser.setRoles(java.util.List.of("USER"));
 
         otherUser = new UserModel();
         otherUser.setId(2L);
         otherUser.setUsername("otheruser");
+        otherUser.setRoles(java.util.List.of("USER"));
 
         testNote = new Note();
         testNote.setId(1L);
         testNote.setTitle("Test Note");
         testNote.setUser(testUser);
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote.setSharedWith(new HashSet<>());
 
         testComment = new Comment();
@@ -162,7 +168,7 @@ public class CommentServiceTest {
         Page<Comment> commentPage = new PageImpl<>(Arrays.asList(testComment));
         Pageable pageable = PageRequest.of(0, 10);
         
-        when(commentRepository.findByNoteId(1L, pageable)).thenReturn(commentPage);
+        when(commentRepository.findByNoteIdOrderByCreatedAtDesc(1L, pageable)).thenReturn(commentPage);
         when(commentMapper.toDto(testComment)).thenReturn(testCommentDTO);
 
         Page<CommentDTO> result = commentService.getCommentsByNoteIdPaginated(1L, pageable);
@@ -256,5 +262,35 @@ public class CommentServiceTest {
         boolean result = commentService.canUserAccessComments(999L, "testuser");
 
         assertFalse(result);
+    }
+
+    // admin tests
+    @Test
+    void adminCanDeleteAnyComment() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        assertDoesNotThrow(() -> commentService.deleteComment(1L, "admin"));
+        verify(commentRepository).deleteById(1L);
+    }
+
+    @Test
+    void adminCanAccessPrivateNoteComments() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        boolean result = commentService.canUserAccessComments(1L, "admin");
+
+        assertTrue(result);
     }
 }

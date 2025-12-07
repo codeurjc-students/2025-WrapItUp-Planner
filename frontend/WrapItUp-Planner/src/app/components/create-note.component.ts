@@ -1,24 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NoteService } from '../services/note.service';
-import { NoteDTO } from '../dtos/note.dto';
+import { UserService } from '../services/user.service';
+import { NoteDTO, NoteCategory } from '../dtos/note.dto';
 
 @Component({
   selector: 'app-create-note',
   templateUrl: './create-note.component.html',
   styleUrls: ['./create-note.component.css']
 })
-export class CreateNoteComponent {
+export class CreateNoteComponent implements OnInit {
 
   title = '';
   overview = '';
   summary = '';
   visibility: 'PUBLIC' | 'PRIVATE' = 'PRIVATE';
+  category: NoteCategory = 'OTHERS';
+  
+  categories: NoteCategory[] = ['MATHS', 'SCIENCE', 'HISTORY', 'ART', 'LANGUAGES', 'OTHERS'];
 
   constructor(
     private noteService: NoteService,
+    private userService: UserService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        if (user?.roles?.includes('ADMIN')) {
+          alert('Administrators cannot create notes');
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
+      }
+    });
+  }
 
   createNote(): void {
     
@@ -31,7 +50,8 @@ export class CreateNoteComponent {
       title: this.title,
       overview: this.overview || '',
       summary: this.summary || '',
-      visibility: this.visibility
+      visibility: this.visibility,
+      category: this.category
     };
 
     this.noteService.createNote(newNote).subscribe({

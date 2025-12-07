@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NoteService } from './note.service';
 import { NoteDTO } from '../dtos/note.dto';
+import { Page } from '../dtos/page.dto';
 
 describe('NoteService', () => {
   let service: NoteService;
@@ -151,5 +152,165 @@ describe('NoteService', () => {
 
     const req = httpMock.expectOne(apiUrl);
     req.flush('Bad request', { status: 400, statusText: 'Bad Request' });
+  });
+
+  it('should get recent notes with pagination', () => {
+    const mockPage: Page<NoteDTO> = {
+      content: [
+        {
+          id: 1,
+          title: 'Note 1',
+          overview: 'Overview 1',
+          summary: 'Summary 1',
+          visibility: 'PUBLIC' as const,
+          userId: 1
+        }
+      ],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      empty: false
+    };
+
+    service.getRecentNotes(0, 10).subscribe(page => {
+      expect(page.content.length).toBe(1);
+      expect(page.totalElements).toBe(1);
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockPage);
+  });
+
+  it('should get recent notes with category filter', () => {
+    const mockPage: Page<NoteDTO> = {
+      content: [
+        {
+          id: 1,
+          title: 'Math Note',
+          overview: 'Overview',
+          summary: 'Summary',
+          visibility: 'PUBLIC' as const,
+          userId: 1,
+          category: 'MATHS' as const
+        }
+      ],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      empty: false
+    };
+
+    service.getRecentNotes(0, 10, 'MATHS').subscribe(page => {
+      expect(page.content[0].category).toBe('MATHS');
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10&category=MATHS`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockPage);
+  });
+
+  it('should get recent notes with search filter', () => {
+    const mockPage: Page<NoteDTO> = {
+      content: [
+        {
+          id: 1,
+          title: 'Test Search',
+          overview: 'Overview',
+          summary: 'Summary',
+          visibility: 'PRIVATE' as const,
+          userId: 1
+        }
+      ],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      empty: false
+    };
+
+    service.getRecentNotes(0, 10, undefined, 'Test').subscribe(page => {
+      expect(page.content[0].title).toContain('Test');
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10&search=Test`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockPage);
+  });
+
+  it('should get shared with me notes', () => {
+    const mockPage: Page<NoteDTO> = {
+      content: [
+        {
+          id: 1,
+          title: 'Shared Note',
+          overview: 'Overview',
+          summary: 'Summary',
+          visibility: 'PUBLIC' as const,
+          userId: 2,
+          sharedWithUserIds: [1]
+        }
+      ],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      empty: false
+    };
+
+    service.getSharedWithMe(0, 10).subscribe(page => {
+      expect(page.content.length).toBe(1);
+      expect(page.content[0].sharedWithUserIds).toContain(1);
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}/shared?page=0&size=10`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockPage);
+  });
+
+  it('should get shared with me notes with search filter', () => {
+    const mockPage: Page<NoteDTO> = {
+      content: [
+        {
+          id: 1,
+          title: 'Shared Search Note',
+          overview: 'Overview',
+          summary: 'Summary',
+          visibility: 'PUBLIC' as const,
+          userId: 2,
+          sharedWithUserIds: [1]
+        }
+      ],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      empty: false
+    };
+
+    service.getSharedWithMe(0, 10, 'Search').subscribe(page => {
+      expect(page.content[0].title).toContain('Search');
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}/shared?page=0&size=10&search=Search`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockPage);
   });
 });

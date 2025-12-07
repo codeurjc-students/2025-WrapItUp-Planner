@@ -1,6 +1,8 @@
 package es.wrapitup.wrapitup_planner.dto;
 
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,8 @@ public class NoteDTO {
     private String summary;
     private String jsonQuestions;
     private NoteVisibility visibility;
+    private NoteCategory category;
+    private LocalDateTime lastModified;
     private Long userId;
     private List<Long> sharedWithUserIds;
     private List<CommentDTO> comments = new ArrayList<>();
@@ -69,5 +73,21 @@ public class NoteDTO {
     }
     public void setComments(List<CommentDTO> comments) {
         this.comments = comments;
+    }
+    
+    public NoteCategory getCategory() {
+        return category;
+    }
+    
+    public void setCategory(NoteCategory category) {
+        this.category = category;
+    }
+    
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+    
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
     }
 }

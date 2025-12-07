@@ -1,14 +1,20 @@
 package es.wrapitup.wrapitup_planner.service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
@@ -24,6 +30,10 @@ public class NoteService {
         this.noteRepository = noteRepository;
         this.noteMapper = noteMapper;
         this.userRepository = userRepository;
+    }
+
+    private boolean isAdmin(UserModel user) {
+        return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
     }
 
     public Optional<NoteDTO> findById(Long id) {
@@ -45,6 +55,11 @@ public class NoteService {
         
         UserModel user = userOpt.get();
         
+        // admins cannot create notes
+        if (isAdmin(user)) {
+            throw new IllegalArgumentException("Admins cannot create notes");
+        }
+        
         
         Note note = new Note(
             user,
@@ -55,8 +70,84 @@ public class NoteService {
             noteDTO.getVisibility() != null ? noteDTO.getVisibility() : NoteVisibility.PRIVATE
         );
         
+        
+        if (noteDTO.getCategory() != null) {
+            note.setCategory(noteDTO.getCategory());
+        }
+        
         Note saved = noteRepository.save(note);
         return noteMapper.toDto(saved);
+    }
+
+    public List<NoteDTO> findUsersNotesById (String username) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return null;
+        }
+    
+        Long userLong = currentUserOpt.get().getId();
+        return noteRepository.findByUserId(userLong)
+                                .stream()
+                                .map(noteMapper::toDto)
+                                .collect(Collectors.toList());
+    }
+
+    public Page<NoteDTO> findUsersNotesPaginated(String username, Pageable pageable) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return null;
+        }
+        Long userLong = currentUserOpt.get().getId();
+        return noteRepository.findByUserId(userLong, pageable)
+                                .map(noteMapper::toDto);
+    }
+    
+    public Page<NoteDTO> findRecentNotesByUser(String username, Pageable pageable, String category, String search) {
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return Page.empty();
+        }
+        Long userId = currentUserOpt.get().getId();
+        
+        Page<Note> notes;
+        
+        
+        boolean hasCategory = category != null && !category.isEmpty();
+        boolean hasSearch = search != null && !search.isEmpty();
+        
+        if (hasCategory && hasSearch) {
+            // Both filters
+            NoteCategory noteCategory = NoteCategory.valueOf(category.toUpperCase());
+            notes = noteRepository.findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(userId, noteCategory, search, pageable);
+        } else if (hasCategory) {
+            // Category only
+            NoteCategory noteCategory = NoteCategory.valueOf(category.toUpperCase());
+            notes = noteRepository.findByUserIdAndCategoryOrderByLastModifiedDesc(userId, noteCategory, pageable);
+        } else if (hasSearch) {
+            // Search only
+            notes = noteRepository.findByUserIdAndTitleContainingOrderByLastModifiedDesc(userId, search, pageable);
+        } else {
+            // No filters
+            notes = noteRepository.findByUserIdOrderByLastModifiedDesc(userId, pageable);
+        }
+        
+        return notes.map(noteMapper::toDto);
+    }
+    
+    public Page<NoteDTO> findNotesSharedWithUser(String username, Pageable pageable, String search) {
+        if (username == null || username.isEmpty()) {
+            return Page.empty();
+        }
+        
+        Page<Note> notes;
+        
+        if (search != null && !search.isEmpty()) {
+            notes = noteRepository.findNotesSharedWithUserAndTitleContaining(username, search, pageable);
+        } else {
+            notes = noteRepository.findNotesSharedWithUser(username, pageable);
+        }
+        
+        return notes.map(noteMapper::toDto);
     }
 
     public Optional<NoteDTO> findByIdWithPermissions(Long id, String username) {
@@ -84,6 +175,11 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
+        
+        
+        if (isAdmin(currentUser)) {
+            return Optional.of(noteMapper.toDto(note));
+        }
         
         
         if (note.getUser().getId().equals(currentUser.getId())) {
@@ -117,7 +213,9 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
-        if (!note.getUser().getId().equals(currentUser.getId())) {
+        
+        // Admins CANNOT edit notes, only owners can
+        if (isAdmin(currentUser) || !note.getUser().getId().equals(currentUser.getId())) {
             return Optional.empty(); 
         }
         
@@ -140,6 +238,12 @@ public class NoteService {
         if (noteDTO.getJsonQuestions() != null) {
             note.setJsonQuestions(noteDTO.getJsonQuestions());
         }
+        if (noteDTO.getCategory() != null) {
+            note.setCategory(noteDTO.getCategory());
+        }
+        
+        // Update lastModified timestamp
+        note.setLastModified(LocalDateTime.now());
         
         Note updated = noteRepository.save(note);
         return Optional.of(noteMapper.toDto(updated));
@@ -187,7 +291,8 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
-        if (!note.getUser().getId().equals(currentUser.getId())) {
+        
+        if (!isAdmin(currentUser) && !note.getUser().getId().equals(currentUser.getId())) {
             return false; 
         }
         

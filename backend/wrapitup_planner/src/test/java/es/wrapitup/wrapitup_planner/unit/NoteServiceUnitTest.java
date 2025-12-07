@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -14,10 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
@@ -52,11 +56,13 @@ public class NoteServiceUnitTest {
         testUser.setId(1L);
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
+        testUser.setRoles(java.util.List.of("USER"));
 
         otherUser = new UserModel();
         otherUser.setId(2L);
         otherUser.setUsername("otheruser");
         otherUser.setEmail("other@example.com");
+        otherUser.setRoles(java.util.List.of("USER"));
 
         testNote = new Note();
         testNote.setId(1L);
@@ -65,6 +71,8 @@ public class NoteServiceUnitTest {
         testNote.setSummary("Test Summary");
         testNote.setJsonQuestions("{}");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote.setUser(testUser);
         testNote.setSharedWith(new HashSet<>());
 
@@ -75,6 +83,8 @@ public class NoteServiceUnitTest {
         testNoteDTO.setSummary("Test Summary");
         testNoteDTO.setJsonQuestions("{}");
         testNoteDTO.setVisibility(NoteVisibility.PRIVATE);
+        testNoteDTO.setCategory(NoteCategory.OTHERS);
+        testNoteDTO.setLastModified(LocalDateTime.now());
         testNoteDTO.setUserId(1L);
     }
 
@@ -330,4 +340,147 @@ public class NoteServiceUnitTest {
         verify(noteRepository, never()).delete(any(Note.class));
     }
 
+    // admin tests
+
+    @Test
+    void adminCanDeleteAnyNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        boolean result = noteService.deleteNote(1L, "admin");
+
+        assertTrue(result);
+        verify(noteRepository).delete(testNote);
+    }
+
+    @Test
+    void adminCannotEditNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        NoteDTO updateDTO = new NoteDTO();
+        updateDTO.setTitle("Updated Title");
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        Optional<NoteDTO> result = noteService.updateNote(1L, updateDTO, "admin");
+
+        assertTrue(result.isEmpty());
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void adminCanAccessPrivateNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(noteMapper.toDto(testNote)).thenReturn(testNoteDTO);
+
+        Optional<NoteDTO> result = noteService.findByIdWithPermissions(1L, "admin");
+
+        assertTrue(result.isPresent());
+        assertEquals(testNoteDTO, result.get());
+    }
+
+    // Recent notes filtering tests
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithNoFilters() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdOrderByLastModifiedDesc(eq(1L), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), null, null);
+
+        verify(noteRepository).findByUserIdOrderByLastModifiedDesc(eq(1L), any());
+        verify(noteRepository, never()).findByUserIdAndCategoryOrderByLastModifiedDesc(any(), any(), any());
+        verify(noteRepository, never()).findByUserIdAndTitleContainingOrderByLastModifiedDesc(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithCategoryFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndCategoryOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.MATHS), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), "MATHS", null);
+
+        verify(noteRepository).findByUserIdAndCategoryOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.MATHS), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq("test"), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), null, "test");
+
+        verify(noteRepository).findByUserIdAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq("test"), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithCategoryAndSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.SCIENCE), eq("biology"), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), "SCIENCE", "biology");
+
+        verify(noteRepository).findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.SCIENCE), eq("biology"), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    // Shared notes tests
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findNotesSharedWithUserSuccess() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(noteRepository.findNotesSharedWithUser(eq("testuser"), any())).thenReturn(page);
+
+        noteService.findNotesSharedWithUser("testuser", PageRequest.of(0, 10), null);
+
+        verify(noteRepository).findNotesSharedWithUser(eq("testuser"), any());
+        verify(noteRepository, never()).findNotesSharedWithUserAndTitleContaining(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findNotesSharedWithUserWithSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(noteRepository.findNotesSharedWithUserAndTitleContaining(eq("testuser"), eq("biology"), any())).thenReturn(page);
+
+        noteService.findNotesSharedWithUser("testuser", PageRequest.of(0, 10), "biology");
+
+        verify(noteRepository).findNotesSharedWithUserAndTitleContaining(eq("testuser"), eq("biology"), any());
+        verify(noteRepository, never()).findNotesSharedWithUser(any(), any());
+    }
 }

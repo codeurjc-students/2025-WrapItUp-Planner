@@ -5,7 +5,6 @@ import java.security.Principal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -51,7 +50,7 @@ public class CommentRestController {
                     .body(new ErrorResponse("You do not have permission to view comments"));
         }
         
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, size);
         Page<CommentDTO> comments = commentService.getCommentsByNoteIdPaginated(noteId, pageable);
         return ResponseEntity.ok(comments);
     }

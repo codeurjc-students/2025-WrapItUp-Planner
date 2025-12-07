@@ -12,6 +12,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CommentService;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,7 @@ public class CommentSystemTest {
 
     private UserModel testUser;
     private UserModel otherUser;
+    private UserModel adminUser;
     private Note testNote;
 
     @BeforeEach
@@ -65,12 +68,21 @@ public class CommentSystemTest {
         otherUser.setStatus(UserStatus.ACTIVE);
         otherUser = userRepository.save(otherUser);
 
+        adminUser = new UserModel();
+        adminUser.setUsername("admincommentsystemuser");
+        adminUser.setEmail("admincommentsystem@test.com");
+        adminUser.setRoles(Arrays.asList("USER", "ADMIN"));
+        adminUser.setStatus(UserStatus.ACTIVE);
+        adminUser = userRepository.save(adminUser);
+
         testNote = new Note();
         testNote.setUser(testUser);
         testNote.setTitle("Test Note for Comments");
         testNote.setOverview("Overview");
         testNote.setSummary("Summary");
         testNote.setVisibility(NoteVisibility.PRIVATE);
+        testNote.setCategory(NoteCategory.OTHERS);
+        testNote.setLastModified(LocalDateTime.now());
         testNote = noteRepository.save(testNote);
     }
 
@@ -242,5 +254,30 @@ public class CommentSystemTest {
         boolean result = commentService.canUserAccessComments(999L, "commentsystemuser");
 
         assertFalse(result);
+    }
+
+    // admin tests
+
+    @Test
+    void adminCanDeleteAnyComment() {
+        Comment comment = new Comment("User's comment", testNote, testUser);
+        comment = commentRepository.save(comment);
+
+        Long commentId = comment.getId();
+
+        commentService.deleteComment(commentId, "admincommentsystemuser");
+
+        Optional<Comment> deletedComment = commentRepository.findById(commentId);
+        assertFalse(deletedComment.isPresent());
+    }
+
+    @Test
+    void adminCanAccessPrivateNoteComments() {
+        Comment comment = new Comment("Private comment", testNote, testUser);
+        comment = commentRepository.save(comment);
+
+        boolean result = commentService.canUserAccessComments(testNote.getId(), "admincommentsystemuser");
+
+        assertTrue(result);
     }
 }
