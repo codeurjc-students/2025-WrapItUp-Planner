@@ -13,6 +13,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -649,6 +651,224 @@ public class NoteApiIntegrationTest {
         .then()
             .statusCode(OK.value())
             .body("title", equalTo("Private Note"));
+    }
+
+    // Note filtering tests
+
+    @Test
+    void getRecentNotesWithCategoryFilterSuccess() {
+        Note mathsNote = new Note();
+        mathsNote.setUser(testUser);
+        mathsNote.setTitle("Algebra Note");
+        mathsNote.setOverview("Math overview");
+        mathsNote.setSummary("Math summary");
+        mathsNote.setJsonQuestions("{}");
+        mathsNote.setVisibility(NoteVisibility.PRIVATE);
+        mathsNote.setCategory(NoteCategory.MATHS);
+        mathsNote.setLastModified(LocalDateTime.now());
+        noteRepository.save(mathsNote);
+
+        Note scienceNote = new Note();
+        scienceNote.setUser(testUser);
+        scienceNote.setTitle("Biology Note");
+        scienceNote.setOverview("Science overview");
+        scienceNote.setSummary("Science summary");
+        scienceNote.setJsonQuestions("{}");
+        scienceNote.setVisibility(NoteVisibility.PRIVATE);
+        scienceNote.setCategory(NoteCategory.SCIENCE);
+        scienceNote.setLastModified(LocalDateTime.now().minusDays(1));
+        noteRepository.save(scienceNote);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/notes?category=MATHS&page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content.size()", equalTo(1))
+            .body("content[0].title", equalTo("Algebra Note"))
+            .body("content[0].category", equalTo("MATHS"));
+    }
+
+    @Test
+    void getRecentNotesWithSearchFilterSuccess() {
+        // Create notes with different titles
+        Note note1 = new Note();
+        note1.setUser(testUser);
+        note1.setTitle("Pythagorean Theorem");
+        note1.setOverview("Overview");
+        note1.setSummary("Summary");
+        note1.setJsonQuestions("{}");
+        note1.setVisibility(NoteVisibility.PRIVATE);
+        note1.setCategory(NoteCategory.MATHS);
+        note1.setLastModified(LocalDateTime.now());
+        noteRepository.save(note1);
+
+        Note note2 = new Note();
+        note2.setUser(testUser);
+        note2.setTitle("Biology Basics");
+        note2.setOverview("Overview");
+        note2.setSummary("Summary");
+        note2.setJsonQuestions("{}");
+        note2.setVisibility(NoteVisibility.PRIVATE);
+        note2.setCategory(NoteCategory.SCIENCE);
+        note2.setLastModified(LocalDateTime.now().minusDays(1));
+        noteRepository.save(note2);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/notes?search=Pythagorean&page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content.size()", equalTo(1))
+            .body("content[0].title", equalTo("Pythagorean Theorem"));
+    }
+
+    @Test
+    void getRecentNotesWithCategoryAndSearchFilterSuccess() {
+        // Create multiple notes
+        Note mathsNote1 = new Note();
+        mathsNote1.setUser(testUser);
+        mathsNote1.setTitle("Algebra Equations");
+        mathsNote1.setOverview("Overview");
+        mathsNote1.setSummary("Summary");
+        mathsNote1.setJsonQuestions("{}");
+        mathsNote1.setVisibility(NoteVisibility.PRIVATE);
+        mathsNote1.setCategory(NoteCategory.MATHS);
+        mathsNote1.setLastModified(LocalDateTime.now());
+        noteRepository.save(mathsNote1);
+
+        Note mathsNote2 = new Note();
+        mathsNote2.setUser(testUser);
+        mathsNote2.setTitle("Geometry Basics");
+        mathsNote2.setOverview("Overview");
+        mathsNote2.setSummary("Summary");
+        mathsNote2.setJsonQuestions("{}");
+        mathsNote2.setVisibility(NoteVisibility.PRIVATE);
+        mathsNote2.setCategory(NoteCategory.MATHS);
+        mathsNote2.setLastModified(LocalDateTime.now().minusDays(1));
+        noteRepository.save(mathsNote2);
+
+        Note scienceNote = new Note();
+        scienceNote.setUser(testUser);
+        scienceNote.setTitle("Algebra in Chemistry");
+        scienceNote.setOverview("Overview");
+        scienceNote.setSummary("Summary");
+        scienceNote.setJsonQuestions("{}");
+        scienceNote.setVisibility(NoteVisibility.PRIVATE);
+        scienceNote.setCategory(NoteCategory.SCIENCE);
+        scienceNote.setLastModified(LocalDateTime.now().minusDays(2));
+        noteRepository.save(scienceNote);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/notes?category=MATHS&search=Algebra&page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content.size()", equalTo(1))
+            .body("content[0].title", equalTo("Algebra Equations"))
+            .body("content[0].category", equalTo("MATHS"));
+    }
+
+    @Test
+    void getRecentNotesNotAuthenticatedReturns401() {
+        given()
+        .when()
+            .get("/api/v1/notes?page=0&size=10")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
+
+    //Shared notes tests
+
+    @Test
+    void getSharedNotesSuccess() {
+        Note sharedNote = new Note();
+        sharedNote.setUser(otherUser);
+        sharedNote.setTitle("Shared Note");
+        sharedNote.setOverview("Shared Overview");
+        sharedNote.setSummary("Shared Summary");
+        sharedNote.setJsonQuestions("{}");
+        sharedNote.setVisibility(NoteVisibility.PRIVATE);
+        sharedNote.setCategory(NoteCategory.HISTORY);
+        sharedNote.setLastModified(LocalDateTime.now());
+        
+        Set<UserModel> sharedWith = new HashSet<>();
+        sharedWith.add(testUser);
+        sharedNote.setSharedWith(sharedWith);
+        noteRepository.save(sharedNote);
+
+        Note ownNote = new Note();
+        ownNote.setUser(testUser);
+        ownNote.setTitle("Own Note");
+        ownNote.setOverview("Overview");
+        ownNote.setSummary("Summary");
+        ownNote.setJsonQuestions("{}");
+        ownNote.setVisibility(NoteVisibility.PRIVATE);
+        ownNote.setCategory(NoteCategory.MATHS);
+        ownNote.setLastModified(LocalDateTime.now());
+        noteRepository.save(ownNote);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/notes/shared?page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content.size()", equalTo(1))
+            .body("content[0].title", equalTo("Shared Note"))
+            .body("content[0].category", equalTo("HISTORY"));
+    }
+
+    @Test
+    void getSharedNotesWithSearchFilterSuccess() {
+        Note sharedNote1 = new Note();
+        sharedNote1.setUser(otherUser);
+        sharedNote1.setTitle("Pythagorean Theorem");
+        sharedNote1.setOverview("Overview");
+        sharedNote1.setSummary("Summary");
+        sharedNote1.setJsonQuestions("{}");
+        sharedNote1.setVisibility(NoteVisibility.PRIVATE);
+        sharedNote1.setCategory(NoteCategory.MATHS);
+        sharedNote1.setLastModified(LocalDateTime.now());
+        Set<UserModel> sharedWith1 = new HashSet<>();
+        sharedWith1.add(testUser);
+        sharedNote1.setSharedWith(sharedWith1);
+        noteRepository.save(sharedNote1);
+
+        Note sharedNote2 = new Note();
+        sharedNote2.setUser(otherUser);
+        sharedNote2.setTitle("Biology Basics");
+        sharedNote2.setOverview("Overview");
+        sharedNote2.setSummary("Summary");
+        sharedNote2.setJsonQuestions("{}");
+        sharedNote2.setVisibility(NoteVisibility.PRIVATE);
+        sharedNote2.setCategory(NoteCategory.SCIENCE);
+        sharedNote2.setLastModified(LocalDateTime.now().minusDays(1));
+        Set<UserModel> sharedWith2 = new HashSet<>();
+        sharedWith2.add(testUser);
+        sharedNote2.setSharedWith(sharedWith2);
+        noteRepository.save(sharedNote2);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/notes/shared?search=Pythagorean&page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content.size()", equalTo(1))
+            .body("content[0].title", equalTo("Pythagorean Theorem"));
+    }
+
+    @Test
+    void getSharedNotesNotAuthenticatedReturns401() {
+        given()
+        .when()
+            .get("/api/v1/notes/shared?page=0&size=10")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
     }
 
 }

@@ -43,5 +43,12 @@ export class NoteService {
     }
     return this.http.get<Page<NoteDTO>>(`${this.apiUrl}?${params}`, { withCredentials: true });
   }
+  
+  getSharedWithMe(page: number = 0, size: number = 10, search?: string): Observable<Page<NoteDTO>> {
+    let params = `page=${page}&size=${size}`;
+    if (search) {
+      params += `&search=${encodeURIComponent(search)}`;
+    }
+    return this.http.get<Page<NoteDTO>>(`${this.apiUrl}/shared?${params}`, { withCredentials: true });
+  }
 }
-

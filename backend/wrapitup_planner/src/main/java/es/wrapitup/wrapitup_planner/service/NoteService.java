@@ -133,6 +133,22 @@ public class NoteService {
         
         return notes.map(noteMapper::toDto);
     }
+    
+    public Page<NoteDTO> findNotesSharedWithUser(String username, Pageable pageable, String search) {
+        if (username == null || username.isEmpty()) {
+            return Page.empty();
+        }
+        
+        Page<Note> notes;
+        
+        if (search != null && !search.isEmpty()) {
+            notes = noteRepository.findNotesSharedWithUserAndTitleContaining(username, search, pageable);
+        } else {
+            notes = noteRepository.findNotesSharedWithUser(username, pageable);
+        }
+        
+        return notes.map(noteMapper::toDto);
+    }
 
     public Optional<NoteDTO> findByIdWithPermissions(Long id, String username) {
         Optional<Note> noteOpt = noteRepository.findById(id);

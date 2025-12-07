@@ -29,4 +29,12 @@ public interface NoteRepository extends JpaRepository<Note, Long>{
     //filter by both category and search
     @Query("SELECT n FROM Note n WHERE n.user.id = :userId AND n.category = :category AND LOWER(n.title) LIKE LOWER(CONCAT('%', :search, '%')) ORDER BY n.lastModified DESC")
     Page<Note> findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(@Param("userId") Long userId, @Param("category") NoteCategory category, @Param("search") String search, Pageable pageable);
+    
+    //find notes shared with user
+    @Query("SELECT n FROM Note n JOIN n.sharedWith u WHERE u.username = :username ORDER BY n.lastModified DESC")
+    Page<Note> findNotesSharedWithUser(@Param("username") String username, Pageable pageable);
+    
+    //find notes shared with user and search by title
+    @Query("SELECT n FROM Note n JOIN n.sharedWith u WHERE u.username = :username AND LOWER(n.title) LIKE LOWER(CONCAT('%', :search, '%')) ORDER BY n.lastModified DESC")
+    Page<Note> findNotesSharedWithUserAndTitleContaining(@Param("username") String username, @Param("search") String search, Pageable pageable);
 }

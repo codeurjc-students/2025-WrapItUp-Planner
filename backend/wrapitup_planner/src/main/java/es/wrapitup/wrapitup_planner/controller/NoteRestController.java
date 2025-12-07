@@ -74,6 +74,25 @@ public class NoteRestController {
         Page<NoteDTO> recentNotes = noteService.findRecentNotesByUser(username, pageable, category, search);
         return ResponseEntity.ok(recentNotes);
     }
+    
+    @GetMapping("/shared")
+    public ResponseEntity<?> getSharedNotes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to view shared notes"));
+        }
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoteDTO> sharedNotes = noteService.findNotesSharedWithUser(username, pageable, search);
+        return ResponseEntity.ok(sharedNotes);
+    }
 
     @PostMapping
     public ResponseEntity<?> createNote(@RequestBody NoteDTO noteDTO, HttpServletRequest request) {

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
@@ -395,4 +397,90 @@ public class NoteServiceUnitTest {
         assertEquals(testNoteDTO, result.get());
     }
 
+    // Recent notes filtering tests
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithNoFilters() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdOrderByLastModifiedDesc(eq(1L), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), null, null);
+
+        verify(noteRepository).findByUserIdOrderByLastModifiedDesc(eq(1L), any());
+        verify(noteRepository, never()).findByUserIdAndCategoryOrderByLastModifiedDesc(any(), any(), any());
+        verify(noteRepository, never()).findByUserIdAndTitleContainingOrderByLastModifiedDesc(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithCategoryFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndCategoryOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.MATHS), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), "MATHS", null);
+
+        verify(noteRepository).findByUserIdAndCategoryOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.MATHS), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq("test"), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), null, "test");
+
+        verify(noteRepository).findByUserIdAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq("test"), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findRecentNotesByUserWithCategoryAndSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(noteRepository.findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.SCIENCE), eq("biology"), any())).thenReturn(page);
+
+        noteService.findRecentNotesByUser("testuser", PageRequest.of(0, 10), "SCIENCE", "biology");
+
+        verify(noteRepository).findByUserIdAndCategoryAndTitleContainingOrderByLastModifiedDesc(eq(1L), eq(NoteCategory.SCIENCE), eq("biology"), any());
+        verify(noteRepository, never()).findByUserIdOrderByLastModifiedDesc(any(), any());
+    }
+
+    // Shared notes tests
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findNotesSharedWithUserSuccess() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(noteRepository.findNotesSharedWithUser(eq("testuser"), any())).thenReturn(page);
+
+        noteService.findNotesSharedWithUser("testuser", PageRequest.of(0, 10), null);
+
+        verify(noteRepository).findNotesSharedWithUser(eq("testuser"), any());
+        verify(noteRepository, never()).findNotesSharedWithUserAndTitleContaining(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findNotesSharedWithUserWithSearchFilter() {
+        Page<Note> page = mock(Page.class);
+        when(page.map(any())).thenReturn(mock(Page.class));
+        when(noteRepository.findNotesSharedWithUserAndTitleContaining(eq("testuser"), eq("biology"), any())).thenReturn(page);
+
+        noteService.findNotesSharedWithUser("testuser", PageRequest.of(0, 10), "biology");
+
+        verify(noteRepository).findNotesSharedWithUserAndTitleContaining(eq("testuser"), eq("biology"), any());
+        verify(noteRepository, never()).findNotesSharedWithUser(any(), any());
+    }
 }

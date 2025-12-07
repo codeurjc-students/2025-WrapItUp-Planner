@@ -57,7 +57,10 @@
             <span class="note-visibility" [class.public]="note.visibility === 'PUBLIC'">
               {{ note.visibility === 'PUBLIC' ? '🌐 Public' : '🔒 Private' }}
             </span>
-            <button class="btn-options" (click)="deleteNote(note.id, $event)">✕</button>
+            <button 
+              *ngIf="selectedCategory !== 'SHARED_WITH_ME'" 
+              class="btn-options" 
+              (click)="deleteNote(note.id, $event)">✕</button>
           </div>
         </div>
 

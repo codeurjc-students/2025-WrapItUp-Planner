@@ -15,9 +15,9 @@ export class MyNotesComponent implements OnInit {
   
   filteredNotes: NoteDTO[] = [];
   searchQuery: string = '';
-  selectedCategory: NoteCategory | null = null;
+  selectedCategory: NoteCategory | 'SHARED_WITH_ME' | null = null;
   
-  categories: NoteCategory[] = ['MATHS', 'SCIENCE', 'HISTORY', 'ART', 'LANGUAGES', 'OTHERS'];
+  categories: (NoteCategory | 'SHARED_WITH_ME')[] = ['MATHS', 'SCIENCE', 'HISTORY', 'ART', 'LANGUAGES', 'OTHERS', 'SHARED_WITH_ME'];
   
   currentPage: number = 0;
   pageSize: number = 10;
@@ -68,25 +68,62 @@ export class MyNotesComponent implements OnInit {
   loadMore(): void {
     if (this.hasMore) {
       this.currentPage++;
-      this.loadRecentNotes();
+      if (this.selectedCategory === 'SHARED_WITH_ME') {
+        this.loadSharedNotes();
+      } else {
+        this.loadRecentNotes();
+      }
     }
   }
 
-  selectCategory(category: NoteCategory): void {
+  selectCategory(category: NoteCategory | 'SHARED_WITH_ME'): void {
     if (this.selectedCategory === category) {
       this.selectedCategory = null;
+      this.currentPage = 0;
+      this.filteredNotes = [];
+      this.loadRecentNotes(); // Volver a cargar las notas generales
     } else {
       this.selectedCategory = category;
+      this.currentPage = 0;
+      this.filteredNotes = [];
+      
+      if (category === 'SHARED_WITH_ME') {
+        this.loadSharedNotes();
+      } else {
+        this.loadRecentNotes();
+      }
     }
-    this.currentPage = 0;
-    this.filteredNotes = [];
-    this.loadRecentNotes();
   }
 
   onSearchChange(): void {
     this.currentPage = 0;
     this.filteredNotes = [];
-    this.loadRecentNotes();
+    
+    if (this.selectedCategory === 'SHARED_WITH_ME') {
+      this.loadSharedNotes();
+    } else {
+      this.loadRecentNotes();
+    }
+  }
+  
+  loadSharedNotes(): void {
+    this.noteService.getSharedWithMe(
+      this.currentPage,
+      this.pageSize,
+      this.searchQuery || undefined
+    ).subscribe({
+      next: (response: Page<NoteDTO>) => {
+        if (this.currentPage === 0) {
+          this.filteredNotes = response.content || [];
+        } else {
+          this.filteredNotes = [...this.filteredNotes, ...(response.content || [])];
+        }
+        this.hasMore = !response.last;
+      },
+      error: (err: any) => {
+        console.error('Error loading shared notes:', err);
+      }
+    });
   }
 
   createNote(): void {
@@ -128,8 +165,9 @@ export class MyNotesComponent implements OnInit {
     return `${day}/${month}/${year}`;
   }
 
-  getCategoryDisplayName(category: NoteCategory | undefined): string {
+  getCategoryDisplayName(category: NoteCategory | 'SHARED_WITH_ME' | undefined): string {
     if (!category) return 'Others';
+    if (category === 'SHARED_WITH_ME') return 'Shared with Me';
     
     const displayNames: { [key in NoteCategory]: string } = {
       'MATHS': 'Maths',
@@ -143,7 +181,9 @@ export class MyNotesComponent implements OnInit {
     return displayNames[category] || category;
   }
 
-  getCategoryIcon(category: NoteCategory): string {
+  getCategoryIcon(category: NoteCategory | 'SHARED_WITH_ME'): string {
+    if (category === 'SHARED_WITH_ME') return '🤝';
+    
     const icons: { [key in NoteCategory]: string } = {
       'MATHS': '📐',
       'SCIENCE': '🔬',
