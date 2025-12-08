@@ -65,6 +65,7 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }} --file - . <<DOCKERFILE
           FROM scratch
           COPY docker-compose.yml /docker-compose.yml
+          COPY .env /.env
           DOCKERFILE
           
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/wrapitup_planner-compose:${{ steps.tag.outputs.TAG }}
