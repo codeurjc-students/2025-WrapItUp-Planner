@@ -87,7 +87,6 @@ export class AuthComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          // Mostrar solo si es "usuario ya existe", sino mensaje genérico
           const serverError = err?.error?.error || err?.error?.message || '';
           if (serverError.toLowerCase().includes('already exists')) {
             this.error = serverError;

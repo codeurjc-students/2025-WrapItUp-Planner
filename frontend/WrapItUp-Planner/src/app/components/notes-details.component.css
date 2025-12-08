@@ -49,7 +49,6 @@
   font-weight: normal;
 }
 
-/* Botón Edit */
 .btn-edit {
   background: #007bff;
 }
@@ -58,7 +57,6 @@
   background: #0056b3;
 }
 
-/* Botón Share */
 .btn-share {
   background: #17a2b8;
 }
@@ -73,7 +71,6 @@
   opacity: 0.5;
 }
 
-/* Botón Delete */
 .btn-delete {
   background: #dc3545;
 }
@@ -143,7 +140,6 @@
   color: #495057;
 }
 
-/* Modo edición */
 .edit-mode {
   margin-bottom: 2rem;
 }
@@ -196,7 +192,6 @@ textarea.form-control {
   background: #218838;
 }
 
-/* Sección compartir */
 .share-section {
   margin-top: 3rem;
   padding-top: 2rem;

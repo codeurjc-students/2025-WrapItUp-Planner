@@ -1,8 +1,13 @@
 package es.wrapitup.wrapitup_planner.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +34,26 @@ public class DatabaseInitizalizer {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public Blob saveImageFromFile(String resourcePath) throws IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
+        if (inputStream == null) {
+            throw new IOException("File not found in classpath: " + resourcePath);
+        }
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+        
+        return BlobProxy.generateProxy(buffer.toByteArray());
+    }
+}
+
     @PostConstruct
-    public void init(){
+    public void init() throws IOException{
 
         // User 1: genericUser
         UserModel user = new UserModel(
@@ -40,6 +63,9 @@ public class DatabaseInitizalizer {
             UserStatus.ACTIVE, 
             "USER"
         );
+        user.setProfilePic(saveImageFromFile("images/calendar.jpg"));
+        userRepository.save(user);
+        user.setImage("/api/v1/users/profile-image/" + user.getId());
 
         // User 2: secondUser
         UserModel secondUser = new UserModel(
@@ -49,6 +75,9 @@ public class DatabaseInitizalizer {
             UserStatus.ACTIVE, 
             "USER"
         );
+        secondUser.setProfilePic(saveImageFromFile("images/notebook.jpg"));
+        userRepository.save(secondUser);
+        secondUser.setImage("/api/v1/users/profile-image/" + secondUser.getId());
 
         // admin
         UserModel admin = new UserModel(
