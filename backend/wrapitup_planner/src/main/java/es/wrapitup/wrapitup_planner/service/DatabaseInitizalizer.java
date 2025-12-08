@@ -92,8 +92,6 @@ public class DatabaseInitizalizer {
             "ADMIN", "USER"
         );
 
-        userRepository.save(user);
-        userRepository.save(secondUser);
         userRepository.save(admin);
 
         // Notes for genericUser
