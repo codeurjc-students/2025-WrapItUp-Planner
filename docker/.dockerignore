@@ -7,6 +7,6 @@ backend/wrapitup_planner/target
 # git
 .git
 # environment files
-.env
-.env.*
+# .env
+# .env.*
 !.env.example
