@@ -2,13 +2,15 @@ version: "3.8"
 
 services:
   db:
+    env_file:
+      - .env
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-wrapitup}
       MYSQL_USER: ${MYSQL_USER:-user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
     ports:
@@ -23,6 +25,8 @@ services:
       start_period: 30s
 
   app:
+    env_file:
+      - .env
     image: ${DOCKER_USERNAME:-arturox2500}/wrapitup_planner:${VERSION:-0.1}
     restart: unless-stopped
     depends_on:
@@ -31,10 +35,10 @@ services:
     environment:
       SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:mysql://db:3306/wrapitup}"
       SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-user}"
-      SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD:-password}"
+      SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD}"
       SPRING_JPA_HIBERNATE_DDL_AUTO: "${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}"      
       SERVER_PORT: "${SERVER_PORT:-443}"
-      SERVER_SSL_KEY_STORE_PASSWORD: "${SERVER_SSL_KEY_STORE_PASSWORD:-password}"
+      SERVER_SSL_KEY_STORE_PASSWORD: "${SERVER_SSL_KEY_STORE_PASSWORD}"
       
 
     ports:
