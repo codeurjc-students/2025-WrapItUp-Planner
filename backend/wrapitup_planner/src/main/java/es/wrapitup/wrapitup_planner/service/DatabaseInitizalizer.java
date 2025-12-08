@@ -16,8 +16,10 @@ import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
+import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
+import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import jakarta.annotation.PostConstruct;
 
 @Service
@@ -25,12 +27,14 @@ public class DatabaseInitizalizer {
 
     private final UserRepository userRepository;
     private final NoteRepository noteRepository;
+    private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
     
     public DatabaseInitizalizer(UserRepository userRepository, NoteRepository noteRepository, 
-                                PasswordEncoder passwordEncoder) {
+                                CommentRepository commentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.noteRepository = noteRepository;
+        this.commentRepository = commentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -143,6 +147,76 @@ public class DatabaseInitizalizer {
         );
         note5.setCategory(NoteCategory.LANGUAGES);
 
+        Note note12 = new Note(
+            user,
+            "Newton's Laws",
+            "Fundamental principles of motion",
+            "Newton's three laws of motion describe the relationship between forces and motion.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note12.setCategory(NoteCategory.SCIENCE);
+
+        Note note13 = new Note(
+            user,
+            "Roman Empire",
+            "Ancient civilization",
+            "The Roman Empire was one of the most influential civilizations in world history.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note13.setCategory(NoteCategory.HISTORY);
+
+        Note note14 = new Note(
+            user,
+            "Calculus Basics",
+            "Introduction to derivatives",
+            "Calculus is the mathematical study of continuous change, focusing on limits, derivatives, and integrals.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note14.setCategory(NoteCategory.MATHS);
+
+        Note note15 = new Note(
+            user,
+            "DNA Structure",
+            "Molecular biology",
+            "DNA is a double helix structure that contains genetic information for all living organisms.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note15.setCategory(NoteCategory.SCIENCE);
+
+        Note note16 = new Note(
+            user,
+            "Baroque Art",
+            "17th century artistic style",
+            "Baroque art is characterized by dramatic use of light and shadow, intense emotions, and grandeur.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note16.setCategory(NoteCategory.ART);
+
+        Note note17 = new Note(
+            user,
+            "German Pronunciation",
+            "Language learning guide",
+            "Guide to proper German pronunciation including umlauts and consonant combinations.",
+            "{}",
+            NoteVisibility.PRIVATE
+        );
+        note17.setCategory(NoteCategory.LANGUAGES);
+
+        Note note18 = new Note(
+            user,
+            "Study Techniques",
+            "Effective learning methods",
+            "Various study techniques including spaced repetition, active recall, and the Feynman technique.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note18.setCategory(NoteCategory.OTHERS);
+
         // Notes for secondUser
         Note note6 = new Note(
             secondUser,
@@ -215,6 +289,13 @@ public class DatabaseInitizalizer {
         noteRepository.save(note9);
         noteRepository.save(note10);
         noteRepository.save(note11);
+        noteRepository.save(note12);
+        noteRepository.save(note13);
+        noteRepository.save(note14);
+        noteRepository.save(note15);
+        noteRepository.save(note16);
+        noteRepository.save(note17);
+        noteRepository.save(note18);
 
         // Share some notes
         // note1 (genericUser's Pythagorean Theorem) shared with secondUser
@@ -234,5 +315,32 @@ public class DatabaseInitizalizer {
         sharedWith9.add(user);
         note9.setSharedWith(sharedWith9);
         noteRepository.save(note9);
+
+
+        Comment comment1 = new Comment("Useful, thanks", note1, secondUser);
+        Comment comment2 = new Comment("Great tips!", note1, user);
+        Comment comment3 = new Comment("Very helpful", note1, secondUser);
+        Comment comment4 = new Comment("Useful, thanks", note1, user);
+        Comment comment5 = new Comment("Nice summary", note1, secondUser);
+        Comment comment6 = new Comment("Useful, thanks", note1, user);
+        Comment comment7 = new Comment("Good information", note1, secondUser);
+        Comment comment8 = new Comment("Useful, thanks", note1, user);
+        Comment comment9 = new Comment("Well explained", note1, secondUser);
+        Comment comment10 = new Comment("Useful, thanks", note1, user);
+        Comment comment11 = new Comment("Thanks for sharing", note1, secondUser);
+        Comment comment12 = new Comment("Useful, thanks", note1, user);
+
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
+        commentRepository.save(comment3);
+        commentRepository.save(comment4);
+        commentRepository.save(comment5);
+        commentRepository.save(comment6);
+        commentRepository.save(comment7);
+        commentRepository.save(comment8);
+        commentRepository.save(comment9);
+        commentRepository.save(comment10);
+        commentRepository.save(comment11);
+        commentRepository.save(comment12);
     }
 }
