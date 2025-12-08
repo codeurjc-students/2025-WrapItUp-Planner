@@ -68,8 +68,8 @@ public class DatabaseInitizalizer {
             "USER"
         );
         user.setProfilePic(saveImageFromFile("images/calendar.jpg"));
-        userRepository.save(user);
         user.setImage("/api/v1/users/profile-image/" + user.getId());
+        userRepository.save(user);
 
         // User 2: secondUser
         UserModel secondUser = new UserModel(
@@ -80,9 +80,9 @@ public class DatabaseInitizalizer {
             "USER"
         );
         secondUser.setProfilePic(saveImageFromFile("images/notebook.jpg"));
-        userRepository.save(secondUser);
         secondUser.setImage("/api/v1/users/profile-image/" + secondUser.getId());
-
+        userRepository.save(secondUser);
+        
         // admin
         UserModel admin = new UserModel(
             "admin", 
