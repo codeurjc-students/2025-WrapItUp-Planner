@@ -20,6 +20,24 @@ jobs:
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Generated tag: ${TAG}"
 
+      - name: Create .env file
+        working-directory: ./docker
+        run: |
+          cat << EOF > .env
+          DOCKER_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          VERSION=${{ steps.tag.outputs.tag }}
+          MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE=wrapitup
+          MYSQL_USER=user
+          MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+          SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/wrapitup
+          SPRING_DATASOURCE_USERNAME=user
+          SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO=update
+          SERVER_PORT=443
+          SERVER_SSL_KEY_STORE_PASSWORD=${{ secrets.SERVER_SSL_KEY_STORE_PASSWORD }}
+          EOF
+
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
