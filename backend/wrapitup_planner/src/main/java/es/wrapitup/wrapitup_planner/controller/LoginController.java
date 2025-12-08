@@ -1,5 +1,6 @@
 package es.wrapitup.wrapitup_planner.controller;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.wrapitup.wrapitup_planner.dto.UserModelDTO;
 import es.wrapitup.wrapitup_planner.security.jwt.AuthResponse;
@@ -73,7 +75,14 @@ public class LoginController {
 
         userService.createUser(userDTO);
 
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/users/{username}")
+                .buildAndExpand(userDTO.getUsername())
+                .toUri();
+
         return ResponseEntity.status(HttpStatus.CREATED)
+                .location(location)
                 .body(Map.of("message", "User registered successfully"));
     }
 

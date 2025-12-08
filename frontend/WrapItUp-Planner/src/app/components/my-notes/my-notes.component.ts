@@ -81,7 +81,7 @@ export class MyNotesComponent implements OnInit {
       this.selectedCategory = null;
       this.currentPage = 0;
       this.filteredNotes = [];
-      this.loadRecentNotes(); // Volver a cargar las notas generales
+      this.loadRecentNotes();
     } else {
       this.selectedCategory = category;
       this.currentPage = 0;

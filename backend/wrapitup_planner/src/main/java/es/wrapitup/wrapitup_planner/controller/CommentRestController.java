@@ -1,5 +1,6 @@
 package es.wrapitup.wrapitup_planner.controller;
 
+import java.net.URI;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.wrapitup.wrapitup_planner.dto.CommentDTO;
 import es.wrapitup.wrapitup_planner.service.CommentService;
@@ -74,7 +76,14 @@ public class CommentRestController {
         try {
             commentDTO.setNoteId(noteId);
             CommentDTO created = commentService.createComment(commentDTO, username);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(created.getId())
+                    .toUri();
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .location(location)
+                    .body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));

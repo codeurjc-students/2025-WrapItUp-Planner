@@ -1,5 +1,6 @@
 package es.wrapitup.wrapitup_planner.controller;
 
+import java.net.URI;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.service.NoteService;
@@ -106,7 +108,14 @@ public class NoteRestController {
         
         try {
             NoteDTO created = noteService.createNote(noteDTO, username);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(created.getId())
+                    .toUri();
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .location(location)
+                    .body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
