@@ -29,7 +29,8 @@ module.exports = function (config) {
         flags: [
         '--no-sandbox',
         '--disable-gpu',
-        '--ignore-certificate-errors'
+        '--ignore-certificate-errors',
+        '--unsafely-treat-insecure-origin-as-secure=https://localhost:443'
         ],
     },
     },
