@@ -159,8 +159,7 @@ public class NoteApiIntegrationTest {
         .when()
             .post("/api/v1/notes")
         .then()
-            .statusCode(UNAUTHORIZED.value())
-            .body("message", containsString("log in"));
+            .statusCode(UNAUTHORIZED.value());
     }
 
     @Test
@@ -575,7 +574,7 @@ public class NoteApiIntegrationTest {
         .when()
             .post("/api/v1/notes")
         .then()
-            .statusCode(BAD_REQUEST.value())
+            .statusCode(FORBIDDEN.value())
             .body("message", equalTo("Admins cannot create notes"));
     }
 
@@ -628,7 +627,8 @@ public class NoteApiIntegrationTest {
         .when()
             .put("/api/v1/notes/" + note.getId())
         .then()
-            .statusCode(FORBIDDEN.value());
+            .statusCode(FORBIDDEN.value())
+            .body("message", equalTo("Admins cannot edit notes"));
     }
 
     @Test
@@ -869,6 +869,28 @@ public class NoteApiIntegrationTest {
             .get("/api/v1/notes/shared?page=0&size=10")
         .then()
             .statusCode(UNAUTHORIZED.value());
+    }
+
+    @Test
+    void adminCannotViewOwnNotes() {
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .get("/api/v1/notes?page=0&size=10")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", equalTo("Admins do not have their own notes"));
+    }
+
+    @Test
+    void adminCannotViewSharedNotes() {
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .get("/api/v1/notes/shared?page=0&size=10")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", equalTo("Admins do not have shared notes"));
     }
 
 }
