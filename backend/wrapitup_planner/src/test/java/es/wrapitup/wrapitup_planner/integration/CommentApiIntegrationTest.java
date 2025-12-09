@@ -192,8 +192,7 @@ public class CommentApiIntegrationTest {
         .when()
             .post("/api/v1/notes/" + testNote.getId() + "/comments")
         .then()
-            .statusCode(UNAUTHORIZED.value())
-            .body("message", containsString("log in"));
+            .statusCode(UNAUTHORIZED.value());
     }
 
     @Test

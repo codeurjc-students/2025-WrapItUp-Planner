@@ -93,6 +93,7 @@ public class WebSecurityConfig {
 					
 					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/v1/users/profile-image/*").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*/comments").permitAll()
 
 					// PRIVATE ENDPOINTS
 					.requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").hasAnyRole("USER", "ADMIN")
