@@ -57,7 +57,7 @@ public class NoteService {
         
         // admins cannot create notes
         if (isAdmin(user)) {
-            throw new IllegalArgumentException("Admins cannot create notes");
+            throw new SecurityException("Admins cannot create notes");
         }
         
         
@@ -107,7 +107,15 @@ public class NoteService {
         if (currentUserOpt.isEmpty()) {
             return Page.empty();
         }
-        Long userId = currentUserOpt.get().getId();
+        
+        UserModel user = currentUserOpt.get();
+        
+        // Admins cannot have their own notes
+        if (isAdmin(user)) {
+            throw new SecurityException("Admins do not have their own notes");
+        }
+        
+        Long userId = user.getId();
         
         Page<Note> notes;
         
@@ -137,6 +145,12 @@ public class NoteService {
     public Page<NoteDTO> findNotesSharedWithUser(String username, Pageable pageable, String search) {
         if (username == null || username.isEmpty()) {
             return Page.empty();
+        }
+        
+        // Check if user is admin
+        Optional<UserModel> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent() && isAdmin(userOpt.get())) {
+            throw new SecurityException("Admins do not have shared notes");
         }
         
         Page<Note> notes;
@@ -214,9 +228,14 @@ public class NoteService {
         
         UserModel currentUser = currentUserOpt.get();
         
-        // Admins CANNOT edit notes, only owners can
-        if (isAdmin(currentUser) || !note.getUser().getId().equals(currentUser.getId())) {
-            return Optional.empty(); 
+        // Admins CANNOT edit notes
+        if (isAdmin(currentUser)) {
+            throw new SecurityException("Admins cannot edit notes");
+        }
+        
+        // Only owner can edit
+        if (!note.getUser().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You do not have permission to edit this note");
         }
         
         

@@ -72,9 +72,14 @@ public class NoteRestController {
                     .body(new ErrorResponse("You must log in to view notes"));
         }
         
-        Pageable pageable = PageRequest.of(page, size);
-        Page<NoteDTO> recentNotes = noteService.findRecentNotesByUser(username, pageable, category, search);
-        return ResponseEntity.ok(recentNotes);
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<NoteDTO> recentNotes = noteService.findRecentNotesByUser(username, pageable, category, search);
+            return ResponseEntity.ok(recentNotes);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
     
     @GetMapping("/shared")
@@ -91,9 +96,14 @@ public class NoteRestController {
                     .body(new ErrorResponse("You must log in to view shared notes"));
         }
         
-        Pageable pageable = PageRequest.of(page, size);
-        Page<NoteDTO> sharedNotes = noteService.findNotesSharedWithUser(username, pageable, search);
-        return ResponseEntity.ok(sharedNotes);
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<NoteDTO> sharedNotes = noteService.findNotesSharedWithUser(username, pageable, search);
+            return ResponseEntity.ok(sharedNotes);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @PostMapping
@@ -119,6 +129,9 @@ public class NoteRestController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -135,12 +148,15 @@ public class NoteRestController {
         try {
             Optional<NoteDTO> updated = noteService.updateNote(id, noteDTO, username);
             if (updated.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ErrorResponse("You do not have permission to edit this note"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("Note not found"));
             }
             return ResponseEntity.ok(updated.get());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new ErrorResponse(e.getMessage()));
         }
     }

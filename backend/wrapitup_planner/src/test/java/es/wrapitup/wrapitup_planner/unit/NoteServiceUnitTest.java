@@ -233,16 +233,17 @@ public class NoteServiceUnitTest {
     }
 
     @Test
-    void UpdateNoteNotOwnerWithSuccess() {
+    void UpdateNoteNotOwnerThrowsSecurityException() {
         NoteDTO updateDTO = new NoteDTO();
         updateDTO.setTitle("Updated Title");
 
         when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
         when(userRepository.findByUsername("otheruser")).thenReturn(Optional.of(otherUser));
 
-        Optional<NoteDTO> result = noteService.updateNote(1L, updateDTO, "otheruser");
-
-        assertFalse(result.isPresent());
+        assertThrows(SecurityException.class, () -> {
+            noteService.updateNote(1L, updateDTO, "otheruser");
+        });
+        
         verify(noteRepository, never()).save(any(Note.class));
     }
 
@@ -348,7 +349,7 @@ public class NoteServiceUnitTest {
         admin.setId(3L);
         admin.setUsername("admin");
         admin.setEmail("admin@example.com");
-        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
 
         when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
@@ -365,7 +366,7 @@ public class NoteServiceUnitTest {
         admin.setId(3L);
         admin.setUsername("admin");
         admin.setEmail("admin@example.com");
-        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
 
         NoteDTO updateDTO = new NoteDTO();
         updateDTO.setTitle("Updated Title");
@@ -373,9 +374,10 @@ public class NoteServiceUnitTest {
         when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
 
-        Optional<NoteDTO> result = noteService.updateNote(1L, updateDTO, "admin");
-
-        assertTrue(result.isEmpty());
+        assertThrows(SecurityException.class, () -> {
+            noteService.updateNote(1L, updateDTO, "admin");
+        });
+        
         verify(noteRepository, never()).save(any(Note.class));
     }
 
@@ -385,7 +387,7 @@ public class NoteServiceUnitTest {
         admin.setId(3L);
         admin.setUsername("admin");
         admin.setEmail("admin@example.com");
-        admin.setRoles(java.util.List.of("USER", "ADMIN"));
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
 
         when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
@@ -482,5 +484,56 @@ public class NoteServiceUnitTest {
 
         verify(noteRepository).findNotesSharedWithUserAndTitleContaining(eq("testuser"), eq("biology"), any());
         verify(noteRepository, never()).findNotesSharedWithUser(any(), any());
+    }
+
+    @Test
+    void adminCannotCreateNote() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
+
+        NoteDTO noteDTO = new NoteDTO();
+        noteDTO.setTitle("Test Note");
+        noteDTO.setSummary("Summary");
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.createNote(noteDTO, "admin");
+        });
+
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void adminCannotViewOwnNotes() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.findRecentNotesByUser("admin", PageRequest.of(0, 10), null, null);
+        });
+    }
+
+    @Test
+    void adminCannotViewSharedNotes() {
+        UserModel admin = new UserModel();
+        admin.setId(3L);
+        admin.setUsername("admin");
+        admin.setEmail("admin@example.com");
+        admin.setRoles(java.util.List.of("ADMIN", "USER"));
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.findNotesSharedWithUser("admin", PageRequest.of(0, 10), null);
+        });
     }
 }

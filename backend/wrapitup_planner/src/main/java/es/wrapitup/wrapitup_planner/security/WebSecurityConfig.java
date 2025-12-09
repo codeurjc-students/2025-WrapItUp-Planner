@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -63,7 +64,7 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-	//@Bean
+	@Bean
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
@@ -86,10 +87,35 @@ public class WebSecurityConfig {
 		http
 			.authorizeHttpRequests(authorize -> authorize
                     // PUBLIC ENDPOINTS
+					.requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+					.requestMatchers(HttpMethod.POST, "/api/v1/auth/user").permitAll()
+					.requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
+					
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/v1/users/profile-image/*").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*/comments").permitAll()
 
 					// PRIVATE ENDPOINTS
-
-					//.requestMatchers(HttpMethod.GET, "/api/v1/profiles/stats").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").hasAnyRole("USER", "ADMIN")
+					
+					.requestMatchers(HttpMethod.GET, "/api/v1/users").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.PUT, "/api/v1/users").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/v1/users/upload-image").hasAnyRole("USER", "ADMIN")
+					
+					// Notes - USER only (admins cannot create/edit notes)
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes").hasRole("USER")
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes/shared").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes").hasRole("USER")
+					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*").hasRole("USER")
+					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*/share").hasRole("USER")
+					
+					// Delete notes - both USER (own notes) and ADMIN (any note)
+					.requestMatchers(HttpMethod.DELETE, "/api/v1/notes/*").hasAnyRole("USER", "ADMIN")
+					
+					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*/comments").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/comments").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/v1/notes/*/comments/*").hasAnyRole("USER", "ADMIN")
 
 					.anyRequest().permitAll()
 					);
