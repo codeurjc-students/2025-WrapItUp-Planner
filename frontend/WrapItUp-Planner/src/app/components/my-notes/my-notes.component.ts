@@ -61,6 +61,9 @@ export class MyNotesComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error loading notes:', err);
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -122,6 +125,9 @@ export class MyNotesComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error loading shared notes:', err);
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -148,7 +154,11 @@ export class MyNotesComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('Error deleting note:', err);
-          alert('Error deleting note');
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          } else {
+            alert('Error deleting note');
+          }
         }
       });
     }

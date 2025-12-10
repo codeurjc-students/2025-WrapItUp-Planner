@@ -61,7 +61,9 @@ export class CreateNoteComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creating note:', err);
-        if (err.error && err.error.message) {
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else if (err.error && err.error.message) {
           alert(err.error.message);
         } else {
           alert('Error creating note');

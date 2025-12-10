@@ -37,9 +37,13 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error loading user data';
-        this.loading = false;
         console.error('Error loading user:', err);
+        this.loading = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = 'Error loading user data';
+        }
       }
     });
   }
@@ -99,9 +103,13 @@ export class ProfileComponent implements OnInit {
         this.selectedFile = null;
       },
       error: (err) => {
-        this.error = err?.error || 'Error uploading image';
         this.selectedFile = null;
         this.imagePreview = null;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = err?.error || 'Error uploading image';
+        }
       }
     });
   }
@@ -135,7 +143,11 @@ export class ProfileComponent implements OnInit {
         setTimeout(() => this.success = null, 3000);
       },
       error: (err) => {
-        this.error = err?.error || 'Error updating profile';
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = err?.error || 'Error updating profile';
+        }
       }
     });
   }
