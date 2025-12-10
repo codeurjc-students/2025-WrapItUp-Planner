@@ -107,6 +107,10 @@ export class NoteDetailComponent implements OnInit {
           alert('Note not found');
           this.router.navigate(['/profile']);
         }
+        
+        else {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -227,7 +231,9 @@ export class NoteDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating note:', err);
-        if (err.error && err.error.message) {
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else if (err.error && err.error.message) {
           alert(err.error.message);
         } else {
           alert('Error updating note');
@@ -261,7 +267,9 @@ export class NoteDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error deleting note:', err);
-        if (err.error && err.error.message) {
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else if (err.error && err.error.message) {
           alert(err.error.message);
         } else {
           alert('Error deleting note');
@@ -292,6 +300,9 @@ export class NoteDetailComponent implements OnInit {
       error: (err) => {
         console.error('Error loading comments:', err);
         this.loadingComments = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -329,6 +340,8 @@ export class NoteDetailComponent implements OnInit {
           alert('You must log in to comment');
         } else if (err.status === 403) {
           alert('You do not have permission to comment on this note');
+        } else if (err.status >= 500) {
+          this.router.navigate(['/error']);
         } else {
           alert('Error creating comment');
         }
@@ -359,7 +372,11 @@ export class NoteDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error deleting comment:', err);
-        alert('Error deleting comment');
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          alert('Error deleting comment');
+        }
       }
     });
   }

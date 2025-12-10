@@ -62,7 +62,11 @@ export class AuthComponent implements OnInit {
           }, 300);
         },
         error: (err) => {
-          this.error = 'Bad credentials';
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          } else {
+            this.error = 'Bad credentials';
+          }
         }
       });
     } else {
@@ -87,11 +91,15 @@ export class AuthComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          const serverError = err?.error?.error || err?.error?.message || '';
-          if (serverError.toLowerCase().includes('already exists')) {
-            this.error = serverError;
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
           } else {
-            this.error = 'Registration error. Please try again.';
+            const serverError = err?.error?.error || err?.error?.message || '';
+            if (serverError.toLowerCase().includes('already exists')) {
+              this.error = serverError;
+            } else {
+              this.error = 'Registration error. Please try again.';
+            }
           }
         }
       });

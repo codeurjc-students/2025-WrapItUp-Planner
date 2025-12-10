@@ -9,6 +9,7 @@ import { AboutUsComponent } from './components/about-us/about-us.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { AuthGuard } from './guards/auth.guard';
 import { MyNotesComponent } from './components/my-notes/my-notes.component';
+import { ErrorPageComponent } from './components/error-page/error-page.component';
 
 
 export const routes: Routes = [
@@ -20,6 +21,7 @@ export const routes: Routes = [
   , { path: '', component: LandingPageComponent }
   , { path: 'about-us', component: AboutUsComponent }
   , { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] }
+  , { path: 'error', component: ErrorPageComponent }
   , { path: '**', redirectTo: '/' }
 ]; 
 
