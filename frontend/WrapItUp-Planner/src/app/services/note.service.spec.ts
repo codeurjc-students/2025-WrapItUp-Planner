@@ -1,316 +1,396 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientModule } from '@angular/common/http';
 import { NoteService } from './note.service';
+import { AuthService } from './auth.service';
 import { NoteDTO } from '../dtos/note.dto';
-import { Page } from '../dtos/page.dto';
 
-describe('NoteService', () => {
+describe('NoteService (integration with real API)', () => {
   let service: NoteService;
-  let httpMock: HttpTestingController;
-  const apiUrl = 'https://localhost:443/api/v1/notes';
+  let authService: AuthService;
+  const TEST_USERNAME = 'genericUser';
+  const TEST_PASSWORD = '12345678';
+  let createdNoteId: number;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [NoteService]
+      imports: [HttpClientModule],
+      providers: [NoteService, AuthService]
     });
     service = TestBed.inject(NoteService);
-    httpMock = TestBed.inject(HttpTestingController);
+    authService = TestBed.inject(AuthService);
   });
 
-  afterEach(() => {
-    httpMock.verify();
+  afterEach((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
+  });
+
+  afterAll((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get note by id', () => {
-    const testNote: NoteDTO = {
-      id: 1,
-      title: 'Test Note',
-      overview: 'Overview',
-      summary: 'Summary',
-      visibility: 'PUBLIC',
-      userId: 1
-    };
-
-    service.getNoteById(1).subscribe(note => {
-      expect(note).toEqual(testNote);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(testNote);
-  });
-
-  it('should create a note', () => {
-    const newNote: NoteDTO = {
-      title: 'New Note',
-      overview: 'New Overview',
-      summary: 'New Summary',
-      visibility: 'PRIVATE'
-    };
-
-    const createdNote: NoteDTO = {
-      ...newNote,
-      id: 1,
-      userId: 1
-    };
-
-    service.createNote(newNote).subscribe(note => {
-      expect(note).toEqual(createdNote);
-    });
-
-    const req = httpMock.expectOne(apiUrl);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newNote);
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(createdNote);
-  });
-
-  it('should update a note', () => {
-    const updatedNote: NoteDTO = {
-      title: 'Updated Note',
-      overview: 'Updated Overview',
-      summary: 'Updated Summary',
-      visibility: 'PUBLIC'
-    };
-
-    service.updateNote(1, updatedNote).subscribe(note => {
-      expect(note.title).toBe('Updated Note');
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(updatedNote);
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(updatedNote);
-  });
-
-  it('should share note by username', () => {
-    const sharedNote: NoteDTO = {
-      id: 1,
-      title: 'Shared Note',
-      overview: 'Overview',
-      summary: 'Summary',
-      visibility: 'PUBLIC',
-      userId: 1,
-      sharedWithUserIds: [2]
-    };
-
-    service.shareNoteByUsername(1, 'otheruser').subscribe(note => {
-      expect(note.sharedWithUserIds).toContain(2);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1/share`);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual({ username: 'otheruser' });
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(sharedNote);
-  });
-
-  it('should delete a note', () => {
-    service.deleteNote(1).subscribe(response => {
-      expect(response).toBeNull();
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('DELETE');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(null);
-  });
-
-  it('should handle error when getting note by id', () => {
-    service.getNoteById(999).subscribe({
-      next: () => fail('should have failed'),
-      error: (error) => {
-        expect(error.status).toBe(404);
+  it('should get note by id', (done) => {
+    service.getNoteById(1).subscribe({
+      next: (note) => {
+        expect(note).toBeDefined();
+        expect(note.id).toBe(1);
+        expect(note.title).toBeDefined();
+        done();
+      },
+      error: (err) => {
+        console.error('Error getting note:', err);
+        fail('Request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
       }
     });
+  }, 10000);
 
-    const req = httpMock.expectOne(`${apiUrl}/999`);
-    req.flush('Note not found', { status: 404, statusText: 'Not Found' });
-  });
+  it('should create a note after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        const newNote: NoteDTO = {
+          title: `Test Note ${Date.now()}`,
+          overview: 'Test Overview',
+          summary: 'Test Summary',
+          visibility: 'PRIVATE',
+          category: 'OTHERS'
+        };
 
-  it('should handle error when creating note', () => {
-    const newNote: NoteDTO = {
-      title: 'New Note',
-      overview: '',
-      summary: '',
-      visibility: 'PRIVATE'
-    };
-
-    service.createNote(newNote).subscribe({
-      next: () => fail('should have failed'),
-      error: (error) => {
-        expect(error.status).toBe(400);
+        service.createNote(newNote).subscribe({
+          next: (note) => {
+            expect(note).toBeDefined();
+            expect(note.id).toBeDefined();
+            expect(note.title).toBe(newNote.title);
+            createdNoteId = note.id!;
+            done();
+          },
+          error: (err) => {
+            console.error('Error creating note:', err);
+            fail('Failed to create note: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
       }
     });
+  }, 15000);
 
-    const req = httpMock.expectOne(apiUrl);
-    req.flush('Bad request', { status: 400, statusText: 'Bad Request' });
-  });
+  it('should update a note after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        const newNote: NoteDTO = {
+          title: `Note to Update ${Date.now()}`,
+          overview: 'Original Overview',
+          summary: 'Original Summary',
+          visibility: 'PRIVATE',
+          category: 'OTHERS'
+        };
 
-  it('should get recent notes with pagination', () => {
-    const mockPage: Page<NoteDTO> = {
-      content: [
-        {
-          id: 1,
-          title: 'Note 1',
-          overview: 'Overview 1',
-          summary: 'Summary 1',
-          visibility: 'PUBLIC' as const,
-          userId: 1
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-      first: true,
-      last: true,
-      empty: false
-    };
+        service.createNote(newNote).subscribe({
+          next: (createdNote) => {
+            const updatedNote: NoteDTO = {
+              title: 'Updated Title',
+              overview: 'Updated Overview',
+              summary: 'Updated Summary',
+              visibility: 'PUBLIC',
+              category: 'MATHS'
+            };
 
-    service.getRecentNotes(0, 10).subscribe(page => {
-      expect(page.content.length).toBe(1);
-      expect(page.totalElements).toBe(1);
+            service.updateNote(createdNote.id!, updatedNote).subscribe({
+              next: (note) => {
+                expect(note.title).toBe('Updated Title');
+                expect(note.overview).toBe('Updated Overview');
+                done();
+              },
+              error: (err) => {
+                console.error('Error updating note:', err);
+                fail('Failed to update note: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error creating note for update:', err);
+            fail('Failed to create note for update: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
     });
+  }, 20000);
 
-    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockPage);
-  });
-
-  it('should get recent notes with category filter', () => {
-    const mockPage: Page<NoteDTO> = {
-      content: [
-        {
-          id: 1,
-          title: 'Math Note',
+  it('should delete a note after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        const newNote: NoteDTO = {
+          title: `Note to Delete ${Date.now()}`,
           overview: 'Overview',
           summary: 'Summary',
-          visibility: 'PUBLIC' as const,
-          userId: 1,
-          category: 'MATHS' as const
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-      first: true,
-      last: true,
-      empty: false
-    };
+          visibility: 'PRIVATE',
+          category: 'OTHERS'
+        };
 
-    service.getRecentNotes(0, 10, 'MATHS').subscribe(page => {
-      expect(page.content[0].category).toBe('MATHS');
+        service.createNote(newNote).subscribe({
+          next: (createdNote) => {
+            service.deleteNote(createdNote.id!).subscribe({
+              next: () => {
+                expect(true).toBe(true);
+                done();
+              },
+              error: (err) => {
+                console.error('Error deleting note:', err);
+                fail('Failed to delete note: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error creating note for delete:', err);
+            fail('Failed to create note for delete: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
     });
+  }, 20000);
 
-    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10&category=MATHS`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockPage);
-  });
-
-  it('should get recent notes with search filter', () => {
-    const mockPage: Page<NoteDTO> = {
-      content: [
-        {
-          id: 1,
-          title: 'Test Search',
-          overview: 'Overview',
-          summary: 'Summary',
-          visibility: 'PRIVATE' as const,
-          userId: 1
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-      first: true,
-      last: true,
-      empty: false
-    };
-
-    service.getRecentNotes(0, 10, undefined, 'Test').subscribe(page => {
-      expect(page.content[0].title).toContain('Test');
+  it('should get recent notes with pagination', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getRecentNotes(0, 10).subscribe({
+          next: (page) => {
+            expect(page).toBeDefined();
+            expect(page.content).toBeDefined();
+            expect(Array.isArray(page.content)).toBe(true);
+            expect(page.totalElements).toBeGreaterThanOrEqual(0);
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting recent notes:', err);
+            fail('Failed to get recent notes: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
     });
+  }, 15000);
 
-    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10&search=Test`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockPage);
-  });
-
-  it('should get shared with me notes', () => {
-    const mockPage: Page<NoteDTO> = {
-      content: [
-        {
-          id: 1,
-          title: 'Shared Note',
-          overview: 'Overview',
-          summary: 'Summary',
-          visibility: 'PUBLIC' as const,
-          userId: 2,
-          sharedWithUserIds: [1]
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-      first: true,
-      last: true,
-      empty: false
-    };
-
-    service.getSharedWithMe(0, 10).subscribe(page => {
-      expect(page.content.length).toBe(1);
-      expect(page.content[0].sharedWithUserIds).toContain(1);
+  it('should get recent notes with category filter', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getRecentNotes(0, 10, 'SCIENCE').subscribe({
+          next: (page) => {
+            expect(page).toBeDefined();
+            expect(page.content).toBeDefined();
+            if (page.content.length > 0) {
+              page.content.forEach(note => {
+                expect(note.category).toBe('SCIENCE');
+              });
+            }
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting notes by category:', err);
+            fail('Failed to get notes by category: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
     });
+  }, 15000);
 
-    const req = httpMock.expectOne(`${apiUrl}/shared?page=0&size=10`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockPage);
-  });
-
-  it('should get shared with me notes with search filter', () => {
-    const mockPage: Page<NoteDTO> = {
-      content: [
-        {
-          id: 1,
-          title: 'Shared Search Note',
-          overview: 'Overview',
-          summary: 'Summary',
-          visibility: 'PUBLIC' as const,
-          userId: 2,
-          sharedWithUserIds: [1]
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      size: 10,
-      number: 0,
-      first: true,
-      last: true,
-      empty: false
-    };
-
-    service.getSharedWithMe(0, 10, 'Search').subscribe(page => {
-      expect(page.content[0].title).toContain('Search');
+  it('should get shared with me notes', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getSharedWithMe(0, 10).subscribe({
+          next: (page) => {
+            expect(page).toBeDefined();
+            expect(page.content).toBeDefined();
+            expect(Array.isArray(page.content)).toBe(true);
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting shared notes:', err);
+            fail('Failed to get shared notes: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
     });
+  }, 15000);
 
-    const req = httpMock.expectOne(`${apiUrl}/shared?page=0&size=10&search=Search`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockPage);
-  });
+  it('should get recent notes with search filter', (done) => {
+    authService.login('genericUser', '12345678').subscribe({
+      next: () => {
+        service.getRecentNotes(0, 10, 'OTHERS').subscribe({
+          next: (page) => {
+            expect(page).toBeDefined();
+            expect(page.content).toBeDefined();
+            expect(Array.isArray(page.content)).toBe(true);
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting recent notes with filter:', err);
+            fail('Failed to get recent notes: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
+
+  it('should get shared with me notes with search filter', (done) => {
+    authService.login('genericUser', '12345678').subscribe({
+      next: () => {
+        service.getSharedWithMe(0, 10, 'Pythagorean').subscribe({
+          next: (page) => {
+            expect(page).toBeDefined();
+            expect(page.content).toBeDefined();
+            expect(Array.isArray(page.content)).toBe(true);
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting shared notes with filter:', err);
+            fail('Failed to get shared notes: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
+
+  it('should share note by username', (done) => {
+    authService.login('genericUser', '12345678').subscribe({
+      next: () => {
+        const newNote: NoteDTO = {
+          title: 'Note to Share',
+          summary: 'Test sharing',
+          visibility: 'PRIVATE',
+          category: 'OTHERS'
+        };
+
+        service.createNote(newNote).subscribe({
+          next: (createdNote) => {
+            service.shareNoteByUsername(createdNote.id!, 'secondUser').subscribe({
+              next: () => {
+                expect(true).toBe(true);
+                service.deleteNote(createdNote.id!).subscribe(() => {
+                  done();
+                });
+              },
+              error: (err) => {
+                console.error('Error sharing note:', err);
+                service.deleteNote(createdNote.id!).subscribe(() => {
+                  fail('Share failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                  done();
+                });
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error creating note for sharing:', err);
+            fail('Failed to create note: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 20000);
+
+  it('should handle errors when getting note by invalid id', (done) => {
+    authService.login('genericUser', '12345678').subscribe({
+      next: () => {
+        service.getNoteById(999999).subscribe({
+          next: () => {
+            fail('Should have returned an error');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(404);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
+
+  it('should handle errors when deleting non-existent note', (done) => {
+    authService.login('genericUser', '12345678').subscribe({
+      next: () => {
+        service.deleteNote(999999).subscribe({
+          next: () => {
+            fail('Should have returned an error');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(403);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
 });

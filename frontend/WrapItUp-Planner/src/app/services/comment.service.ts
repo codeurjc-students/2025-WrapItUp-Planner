@@ -7,7 +7,7 @@ import { CommentDTO } from '../dtos/comment.dto';
   providedIn: 'root'
 })
 export class CommentService {
-  private apiUrl = 'https://localhost/api/v1/notes';
+  private apiUrl = 'https://localhost:443/api/v1/notes';
 
   constructor(private http: HttpClient) {}
 

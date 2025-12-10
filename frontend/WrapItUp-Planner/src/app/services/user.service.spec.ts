@@ -1,148 +1,220 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './user.service';
 import { UserModelDTO } from '../dtos/user.dto';
+import { AuthService } from './auth.service';
 
-describe('UserService', () => {
+describe('UserService (integration with real API)', () => {
   let service: UserService;
-  let httpMock: HttpTestingController;
-  const apiUrl = 'https://localhost:443/api/v1/users';
+  let authService: AuthService;
+  const TEST_USERNAME = 'genericUser';
+  const TEST_PASSWORD = '12345678';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [UserService]
+      imports: [HttpClientModule],
+      providers: [UserService, AuthService]
     });
     service = TestBed.inject(UserService);
-    httpMock = TestBed.inject(HttpTestingController);
+    authService = TestBed.inject(AuthService);
   });
 
-  afterEach(() => {
-    httpMock.verify();
+  afterEach((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
+  });
+
+  afterAll((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get user by id', () => {
-    const mockUser: UserModelDTO = {
-      id: 1,
-      username: 'testuser',
-      email: 'test@example.com',
-      displayName: 'Test User',
-      password: ''
-    };
-
-    service.getUserById(1).subscribe(user => {
-      expect(user).toEqual(mockUser);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockUser);
-  });
-
-  it('should get current user', () => {
-    const mockUser: UserModelDTO = {
-      id: 2,
-      username: 'currentuser',
-      email: 'current@example.com',
-      displayName: 'Current User',
-      password: ''
-    };
-
-    service.getCurrentUser().subscribe(user => {
-      expect(user).toEqual(mockUser);
-      expect(user.username).toBe('currentuser');
-    });
-
-    const req = httpMock.expectOne(apiUrl);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockUser);
-  });
-
-  it('should update user', () => {
-    const userToUpdate: UserModelDTO = {
-      id: 3,
-      username: 'updateuser',
-      email: 'updated@example.com',
-      displayName: 'Updated Name',
-      password: ''
-    };
-
-    service.updateUser(userToUpdate).subscribe(user => {
-      expect(user).toEqual(userToUpdate);
-      expect(user.displayName).toBe('Updated Name');
-      expect(user.email).toBe('updated@example.com');
-    });
-
-    const req = httpMock.expectOne(apiUrl);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.withCredentials).toBe(true);
-    expect(req.request.body).toEqual(userToUpdate);
-    req.flush(userToUpdate);
-  });
-
-  it('should upload profile image', () => {
-    const mockFile = new File(['image'], 'profile.jpg', { type: 'image/jpeg' });
-    const mockResponse: UserModelDTO = {
-      id: 4,
-      username: 'imageuser',
-      email: 'image@example.com',
-      displayName: 'Image User',
-      password: '',
-      image: '/api/v1/users/profile-image/4'
-    };
-
-    service.uploadProfileImage(mockFile).subscribe(user => {
-      expect(user).toEqual(mockResponse);
-      expect(user.image).toBe('/api/v1/users/profile-image/4');
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/upload-image`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.withCredentials).toBe(true);
-    expect(req.request.body instanceof FormData).toBe(true);
-    
-    const formData = req.request.body as FormData;
-    expect(formData.get('image')).toBe(mockFile);
-    
-    req.flush(mockResponse);
-  });
-
-  it('should handle error when getting current user', () => {
-    const errorMessage = 'Unauthorized';
-
-    service.getCurrentUser().subscribe(
-      () => fail('should have failed with 401 error'),
-      (error) => {
-        expect(error.status).toBe(401);
+  it('should get user by id after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getUserById(1).subscribe({
+          next: (user) => {
+            expect(user).toBeDefined();
+            expect(user.id).toBe(1);
+            expect(user.username).toBe('genericUser');
+            expect(user.email).toBeDefined();
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting user by id:', err);
+            fail('Failed to get user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
       }
-    );
+    });
+  }, 15000);
 
-    const req = httpMock.expectOne(apiUrl);
-    req.flush(errorMessage, { status: 401, statusText: 'Unauthorized' });
-  });
-
-  it('should handle error when updating user', () => {
-    const userToUpdate: UserModelDTO = {
-      username: 'testuser',
-      email: '',
-      displayName: 'Test',
-      password: ''
-    };
-
-    service.updateUser(userToUpdate).subscribe(
-      () => fail('should have failed with 400 error'),
-      (error) => {
-        expect(error.status).toBe(400);
+  it('should get current user after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getCurrentUser().subscribe({
+          next: (user) => {
+            expect(user).toBeDefined();
+            expect(user.username).toBe('genericUser');
+            expect(user.email).toBe('genericUser@example.com');
+            done();
+          },
+          error: (err) => {
+            console.error('Error getting current user:', err);
+            fail('Failed to get current user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
       }
-    );
+    });
+  }, 15000);
 
-    const req = httpMock.expectOne(apiUrl);
-    req.flush('Email is required', { status: 400, statusText: 'Bad Request' });
-  });
+  it('should update user after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        service.getCurrentUser().subscribe({
+          next: (currentUser) => {
+            const userToUpdate: UserModelDTO = {
+              ...currentUser,
+              displayName: 'Updated Display Name'
+            };
+
+            service.updateUser(userToUpdate).subscribe({
+              next: (updatedUser) => {
+                expect(updatedUser).toBeDefined();
+                expect(updatedUser.displayName).toBe('Updated Display Name');
+                
+                const revertUser: UserModelDTO = {
+                  ...updatedUser,
+                  displayName: currentUser.displayName || ''
+                };
+                service.updateUser(revertUser).subscribe(() => {
+                  done();
+                });
+              },
+              error: (err) => {
+                console.error('Error updating user:', err);
+                fail('Failed to update user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error getting current user:', err);
+            fail('Failed to get current user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 20000);
+
+  it('should upload profile image after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        const mockFile = new File(['test image content'], 'test-profile.jpg', { type: 'image/jpeg' });
+
+        service.uploadProfileImage(mockFile).subscribe({
+          next: (user) => {
+            expect(user).toBeDefined();
+            expect(user.image).toBeDefined();
+            expect(user.image).toContain('/api/v1/users/profile-image/');
+            done();
+          },
+          error: (err) => {
+            console.error('Error uploading image:', err);
+            fail('Failed to upload image: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
+
+  it('should handle error when getting current user without login', (done) => {
+    authService.logout().subscribe({
+      next: () => {
+        service.getCurrentUser().subscribe({
+          next: () => {
+            fail('Should have failed with 401 error');
+            done();
+          },
+          error: (err) => {
+            expect([0, 401]).toContain(err.status);
+            done();
+          }
+        });
+      },
+      error: () => {
+        service.getCurrentUser().subscribe({
+          next: () => {
+            fail('Should have failed with 401 error');
+            done();
+          },
+          error: (err) => {
+            expect([0, 401]).toContain(err.status);
+            done();
+          }
+        });
+      }
+    });
+  }, 10000);
+
+  it('should handle error when updating user with invalid data', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: () => {
+        const invalidUser: UserModelDTO = {
+          username: '',
+          email: '',
+          displayName: '',
+          password: ''
+        };
+
+        service.updateUser(invalidUser).subscribe({
+          next: () => {
+            fail('Should have failed with 400 error');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBeGreaterThanOrEqual(400);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
 });

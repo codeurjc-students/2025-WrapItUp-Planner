@@ -1,11 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { ProfileComponent } from './profile.component';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+
+@Component({ template: '' })
+class DummyComponent {}
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -20,8 +23,15 @@ describe('ProfileComponent', () => {
     userServiceSpy.getCurrentUser.and.returnValue(of({ username: 'test', email: 'test@test.com', displayName: 'Test User', password: '' }));
 
     await TestBed.configureTestingModule({
-      declarations: [ProfileComponent],
-      imports: [HttpClientTestingModule, RouterTestingModule],
+      declarations: [ProfileComponent, DummyComponent],
+      imports: [
+        HttpClientTestingModule, 
+        RouterTestingModule.withRoutes([
+          { path: 'login', component: DummyComponent },
+          { path: 'profile', component: DummyComponent },
+          { path: 'error', component: DummyComponent }
+        ])
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: UserService, useValue: userServiceSpy },

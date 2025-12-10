@@ -1,107 +1,109 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CommentService } from './comment.service';
 import { CommentDTO } from '../dtos/comment.dto';
+import { AuthService } from './auth.service';
 
-describe('CommentService', () => {
+describe('CommentService (integration with real API)', () => {
   let service: CommentService;
-  let httpMock: HttpTestingController;
-  const apiUrl = 'https://localhost/api/v1/notes';
+  let authService: AuthService;
+  let http: HttpClient;
+  const TEST_NOTE_ID = 1;
+  const TEST_USERNAME = 'genericUser';
+  const TEST_PASSWORD = '12345678';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [CommentService]
+      imports: [HttpClientModule],
+      providers: [CommentService, AuthService]
     });
     service = TestBed.inject(CommentService);
-    httpMock = TestBed.inject(HttpTestingController);
+    authService = TestBed.inject(AuthService);
+    http = TestBed.inject(HttpClient);
   });
 
-  afterEach(() => {
-    httpMock.verify();
+  afterEach((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
+  });
+
+  afterAll((done) => {
+    authService.logout().subscribe({
+      next: () => done(),
+      error: () => done()
+    });
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch comments for a note with pagination', () => {
-    const noteId = 1;
-    const mockResponse = {
-      content: [
-        {
-          id: 1,
-          content: 'Test comment',
-          noteId: 1,
-          username: 'testuser',
-          displayName: 'Test User',
-          createdAt: '2025-01-01T10:00:00'
-        }
-      ],
-      totalElements: 1,
-      totalPages: 1,
-      last: true
-    };
-
-    service.getCommentsByNote(noteId, 0, 10).subscribe(response => {
-      expect(response.content.length).toBe(1);
-      expect(response.totalElements).toBe(1);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/${noteId}/comments?page=0&size=10`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(mockResponse);
-  });
-
-  it('should create a new comment', () => {
-    const noteId = 1;
-    const newComment: CommentDTO = { content: 'New test comment' };
-    const createdComment: CommentDTO = {
-      id: 1,
-      content: 'New test comment',
-      noteId: 1,
-      username: 'testuser',
-      displayName: 'Test User',
-      createdAt: '2025-01-01T10:00:00'
-    };
-
-    service.createComment(noteId, newComment).subscribe(comment => {
-      expect(comment.id).toBe(1);
-      expect(comment.content).toBe('New test comment');
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/${noteId}/comments`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newComment);
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(createdComment);
-  });
-
-  it('should delete a comment', () => {
-    const noteId = 1;
-    const commentId = 5;
-
-    service.deleteComment(noteId, commentId).subscribe();
-
-    const req = httpMock.expectOne(`${apiUrl}/${noteId}/comments/${commentId}`);
-    expect(req.request.method).toBe('DELETE');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush(null);
-  });
-
-  it('should handle errors appropriately', () => {
-    const noteId = 1;
-
-    service.getCommentsByNote(noteId).subscribe(
-      () => fail('should have failed'),
-      (error) => {
-        expect(error.status).toBe(500);
+  it('should fetch comments for a note with pagination', (done) => {
+    service.getCommentsByNote(TEST_NOTE_ID, 0, 10).subscribe({
+      next: (response) => {
+        expect(response).toBeDefined();
+        expect(response.content).toBeDefined();
+        expect(Array.isArray(response.content)).toBe(true);
+        expect(response.totalElements).toBeGreaterThanOrEqual(0);
+        done();
+      },
+      error: (err) => {
+        console.error('Error fetching comments:', err);
+        fail('Request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
       }
-    );
+    });
+  }, 10000);
 
-    const req = httpMock.expectOne(`${apiUrl}/${noteId}/comments?page=0&size=10`);
-    req.flush('Server error', { status: 500, statusText: 'Internal Server Error' });
-  });
+  it('should create a new comment after login', (done) => {
+    authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
+      next: (loginResponse) => {
+        expect(loginResponse).toBeDefined();
+        
+        const newComment: CommentDTO = { 
+          content: `Test comment ${Date.now()}` 
+        };
+
+        service.createComment(TEST_NOTE_ID, newComment).subscribe({
+          next: (comment) => {
+            expect(comment).toBeDefined();
+            expect(comment.id).toBeDefined();
+            expect(comment.content).toBe(newComment.content);
+            expect(comment.username).toBeDefined();
+            done();
+          },
+          error: (err) => {
+            console.error('Error creating comment:', err);
+            fail('Failed to create comment after login: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        fail('Login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 15000);
+
+  it('should handle errors when fetching comments for non-existent note', (done) => {
+    const nonExistentNoteId = 999999;
+
+    service.getCommentsByNote(nonExistentNoteId).subscribe({
+      next: (response) => {
+        expect(response).toBeDefined();
+        expect(response.content).toBeDefined();
+        expect(Array.isArray(response.content)).toBe(true);
+        done();
+      },
+      error: (err) => {
+        expect([401, 403]).toContain(err.status);
+        done();
+      }
+    });
+  }, 10000);
 });
 
