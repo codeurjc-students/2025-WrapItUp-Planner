@@ -66,20 +66,25 @@ describe('AuthService (integration with real API)', () => {
     }, 10000);
 
   it('logout should call real API (POST /logout)', (done) => {
-    service.logout().subscribe({
-      next: (res) => {
-        expect(res).toBeDefined();
-        done();
+    service.login('genericUser', '12345678').subscribe({
+      next: () => {
+        service.logout().subscribe({
+          next: (res) => {
+            expect(res).toBeDefined();
+            done();
+          },
+          error: (err) => {
+            console.error('Logout error:', err);
+            fail('Logout request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
       },
       error: (err) => {
-        console.error('Logout error:', err);
-        if (err.status === 0) {
-          fail('Backend is not running. Start it with: mvn spring-boot:run');
-        } else {
-          fail('Logout request failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
-        }
+        console.error('Login error:', err);
+        fail('Login failed before logout test: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
         done();
       }
     });
-  }, 10000);
+  }, 15000);
 });
