@@ -1,6 +1,6 @@
 {
   "name": "wrap-it-up-planner",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "build": "ng build --configuration=production",
     "start": "ng serve",

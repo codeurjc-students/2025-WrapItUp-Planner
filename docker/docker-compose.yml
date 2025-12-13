@@ -25,7 +25,7 @@ services:
   app:
     env_file:
       - .env
-    image: ${DOCKER_USERNAME:-arturox2500}/wrapitup_planner:${VERSION:-0.1}
+    image: ${DOCKER_USERNAME:-arturox2500}/wrapitup_planner:0.1
     restart: unless-stopped
     depends_on:
       db:
