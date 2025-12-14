@@ -199,7 +199,7 @@ The final thesis defense will be carried out.
 | Entity         | Description                                                                                  |
 |----------------|----------------------------------------------------------------------------------------------|
 | **User**       | Stores login credentials, role, and account status.                                          |
-| **AI_Notes**   | Represents the AI-generated content based on user-uploaded notes, including overview, summary, and quiz questions. Stores visibility settings. |
+| **Notes**   | Represents the AI-generated content based on user-uploaded notes, including overview, summary, and quiz questions. Stores visibility settings. |
 | **Comment**    | Represents a comment made by a user (or anonymously) on a specific set of notes.             |
 | **CalendarEvent** | Represents an event created by a user in the interactive calendar, with start and end dates and a description. |
 | **CalendarTask**  | Represents a to-do list task created by a user for a specific day.                        |
@@ -208,12 +208,12 @@ The final thesis defense will be carried out.
 
 **Relationships**
 
-A user can upload multiple AI_Notes.
+A user can upload multiple Notes.
 
 A user can create multiple comments, calendar events, calendar tasks,
 quiz results, and comment reports.
 
-AI_Notes can have multiple comments and multiple quiz results.
+Notes can have multiple comments and multiple quiz results.
 
 Comment can have multiple comment reports.
 
