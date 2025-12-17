@@ -94,15 +94,6 @@ The frontend tests were performed using **Karma and Jasmine** to verify componen
 
 ---
 
-### Backend Coverage (JaCoCo)
-
-The **Java backend code coverage** was measured using **JaCoCo**, providing insight into which parts of the code were tested.
-
-![JaCoCo Coverage](../../images/JacocoReport.png)  
-*Figure 3: JaCoCo report showing code coverage for the backend.*
-
----
-
 ### Frontend Coverage (Angular)
 
 The frontend code coverage was generated using **Karma with the coverage reporter**. This report shows which components, methods, and lines were exercised by the tests, ensuring the reliability of the client-side application.
