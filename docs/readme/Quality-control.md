@@ -27,17 +27,47 @@ The testing strategy covers both the **backend (server)** and the **frontend (cl
 
 ### Functional Coverage
 
-The automated tests focus primarily on the Notes management (As of the end of fase 2) feature of WrapItUp Planner. Each test type ensures the correct behavior of specific functionalities:
+The automated tests cover the complete basic functionality (Version 0.1) of WrapItUp Planner, making sure the application works according to what it was designed to accomplish:
 
-- **Backend Tests:**  
-  - Retrieval of Notes from the database 
-  - Correct mapping to Data Transfer Objects (DTOs)  
-  - Proper REST API responses for example notes
+#### Backend Tests
 
-- **Frontend Tests:**  
-  - Display of Note details in the user interface
-  - Correct handling of route parameters and service responses
-  - End-to-End process of viewing Notes
+**Unit Tests:**
+- **Authentication Service**: User registration, login, password encoding, and token management
+- **Note Service**: Note creation, retrieval, updating, deletion, and DTO mapping
+- **User Service**: User profile management, updates, and data validation
+- **Comment Service**: Comment creation, retrieval and deletion
+
+**Integration Tests (REST API):**
+- **Note API**: CRUD operations on notes with proper HTTP status codes and JSON responses
+- **Comment API**: Comment management endpoints with authentication
+- **User API**: User profile endpoints and data retrieval
+
+**System Tests:**
+- **Note System**: Complete note workflows including filtering, categorization, and visibility controls
+- **Comment System**: Full comment lifecycle with permission checks and user interactions
+- **Server System**: Overall server functionality and integration
+
+**End-to-End Tests:**
+- **Note Web Tests**: Complete user flows for viewing and managing notes through the web interface
+- **User Web Tests**: User authentication and profile management flows
+
+#### Frontend Tests
+
+**Component Tests:**
+- **Authentication Component**: Login and registration forms with validation
+- **Note Components**: Note creation, editing, viewing, and deletion
+- **My Notes Component**: Note listing, filtering by category, searching, and pagination
+- **Profile Component**: User profile display and editing
+- **Header Component**: Navigation and user session management
+- **Landing & About Us**: Static page rendering
+
+**Service Tests (Integration with API):**
+- **Auth Service**: Real API integration for login, registration, and logout
+- **Note Service**: Note CRUD operations with backend communication
+- **Comment Service**: Comment management with pagination
+- **User Service**: User profile operations
+
+All tests ensure data consistency between frontend and backend, proper authentication flows, authorization checks, and correct handling of edge cases and errors.
  
 ## Test Statistics
 
@@ -47,7 +77,7 @@ To ensure the quality of WrapItUp Planner, automated tests were executed at mult
 
 ### Backend Tests (Java)
 
-A total of **5 automated backend tests** were implemented so far:
+The backend tests were performed using **JUnit**, **RestAssured** and **Selenium** to verify service logic, database interactions, and REST API functionality.
 
 *Example of test execution:*  
 
