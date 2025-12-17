@@ -161,6 +161,7 @@ The application is initialized with sample data to demonstrate its functionality
 - [Architecture](docs/readme/Architecture.md) – System architecture and components
 - [Quality Control](docs/readme/Quality-control.md) – Testing and code analysis
 - [Development Process](docs/readme/Development-process.md) – Git workflow and CI/CD
+- [Deployment](docs/readme/Deployment.md) – Packaging, distribution, and Docker deployment
 - [Code Execution and Editing](docs/readme/Code-Execution-And-Editing.md) – Setup and run instructions
 
 ## Project Information

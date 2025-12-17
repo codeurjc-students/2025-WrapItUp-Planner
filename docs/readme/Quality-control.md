@@ -90,7 +90,7 @@ The backend tests were performed using **JUnit**, **RestAssured** and **Selenium
 The frontend tests were performed using **Karma and Jasmine** to verify component behavior and integration with the REST API.  
 
 ![Karma Test Results](../../images/KarmaTests.png)  
-*Figure 2: Karma and Jasmine test results showing passed frontend tests.*
+*Figure 1: Karma and Jasmine test results showing passed frontend tests.*
 
 ---
 
@@ -99,7 +99,7 @@ The frontend tests were performed using **Karma and Jasmine** to verify componen
 The frontend code coverage was generated using **Karma with the coverage reporter**. This report shows which components, methods, and lines were exercised by the tests, ensuring the reliability of the client-side application.
 
 ![Frontend Coverage](../../images/FrontendCoverage.png)  
-*Figure 4: Angular frontend coverage report showing lines, statements, functions, and branches covered.*
+*Figure 2: Angular frontend coverage report showing lines, statements, functions, and branches covered.*
 
 ---
 
@@ -114,9 +114,9 @@ To ensure the quality, security, and maintainability of WrapItUp Planner, **Sona
 The following captures summarize the results of the static code analysis as of the end of Phase 2:
 
 ![SonarCloud Dashboard](../../images/sonarcloud_dashboard.png)  
-*Figure 1: SonarCloud dashboard showing overall code quality, including ratings for Security, Reliability, and Maintainability.*
+*Figure 3: SonarCloud dashboard showing overall code quality, including ratings for Security, Reliability, and Maintainability.*
 
 ![Code Size Metrics](../../images/sonarcloud_measures.png)  
-*Figure 2: SonarCloud measures showing the size of the codebase, including lines of code, number of classes, and methods.*
+*Figure 4: SonarCloud measures showing the size of the codebase, including lines of code, number of classes, and methods.*
 
 

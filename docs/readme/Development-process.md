@@ -15,9 +15,9 @@
   - Feature branches are created for each new functionality or bug fix.
   - Pull Requests are reviewed and pass automated quality gates before merging.  
 - **Metrics tracked**:
-  - **Commits:** 35 commits in total.
-  - **Branches:** 2 branches (main and one fix branch).
-  - **Pull Requests:** At least one PR created and merged.
+  - **Commits:** 125 commits in total.
+  - **Branches:** 20 branches.
+  - **Pull Requests:** 29 PR created and merged.
 - **Repository activity visualizations**:
   - **Commits over time:**  
     ![Commits](../../images/Commits.png)
@@ -26,10 +26,41 @@
 
 ## 4. Continuous Integration (CI/CD)
 - **GitHub Actions** automates testing, building, and code validation for every push to feature branches and pull request to the main branch.
-- The CI workflows are structured in two levels:
-  1. **Basic CI**: triggered on pushes to feature/fix branches, runs backend and frontend unit tests, and builds the projects.
-  2. **Full CI**: triggered on pull requests to main, runs:
-     - Backend unit, integration, and system tests
-     - Frontend unit and E2E tests
-     - Static code analysis with SonarCloud
+### 4.1. CI Workflows
+- **Basic CI** `ci-basic.yml` - Triggered on pushes to `feature/*` and `fix/*` branches. Runs backend and frontend unit tests and builds.
+- **Full CI** `ci-full.yml` - Triggered on pull requests to `main`. Runs complete testing (unit, integration, system, and E2E tests), deploys services locally, and performs SonarCloud analysis.
+
+- **Automated deployment**: `docker-main.yml` - builds and pushes Docker images to DockerHub on every push to `main`.
+- **Release deployment**: `docker-release.yml` - triggered on GitHub releases, builds and pushes production images with version tags.
+- **Manual workflow**: `docker-manual.yml` - on-demand Docker builds for testing.
+
+## 5. Release Management
+
+### 5.1. Release Process
+- Releases are created through GitHub Releases when major features are completed and tested.
+- Each release triggers the `docker-release.yml` workflow, which builds and publishes Docker images to DockerHub with version-specific tags.
+
+### 5.2. Version 0.1 
+**Release Date:** December 2024
+
+**Features:**
+- **User Management:**
+  - User registration and authentication
+  - Profile management with customizable information and profile pictures
+  - Role-based functionalities (Users and Administrators)
+
+- **Note Management:**
+  - Create, edit, delete, and view notes
+  - Public and private visibility settings
+  - Category organization (Mathematics, Science, History, Art, Languages, Others)
+  - Note sharing with other users
+
+- **Collaboration:**
+  - Comment system for shared notes
+  - User interaction on shared content
+
+- **Administration:**
+  - Full access to all notes and user profiles
+  - Delete notes and comments
+
 
