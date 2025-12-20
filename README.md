@@ -27,10 +27,7 @@ Version 0.1 of WrapItUp Planner focuses on the note-taking and summary aspects o
 
 Below is a demo video showcasing the application:
 
-<video controls width="600">
-  <source src="videos/demov0.1.mp4" type="video/mp4">
-  Your browser does not support video playback.
-</video>
+[![Demo Video](https://img.youtube.com/vi/zgzQLEhDZpY/0.jpg)](https://youtu.be/zgzQLEhDZpY)
 
 ---
 
