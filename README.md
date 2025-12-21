@@ -1,123 +1,81 @@
-# 2025-WrapItUp-Planner
-WrapItUp Planner is an All-In-One collaborative web platform designed to help students in managing their academic journey more efficiently. The application combines study organization, sharing knowledge and AI tools into a single place. Students can upload their notes which are processed using AI to generate overviews, summaries and interactive multiple choice questions to test their knowledge on a particular subject. Alongside this, an integrated interactive calendar with daily to-do lists and event scheduling is available to help students plan their time efficiently. This application means to foster academic collaboration by letting students share their AI generated notes and comment on them to create discussion. Overall WrapItUp Planner's goal is to simplify study management while also creating a community of students who value collaboration.
+# WrapItUp Planner
 
-At this point in time only the functional and objectives have been defined; further development has not yet begun. 
+WrapItUp Planner is an All-In-One collaborative web platform designed to help students manage their academic journey more efficiently. The application combines study organization, knowledge sharing, and AI-powered tools into a single platform. Students can create and share notes, collaborate through comments, and organize their academic life effectively.
 
-## Functional Objectives
+## Version 0.1
 
-WrapItUp Planner's main goal is to provide a collaborative platform where students can share and organize study materials. The application users are divided into three different categories, non-registered users, registered users and administrators, each with tailored functionalities and features. The core functionality of the application includes account management, access to shared AI generated summaries with an available quiz, an interactive calendar with task lists, and user communication through a comment section while ensuring proper moderation.
+Version 0.1 of WrapItUp Planner focuses on the note-taking and summary aspects of the application. Users can now create their own accounts, log in, and edit their profiles. The platform enables users to create, edit, delete, and view notes, which can be set as either public or private. Private note owners can share their content with specific users, allowing them to view and comment. Administrator functionality includes access to all notes and the ability to delete notes and comments when necessary. Users have a dedicated notes page where they can browse their content organized by categories and view notes that have been shared with them.
 
--   Registered users will be able to use an interactive calendar in which they can create multi-day events.
+### Screenshots
 
--   Registered users will be able to create multiple daily tasks in a to-do list format.
+[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
+*Landing page with application introduction*
 
--   Registered users will be able to upload their notes, which will automatically generate an overview, a summary, and a quiz using AI.
+[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
+*About Us page with platform information*
 
--   When accessing the AI-generated summary, registered and not registered users will be able to complete an interactive multiple-choice quiz.
+[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
+*Personal notes organized by category*
 
--   Registered users will be able to leave comments on the summary page, whether they are the owner of the notes or have been granted access.
+[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
+*Note details page with comments section*
 
--   Registered users will be able to view a heat map based on the number of daily tasks throughout the month, as well as a line graph showing their progress on quiz results.
+[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
+*User profile page*
 
--   Registered users will be able to report comments.
+### Demo Video
 
--   Administrators will be able to manage user comment reports and, if necessary, ban users.
+Below is a demo video showcasing the application:
 
-## Technical Objectives
+[![Demo Video](https://img.youtube.com/vi/zgzQLEhDZpY/0.jpg)](https://youtu.be/zgzQLEhDZpY)
 
-This application's main objectives are Spring Boot backend, an Angular frontend, MySQL for data management, automated testing, and code quality checks with SonarQube. The project also integrates CI/CD with GitHub Actions, containerization with Docker, version control with GitHub Flow, and AI features powered by Google's Gemini API.
+---
 
--   Backend: Development of the server-side of the application using Spring Boot to provide a REST API.
+**Features demonstrated by user type:**
+- **Unregistered Users**: View public notes, and landing page
+- **Registered Users**: Create accounts, manage notes, share content, leave comments, visit and edit their profile
+- **Administrators**: Moderate content, delete notes and comments
 
--   Frontend: Implementation of the client-side interface with Angular.
+### Current Development Status
 
--   Database Management: Use of MySQL for efficient storage, management and search of the application's data.
+The application is currently in development and will be continuously improved as further versions are released.
 
--   Testing: Incorporation of automated testing, including both unit and integration tests to ensure quality.
+## Future Versions
 
--   Quality Assurance: Thorough static code analysis with SonarQube to maintain quality and security standards during development.
+The next release of WrapItUp Planner will focus on the calendar component of the application, enabling users to organize their tasks, create events, and maintain daily to-do lists to structure their day-to-day activities. The final release will add AI-powered functionalities to further enhance the notes component, including automatic generation of overviews, summaries, and interactive quizzes from uploaded study materials.
 
--   Continuous Integration and Delivery: Use of GitHub Actions to automate the CI/CD pipeline.
+### Functionalities (Version 0.1)
 
--   Containerization: Packaging and deployment of the application through Docker.
+[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
+*Landing page with application introduction*
 
--   Artificial Intelligence Integration: Integration of Google's Gemini Developer API to enable AI-driven functionalities within the application.
+[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
+*About Us page with platform information and goals*
 
--   Version Control: Adoption of Git as the version control system, with branch management following the GitHub Flow methodology.
+[![Login](images/v0.1/login.png)](images/v0.1/login.png)
+*Users will be able to login to their own account to have access to their personal notes and user's functionalities*
 
-## Methodology
+[![Register](images/v0.1/register.png)](images/v0.1/register.png)
+*Users will be able to create their own account to access to their own page*
 
-**Phase 1 - Definition of functionalities and screens (Deadline Sep. 15)**
+[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
+*Users and Admins can visit their own profile page and edit their personal data, such as their visible name, email and profile photo. They may also access the notes page (in the case of being a regular user)*
 
-Start Date - July 28th
+[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
+*Registered Users will be able to see all their notes in an organized format divided by categories, they will also be able to see notes that were shared with them*
 
-End Date - September 15th
+[![Create Note](images/v0.1/create-note.png)](images/v0.1/create-note.png)
+*Registered users will be able to create their own personal notes as they see fit. They can also decide the visibility of said note.*
 
-In this phase the main functionalities of the application will be
-defined as well as the different screens, user roles and also the
-database entities. The main functionalities will also be divided into
-basic, intermediate and advanced categories.
+[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
+*Users will be able to see previously created notes and will have access to an available comment section to communicate with other users. The owners of these notes will be able to share the notes with other users which will give those users access to another user's private notes*
 
-**Phase 2 - Repository, testing, and CI (Deadline Oct. 15)**
+[![Error Page](images/v0.1/error-page.png)](images/v0.1/error-page.png)
+*Error page for handling server errors*
 
-Start Date - September 16th
+### Detailed Functionalities
 
-End Date - October 15th
-
-The Git repository will be created, and the most essential functionality
-will be developed so that the client-side, server-side and database are
-all set up and connected. Furthermore, basic automatic tests will be
-written, and CI will be configured.
-
-**Phase 3 - Version 0.1 - Basic functionality and Docker (Deadline Dec.
-15)**
-
-Start Date -
-
-End Date -
-
-The functionality of the application will be expanded until the basic
-functionality is completed, automatic testing for this functionality
-will also be developed. The application will be packaged using Docker
-and Continuous Delivery will be available. A version 0.1 of the
-application will be released.
-
-**Phase 4 - Version 0.2 - Intermediate functionality (Deadline Mar. 1)**
-
-Start Date -
-
-End Date -
-
-The project will be extended to cover up until the intermediate
-functionality and the corresponding automatic testing. A version 0.2 of
-the application will be released, and it will also be deployed.
-
-**Phase 5 - Version 0.2 - Advanced Functionality (Deadline Apr. 15)**
-
-Start Date -
-
-End Date -
-
-The application will be finalized, and a version 1.0 will be released.
-
-**Phase 6 -- Report (Deadline May. 15)**
-
-Start Date -
-
-End Date -
-
-The first draft of the final report will be written.
-
-**Phase 7 -- Defense (Deadline Jun. 15)**
-
-The final thesis defense will be carried out.
-
-**Gantt Chart**
-![Gantt Chart](images/Gantt_Chart.png)
-
-## Basic Functionalities
-
-**Basic Functionality**
+**Basic Functionality -  IMPLEMENTED**
 
 | User Type           | Features |
 |--------------------|---------|
@@ -125,146 +83,99 @@ The final thesis defense will be carried out.
 | Registered Users    | - Access a personal profile page.<br>- Access to their personal list of notes.<br>- View notes, whether their own or another user's.<br>- Leave comments on notes they have access to.<br>- Communicate with other authorized users through a comment section associated with each note. |
 | Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments. |
 
+### Planned Features
 
-**Intermediate Functionality**
-
-**Registered Users**
+**Intermediate Functionality - NEXT RELEASE (Version 0.2)**
 
 | User Type           | Features |
 |--------------------|---------|
 | Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. |
 | Administrators      | - Review user-reported comments in a ticket-based format. <br>- Ability to ban a user from accessing the platform. |
 
-**Advanced Functionality**
+**Advanced Functionality - PLANNED (Version 1.0)**
 
 | User Type           | Features |
 |--------------------|---------|
 | Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br>- View a line chart showing performance progression upon completing a quiz. |
 
-## **Screens**
+## How to Run the Application
 
-### **Landing & Authentication**
-**Landing** ![Landing](images/Landing.png)  
-  Landing page with the application's slogan and a background photo.  
-  
-**About Us** ![About Us](images/AboutUs.png)  
-  This page offers further information about the application's functionalities and uses.
-  
-**Login** ![Login](images/LogIn.png)  
-  Allows existing users to sign in securely.
-  
-**Register** ![Register](images/Register.png)  
-  Page for new users to create an account.  
+### Prerequisites
+
+Before running the application, ensure you have Docker installed on your system:
+
+- **Windows and Mac**: Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Linux**: Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Running the Application
+
+To run the application on your local machine, execute the following commands in your terminal:
+
+```bash
+docker pull arturox2500/wrapitup_planner:0.1
+docker pull arturox2500/wrapitup_planner-compose:0.1
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.1 cmd.exe
+docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
+docker cp temp-compose:/.env ./.env
+docker rm temp-compose
+docker compose up -d
+```
+
+### Accessing the Application
+
+Once the containers are running, you can access the application at:
+
+**Web Application**: [https://localhost:443](https://localhost:443)
+
+### Sample User Credentials
+
+The application comes with pre-loaded sample data for testing purposes. You can log in with any of the following accounts:
+
+| Username | Email | Password | Role |
+|----------|-------|----------|------|
+| genericUser | genericUser@example.com | 12345678 | User |
+| secondUser | secondUser@example.com | 12345678 | User |
+| admin | admin@example.com | 12345678 | Administrator |
+
+### Sample Data Overview
+
+The application is initialized with sample data to demonstrate its functionality:
+
+**Users**:
+- **genericUser**: Regular user with 12 notes across different categories and a profile picture
+- **secondUser**: Regular user with 6 notes and a profile picture
+- **admin**: Administrator account with full access to all notes and moderation capabilities, they have to access notes through an url in this phase
+
+**Notes**:
+- 18 total notes covering various subjects (Mathematics, Science, History, Art, Languages, and Others)
+- Notes are categorized by topic (e.g., "Pythagorean Theorem" under MATHS, "Photosynthesis" under SCIENCE)
+- Mix of public and private notes
+- Some notes are shared between users (e.g., genericUser's "Pythagorean Theorem" is shared with secondUser)
+
+**Comments**:
+- Comments from both genericUser and secondUser showing interaction between users
+
+
+## Documentation
+
+- [Project Beginning](docs/readme/Project-Beginning.md) – Complete project overview with objectives, methodology, and planned features
+- [Introduction](docs/readme/Introduction.md) – Overview of the development guide
+- [Technologies](docs/readme/Technologies.md) – Languages, libraries, and services used
+- [Tools](docs/readme/Tools.md) – IDEs and auxiliary development tools
+- [Architecture](docs/readme/Architecture.md) – System architecture and components
+- [Quality Control](docs/readme/Quality-control.md) – Testing and code analysis
+- [Development Process](docs/readme/Development-process.md) – Git workflow and CI/CD
+- [Deployment](docs/readme/Deployment.md) – Packaging, distribution, and Docker deployment
+- [Code Execution and Editing](docs/readme/Code-Execution-And-Editing.md) – Setup and run instructions
+
+## Project Information
+
+This application is developed as part of the Final Degree Project (TFG) for the Software Engineering degree at the School of Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The project is carried out by Arturo Enrique Gutierrez Mirandona under the supervision of Micael Gallego.
+
+### Progress Tracking
+
+Project progress is documented through a [Medium blog](https://medium.com/@gutierrezarturox) with development announcements and GitHub Projects for task management.
 
 ---
 
-### **User Dashboard & Notes**
-**User Dashboard** ![User Dashboard](images/UserDashboard.png)  
-  Main page for users showing key information and navigation to features.  
-  
-**My Notes** ![My Notes](images/MyNotes.png)  
-  Displays all notes created by the user.  
-  
-**New Note** ![New Note](images/NewNote.png)  
-  Interface to create a new note.  
-  
-**Generated Note** ![Generated Note](images/GeneratedNote.png)  
-  Automatically generated notes based on the user privided documents.  
-  
-**Generated Quiz** ![Generated Quiz](images/GeneratedQuiz.png)  
-  Quizzes generated from notes for study and practice.  
-
----
-
-### **Admin Pages**
-**Admin Dashboard** ![Admin Dashboard](images/AdminDashboard.png)  
-  Overview page for admins with access to the tickets page.  
-  
-**Admin Tickets** ![Admin Tickets](images/AdminTickets.png)  
-  Interface to view and manage support tickets for reported comments.  
-
----
-
-### **Calendar & Scheduling**
-**Calendar** ![Calendar](images/Calendar.png)  
-  Monthly view of events.  
-  
-**Calendar Day** ![Calendar Day](images/CalendarDay.png)  
-  Detailed daily view of events and tasks.  
-  
-**Calendar New Event** ![Calendar New Event](images/CalendarNewEvent.png)  
-  Interface to create and schedule new events.  
-
----
-
-### Navigation Diagram
-
-![NavigationDiagram](images/NavigationDiagram.png)  
-
-## Entities and Relationships
-
-**Entities**
-
-| Entity         | Description                                                                                  |
-|----------------|----------------------------------------------------------------------------------------------|
-| **User**       | Stores login credentials, role, and account status.                                          |
-| **AI_Notes**   | Represents the AI-generated content based on user-uploaded notes, including overview, summary, and quiz questions. Stores visibility settings. |
-| **Comment**    | Represents a comment made by a user (or anonymously) on a specific set of notes.             |
-| **CalendarEvent** | Represents an event created by a user in the interactive calendar, with start and end dates and a description. |
-| **CalendarTask**  | Represents a to-do list task created by a user for a specific day.                        |
-| **CommentReport** | Tracks reports submitted by users regarding inappropriate or problematic comments, including timestamp and status. |
-| **QuizResult**    | Stores the outcome of a user's attempt at a quiz generated from a set of notes, including score percentage. |
-
-**Relationships**
-
-A user can upload multiple AI_Notes.
-
-A user can create multiple comments, calendar events, calendar tasks,
-quiz results, and comment reports.
-
-AI_Notes can have multiple comments and multiple quiz results.
-
-Comment can have multiple comment reports.
-
-CommentReport is linked to one comment and one user (the reporter).
-
-## Images
-
-Registered users and administrators will be allowed to have their own profile picture
-
-## Graphs
-
--   Line chart: Registered users will be allowed to see a line chart based on their performance in the AI generated quizzes.
-
--   Heatmap: Registered users may access a heatmap in their profile page based on the number of tasks each day during the current month.
-
-## Complementary Technology
-
--   Ngx-charts as a framework for all data visualization in the project.
-
--   Google's Gemini Developer API for all the AI driven functionalities.
-
-## Advanced Query
-
-Registered users will be given the option to sort their generated summaries based on their average results in each of the quizzes.
-
-## Progress Tracking
-
-The progress of the project will be documented through a blog in Medium with development announcements, complemented by the use of GitHub Projects for task management and project organization.
-
-[Link to the blog](https://medium.com/@gutierrezarturox)
-
-\[Link to the Github Projects page\]
-
-## Author
-
-This application is developed within the framework of the Final Degree Project (TFG) of the degree in Software Engineering at the School of Computer Engineering (ETSII) of Universidad Rey Juan Carlos (URJC). The project is carried out by Arturo Enrique Gutierrez Mirandona under the supervision of Micael Gallego.
-
-## Development Guide
-- [Introduction](docs/readme/Introduction.md) – a rundown of everything covered in this section.
-- [Technologies](docs/readme/Technologies.md) – Languages, libraries, additional services, and their use in the project.
-- [Tools](docs/readme/Tools.md) – IDEs and auxiliary tools used.
-- [Architecture](docs/readme/Architecture.md) – Description of SPA architecture, components (client, server, DB).
-- [Quality Control](docs/readme/Quality-control.md) – Automated tests, metrics, static code analysis.
-- [Development Process](docs/readme/Development-process.md) – Iterative process, Git, DevOps, and CI/CD.
-- [Code Execution and Editing](docs/readme/Code-Execution-And-Editing.md) – Instructions to clone, run, and interact with the application.
+*For detailed information about the complete project scope, planned features, methodology, and all future functionalities, see the [Project Beginning](docs/readme/Project-Beginning.md) documentation.*

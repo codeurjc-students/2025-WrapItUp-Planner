@@ -33,8 +33,9 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-* The backend runs by default at: `http://localhost:8080`
-* In future phases, the port will change to: `https://localhost:8443`
+you will need to provide
+
+* The backend runs by default at: `https://localhost:443`
 
 ### Running the frontend (Angular)
 
@@ -73,8 +74,10 @@ ng serve
 # Frontend
 cd frontend/WrapItUp-Planner
 npm install
-npm run test:all -- --no-watch --browsers=ChromeHeadless
+npm run test:ci
 ```   
+
+> **Note:** The `test:ci` script is preconfigured in `package.json` to run all frontend tests with the appropriate settings (ChromeHeadlessNoSandbox browser, no-watch mode, and karma configuration).
 
 ```bash
 # Backend
