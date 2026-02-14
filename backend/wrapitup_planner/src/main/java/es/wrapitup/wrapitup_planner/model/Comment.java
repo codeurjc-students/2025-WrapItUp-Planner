@@ -26,18 +26,23 @@ public class Comment {
     
     private String userProfilePicUrl;
     
+    @Column(nullable = false)
+    private boolean isReported = false;
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
     
     public Comment() {
+        this.isReported = false;
     }
     
     public Comment(String content, Note note, UserModel user) {
         this.content = content;
         this.note = note;
         this.user = user;
+        this.isReported = false;
         if (user != null) {
             this.userProfilePicUrl = user.getImage();
         }
@@ -92,5 +97,13 @@ public class Comment {
     
     public void setUserProfilePicUrl(String userProfilePicUrl) {
         this.userProfilePicUrl = userProfilePicUrl;
+    }
+    
+    public boolean isReported() {
+        return isReported;
+    }
+    
+    public void setReported(boolean reported) {
+        this.isReported = reported;
     }
 }

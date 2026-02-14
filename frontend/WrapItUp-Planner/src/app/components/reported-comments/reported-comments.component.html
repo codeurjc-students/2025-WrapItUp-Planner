@@ -1,0 +1,58 @@
+<app-header></app-header>
+<div class="reported-comments-container">
+  <h1>Reported Comments</h1>
+
+  <div class="reported-comments-list" *ngIf="reportedComments.length > 0">
+    <div class="comment-card" *ngFor="let comment of reportedComments">
+      <div class="comment-header">
+        <div class="comment-avatar-wrapper">
+          <img 
+            *ngIf="comment.userProfilePicUrl" 
+            [src]="getProfilePicUrl(comment)" 
+            alt="Profile picture"
+            class="comment-avatar"
+            (error)="$any($event.target).src=''">
+          <div *ngIf="!comment.userProfilePicUrl" class="comment-avatar-default">
+            {{ (comment.displayName || comment.username || 'U').charAt(0).toUpperCase() }}
+          </div>
+        </div>
+        <div class="comment-info">
+          <span class="comment-author">{{ comment.displayName || comment.username }}</span>
+          <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+        </div>
+      </div>
+      
+      <p class="comment-content">{{ comment.content }}</p>
+      
+      <div class="comment-actions">
+        <button class="btn-view-profile" (click)="viewProfile(comment)">
+          View Profile
+        </button>
+        <button class="btn-view-note" (click)="viewOriginalNote(comment)">
+          View Original Note
+        </button>
+        <button class="btn-ignore" (click)="ignoreReport(comment)">
+          Ignore
+        </button>
+        <button class="btn-delete" (click)="deleteComment(comment)">
+          Delete Comment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button 
+    class="btn-load-more" 
+    *ngIf="hasMoreComments && !loadingComments"
+    (click)="loadMoreComments()">
+    Load More
+  </button>
+
+  <div class="loading-comments" *ngIf="loadingComments">
+    Loading reported comments...
+  </div>
+
+  <div class="no-comments" *ngIf="reportedComments.length === 0 && !loadingComments">
+    No reported comments at this time.
+  </div>
+</div>

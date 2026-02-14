@@ -54,7 +54,9 @@ public class UserRestController {
                     .body("Logged user not found");
         }
 
-        if (!loggedUser.getId().equals(id)) {
+        // Allow admins to view any user profile
+        boolean isAdmin = loggedUser.getRoles() != null && loggedUser.getRoles().contains("ADMIN");
+        if (!loggedUser.getId().equals(id) && !isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("You cannot access other user's data");
         }

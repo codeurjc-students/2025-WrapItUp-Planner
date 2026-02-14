@@ -18,21 +18,34 @@ export class ProfileComponent implements OnInit {
   isEditing: boolean = false;
   selectedFile: File | null = null;
   imagePreview: string | null = null;
+  viewingOtherProfile: boolean = false;
+  currentUser: UserModelDTO | null = null;
 
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadUserData();
+    this.route.queryParams.subscribe(params => {
+      const userId = params['userId'];
+      if (userId) {
+        this.viewingOtherProfile = true;
+        this.loadUserById(Number(userId));
+      } else {
+        this.viewingOtherProfile = false;
+        this.loadUserData();
+      }
+    });
   }
 
   loadUserData(): void {
     this.userService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
+        this.currentUser = userData;
         this.editedUser = { ...userData };
         this.loading = false;
       },
@@ -40,6 +53,38 @@ export class ProfileComponent implements OnInit {
         console.error('Error loading user:', err);
         this.loading = false;
         if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = 'Error loading user data';
+        }
+      }
+    });
+  }
+
+  loadUserById(userId: number): void {
+    this.userService.getUserById(userId).subscribe({
+      next: (userData) => {
+        this.user = userData;
+        this.editedUser = { ...userData };
+        this.loading = false;
+        
+        // Also load current user to check if they're admin
+        this.userService.getCurrentUser().subscribe({
+          next: (currentUserData) => {
+            this.currentUser = currentUserData;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
+        this.loading = false;
+        if (err.status === 403) {
+          this.error = 'You do not have permission to view this profile';
+          setTimeout(() => this.router.navigate(['/profile']), 2000);
+        } else if (err.status === 404) {
+          this.error = 'User not found';
+          setTimeout(() => this.router.navigate(['/profile']), 2000);
+        } else if (err.status >= 500) {
           this.router.navigate(['/error']);
         } else {
           this.error = 'Error loading user data';
@@ -161,6 +206,15 @@ export class ProfileComponent implements OnInit {
 
   isAdmin(): boolean {
     return this.user?.roles?.includes('ADMIN') ?? false;
+  }
+
+  getProfileTitle(): string {
+    if (this.user?.displayName) {
+      return `${this.user.displayName}'s Profile`;
+    } else if (this.user?.username) {
+      return `${this.user.username}'s Profile`;
+    }
+    return 'User Profile';
   }
 
   getImageUrl(): string {

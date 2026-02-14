@@ -1,6 +1,5 @@
 package es.wrapitup.wrapitup_planner.controller;
 
-import java.net.URI;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
@@ -13,77 +12,80 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.wrapitup.wrapitup_planner.dto.CommentDTO;
+import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/v1/notes/{noteId}/comments")
+@RequestMapping("/api/v1/admin/reported-comments")
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:9876"})
-public class CommentRestController {
+public class ReportedCommentsController {
     
     private final CommentService commentService;
+    private final UserRepository userRepository;
     
-    public CommentRestController(CommentService commentService) {
+    public ReportedCommentsController(CommentService commentService, UserRepository userRepository) {
         this.commentService = commentService;
+        this.userRepository = userRepository;
+    }
+    
+    private boolean isAdmin(String username) {
+        if (username == null) {
+            return false;
+        }
+        
+        return userRepository.findByUsername(username)
+                .map(user -> user.getRoles() != null && user.getRoles().contains("ADMIN"))
+                .orElse(false);
     }
     
     @GetMapping
-    public ResponseEntity<?> getCommentsByNote(
-            @PathVariable Long noteId, 
+    public ResponseEntity<?> getReportedComments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
         String username = principal != null ? principal.getName() : null;
         
-        if (!commentService.canUserAccessComments(noteId, username)) {
-            if (username == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new ErrorResponse("You must log in to view comments"));
-            }
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to view reported comments"));
+        }
+        
+        if (!isAdmin(username)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse("You do not have permission to view comments"));
+                    .body(new ErrorResponse("Only admins can view reported comments"));
         }
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<CommentDTO> comments = commentService.getCommentsByNoteIdPaginated(noteId, pageable);
-        return ResponseEntity.ok(comments);
+        Page<CommentDTO> reportedComments = commentService.getReportedComments(pageable);
+        return ResponseEntity.ok(reportedComments);
     }
     
-    @PostMapping
-    public ResponseEntity<?> createComment(@PathVariable Long noteId, @RequestBody CommentDTO commentDTO, 
-                                          HttpServletRequest request) {
+    @PostMapping("/{commentId}/unreport")
+    public ResponseEntity<?> unreportComment(@PathVariable Long commentId, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
         String username = principal != null ? principal.getName() : null;
         
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("You must log in to create a comment"));
+                    .body(new ErrorResponse("You must log in to unreport comments"));
         }
         
-        if (!commentService.canUserAccessComments(noteId, username)) {
+        if (!isAdmin(username)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse("You do not have permission to comment on this note"));
+                    .body(new ErrorResponse("Only admins can unreport comments"));
         }
         
         try {
-            commentDTO.setNoteId(noteId);
-            CommentDTO created = commentService.createComment(commentDTO, username);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(created.getId())
-                    .toUri();
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .location(location)
-                    .body(created);
+            CommentDTO unreported = commentService.unreportComment(commentId, username);
+            return ResponseEntity.ok(unreported);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
@@ -91,39 +93,23 @@ public class CommentRestController {
     }
     
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Long noteId, @PathVariable Long commentId, 
-                                          HttpServletRequest request) {
+    public ResponseEntity<?> deleteReportedComment(@PathVariable Long commentId, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
         String username = principal != null ? principal.getName() : null;
         
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("You must log in to delete a comment"));
+                    .body(new ErrorResponse("You must log in to delete comments"));
+        }
+        
+        if (!isAdmin(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse("Only admins can delete comments from this view"));
         }
         
         try {
             commentService.deleteComment(commentId, username);
             return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
-    }
-    
-    @PostMapping("/{commentId}/report")
-    public ResponseEntity<?> reportComment(@PathVariable Long noteId, @PathVariable Long commentId,
-                                          HttpServletRequest request) {
-        Principal principal = request.getUserPrincipal();
-        String username = principal != null ? principal.getName() : null;
-        
-        if (username == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("You must log in to report a comment"));
-        }
-        
-        try {
-            CommentDTO reported = commentService.reportComment(commentId, username);
-            return ResponseEntity.ok(reported);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));

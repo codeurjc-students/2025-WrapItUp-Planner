@@ -20,6 +20,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MyNotesComponent } from './components/my-notes/my-notes.component';
+import { ReportedCommentsComponent } from './components/reported-comments/reported-comments.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { MyNotesComponent } from './components/my-notes/my-notes.component';
     HeaderComponent,
     AboutUsComponent,
     ProfileComponent,
-    MyNotesComponent
+    MyNotesComponent,
+    ReportedCommentsComponent
   ],
   imports: [
     BrowserModule,

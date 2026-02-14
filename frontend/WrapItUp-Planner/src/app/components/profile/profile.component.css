@@ -49,6 +49,9 @@
   justify-content: center;
   background: #f9f9f9;
   position: relative;
+}
+
+.avatar-container.clickable {
   cursor: pointer;
 }
 
@@ -177,6 +180,7 @@
 }
 
 .notes-button,
+.dashboard-button,
 .edit-button,
 .save-button,
 .cancel-button,
@@ -202,6 +206,17 @@
   border-color: #d0d0d0;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-button {
+  background: #2196f3;
+  color: #ffffff;
+}
+
+.dashboard-button:hover {
+  background: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .edit-button {
