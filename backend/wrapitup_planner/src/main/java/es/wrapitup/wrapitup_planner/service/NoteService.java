@@ -17,6 +17,7 @@ import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 
@@ -54,6 +55,11 @@ public class NoteService {
         }
         
         UserModel user = userOpt.get();
+        
+        // Check if user is banned
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot create notes");
+        }
         
         // admins cannot create notes
         if (isAdmin(user)) {
@@ -227,6 +233,11 @@ public class NoteService {
         }
         
         UserModel currentUser = currentUserOpt.get();
+        
+        // Check if user is banned
+        if (currentUser.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot edit notes");
+        }
         
         // Admins CANNOT edit notes
         if (isAdmin(currentUser)) {

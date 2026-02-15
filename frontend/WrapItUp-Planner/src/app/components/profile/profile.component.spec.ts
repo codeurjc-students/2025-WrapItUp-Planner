@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { ProfileComponent } from './profile.component';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { UserStatus } from '../../dtos/user-status.enum';
 
 @Component({ template: '' })
 class DummyComponent {}
@@ -17,10 +18,18 @@ describe('ProfileComponent', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    userServiceSpy = jasmine.createSpyObj('UserService', ['getCurrentUser', 'updateUser', 'uploadProfileImage']);
+    userServiceSpy = jasmine.createSpyObj('UserService', [
+      'getCurrentUser',
+      'updateUser',
+      'uploadProfileImage',
+      'banUser',
+      'unbanUser',
+      'getUserById'
+    ]);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
     
     userServiceSpy.getCurrentUser.and.returnValue(of({ username: 'test', email: 'test@test.com', displayName: 'Test User', password: '' }));
+    userServiceSpy.getUserById.and.returnValue(of({ username: 'test', email: 'test@test.com', displayName: 'Test User', password: '' }));
 
     await TestBed.configureTestingModule({
       declarations: [ProfileComponent, DummyComponent],
@@ -185,5 +194,49 @@ describe('ProfileComponent', () => {
 
     const imageUrl = component.user.image;
     expect(imageUrl).toBe('/api/v1/users/profile-image/5');
+  });
+
+  it('should ban user when confirmed', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    component.user = { id: 10, username: 'u', email: 'e', password: '', displayName: 'U', status: UserStatus.ACTIVE } as any;
+    const bannedUser = { ...component.user, status: UserStatus.BANNED } as any;
+    userServiceSpy.banUser.and.returnValue(of(bannedUser));
+
+    component.banUser();
+
+    expect(userServiceSpy.banUser).toHaveBeenCalledWith(10);
+    expect(component.user?.status).toBe(UserStatus.BANNED);
+    expect(component.success).toBe('User banned successfully');
+  });
+
+  it('should not ban user when confirmation is cancelled', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.user = { id: 10, username: 'u', email: 'e', password: '', displayName: 'U', status: UserStatus.ACTIVE } as any;
+
+    component.banUser();
+
+    expect(userServiceSpy.banUser).not.toHaveBeenCalled();
+  });
+
+  it('should unban user when confirmed', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    component.user = { id: 10, username: 'u', email: 'e', password: '', displayName: 'U', status: UserStatus.BANNED } as any;
+    const unbannedUser = { ...component.user, status: UserStatus.ACTIVE } as any;
+    userServiceSpy.unbanUser.and.returnValue(of(unbannedUser));
+
+    component.unbanUser();
+
+    expect(userServiceSpy.unbanUser).toHaveBeenCalledWith(10);
+    expect(component.user?.status).toBe(UserStatus.ACTIVE);
+    expect(component.success).toBe('User unbanned successfully');
+  });
+
+  it('should not unban user when confirmation is cancelled', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.user = { id: 10, username: 'u', email: 'e', password: '', displayName: 'U', status: 'BANNED' } as any;
+
+    component.unbanUser();
+
+    expect(userServiceSpy.unbanUser).not.toHaveBeenCalled();
   });
 });

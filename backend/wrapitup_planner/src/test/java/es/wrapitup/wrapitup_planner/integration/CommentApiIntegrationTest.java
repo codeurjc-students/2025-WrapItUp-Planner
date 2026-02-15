@@ -384,4 +384,65 @@ public class CommentApiIntegrationTest {
             .statusCode(OK.value())
             .body("content[0].content", equalTo("Private comment"));
     }
+
+    // Report and banned user tests
+
+    @Test
+    void userCanReportComment() {
+        Comment comment = new Comment("Comment to report", publicNote, testUser);
+        comment = commentRepository.save(comment);
+
+        given()
+            .cookie("AuthToken", otherAuthToken)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(OK.value())
+            .body("reported", equalTo(true));
+    }
+
+    @Test
+    void reportNonExistentCommentReturns400() {
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .post("/api/v1/notes/" + testNote.getId() + "/comments/999/report")
+        .then()
+            .statusCode(BAD_REQUEST.value());
+    }
+
+    @Test
+    void reportCommentNotAuthReturns401() {
+        Comment comment = new Comment("Comment to report", publicNote, testUser);
+        comment = commentRepository.save(comment);
+
+        given()
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
+
+    @Test
+    void bannedUserCannotCreateComment() {
+        // Ban the other user
+        otherUser.setStatus(UserStatus.BANNED);
+        userRepository.save(otherUser);
+
+        String commentJson = """
+            {
+                "content": "This should fail"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", otherAuthToken)
+            .contentType(ContentType.JSON)
+            .body(commentJson)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Banned users cannot create comments"));
+    }
 }

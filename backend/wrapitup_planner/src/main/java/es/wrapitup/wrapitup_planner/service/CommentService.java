@@ -15,6 +15,7 @@ import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
@@ -66,6 +67,10 @@ public class CommentService {
         
         Note note = noteOpt.get();
         UserModel user = userOpt.get();
+        
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot create comments");
+        }
         
         Comment comment = new Comment(commentDTO.getContent(), note, user);
         Comment saved = commentRepository.save(comment);

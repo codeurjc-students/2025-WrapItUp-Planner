@@ -21,6 +21,7 @@ import { AboutUsComponent } from './components/about-us/about-us.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MyNotesComponent } from './components/my-notes/my-notes.component';
 import { ReportedCommentsComponent } from './components/reported-comments/reported-comments.component';
+import { BannedComponent } from './components/banned/banned.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { ReportedCommentsComponent } from './components/reported-comments/report
     AboutUsComponent,
     ProfileComponent,
     MyNotesComponent,
-    ReportedCommentsComponent
+    ReportedCommentsComponent,
+    BannedComponent
   ],
   imports: [
     BrowserModule,

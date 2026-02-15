@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserModelDTO } from '../../dtos/user.dto';
+import { UserStatus } from '../../dtos/user-status.enum';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -236,6 +237,68 @@ export class ProfileComponent implements OnInit {
         console.error('Error during logout:', err);
         // Navigate anyway
         this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  isCurrentUserAdmin(): boolean {
+    return this.currentUser?.roles?.includes('ADMIN') ?? false;
+  }
+
+  isUserBanned(): boolean {
+    return this.user?.status === UserStatus.BANNED;
+  }
+
+  banUser(): void {
+    if (!this.user?.id) {
+      return;
+    }
+
+    if (!confirm('Are you sure you want to ban this user? They will not be able to create or edit notes and comments.')) {
+      return;
+    }
+
+    this.userService.banUser(this.user.id).subscribe({
+      next: (bannedUser) => {
+        this.user = bannedUser;
+        this.editedUser = { ...bannedUser };
+        this.success = 'User banned successfully';
+        setTimeout(() => this.success = null, 3000);
+      },
+      error: (err) => {
+        console.error('Error banning user:', err);
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = err?.error || 'Error banning user';
+        }
+      }
+    });
+  }
+
+  unbanUser(): void {
+    if (!this.user?.id) {
+      return;
+    }
+
+    if (!confirm('Are you sure you want to unban this user?')) {
+      return;
+    }
+
+    this.userService.unbanUser(this.user.id).subscribe({
+      next: (unbannedUser) => {
+        this.user = unbannedUser;
+        this.editedUser = { ...unbannedUser };
+        this.success = 'User unbanned successfully';
+        setTimeout(() => this.success = null, 3000);
+      },
+      error: (err) => {
+        console.error('Error unbanning user:', err);
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.error = err?.error || 'Error unbanning user';
+        }
       }
     });
   }

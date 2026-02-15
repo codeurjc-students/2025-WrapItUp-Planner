@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { UserModelDTO } from '../../dtos/user.dto';
+import { UserStatus } from '../../dtos/user-status.enum';
 
 @Component({
   selector: 'app-auth',
@@ -21,7 +23,11 @@ export class AuthComponent implements OnInit {
   model: UserModelDTO = { username: '', email: '', password: '' };
   repeatPassword = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService, 
+    private userService: UserService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.setModeFromUrl();
@@ -56,9 +62,30 @@ export class AuthComponent implements OnInit {
             this.error = 'Bad credentials';
             return;
           }
-          // successful login - wait a moment for cookies to be set before redirecting
           setTimeout(() => {
-            this.router.navigate(['/profile']);
+            this.userService.getCurrentUser().subscribe({
+              next: (user) => {
+                if (user.status === UserStatus.BANNED) {
+                  // User is banned - logout and redirect to banned page
+                  this.authService.logout().subscribe({
+                    next: () => {
+                      this.router.navigate(['/banned']);
+                    },
+                    error: () => {
+                      // Even if logout fails, redirect to banned page
+                      this.router.navigate(['/banned']);
+                    }
+                  });
+                } else {
+                  // User is not banned - proceed to profile
+                  this.router.navigate(['/profile']);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching user info:', err);
+                this.router.navigate(['/profile']);
+              }
+            });
           }, 300);
         },
         error: (err) => {

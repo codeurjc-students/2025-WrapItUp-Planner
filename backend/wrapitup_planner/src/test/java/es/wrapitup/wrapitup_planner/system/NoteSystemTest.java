@@ -384,6 +384,60 @@ public class NoteSystemTest {
         assertEquals("Private Note", retrieved.get().getTitle());
     }
 
+    // Banned user tests
+
+    @Test
+    void bannedUserCannotCreateNoteSystemTest() {
+        // Ban the user
+        testUser.setStatus(UserStatus.BANNED);
+        userRepository.save(testUser);
+
+        NoteDTO noteDTO = new NoteDTO();
+        noteDTO.setTitle("Banned user note");
+        noteDTO.setOverview("This should fail");
+        noteDTO.setSummary("Summary");
+        noteDTO.setJsonQuestions("{}");
+        noteDTO.setVisibility(NoteVisibility.PRIVATE);
+        noteDTO.setCategory(NoteCategory.OTHERS);
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.createNote(noteDTO, "systemuser");
+        });
+    }
+
+    @Test
+    void bannedUserCannotUpdateNoteSystemTest() {
+        // Create note first
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Original Title");
+        note.setOverview("Original Overview");
+        note.setSummary("Original Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        // Ban the user
+        testUser.setStatus(UserStatus.BANNED);
+        userRepository.save(testUser);
+
+        NoteDTO updateDTO = new NoteDTO();
+        updateDTO.setTitle("Updated Title");
+        updateDTO.setOverview("Updated Overview");
+        updateDTO.setSummary("Updated Summary");
+        updateDTO.setJsonQuestions("{}");
+        updateDTO.setVisibility(NoteVisibility.PRIVATE);
+        updateDTO.setCategory(NoteCategory.OTHERS);
+
+        Long noteId = note.getId();
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.updateNote(noteId, updateDTO, "systemuser");
+        });
+    }
+
     
 
 }

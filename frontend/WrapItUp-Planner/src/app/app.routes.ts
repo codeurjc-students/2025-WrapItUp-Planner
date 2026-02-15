@@ -12,6 +12,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { MyNotesComponent } from './components/my-notes/my-notes.component';
 import { ErrorPageComponent } from './components/error-page/error-page.component';
 import { ReportedCommentsComponent } from './components/reported-comments/reported-comments.component';
+import { BannedComponent } from './components/banned/banned.component';
 
 
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
   , { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] }
   , { path: 'admin/reported-comments', component: ReportedCommentsComponent, canActivate: [AdminGuard] }
   , { path: 'error', component: ErrorPageComponent }
+  , { path: 'banned', component: BannedComponent }
   , { path: '**', redirectTo: '/' }
 ]; 
 

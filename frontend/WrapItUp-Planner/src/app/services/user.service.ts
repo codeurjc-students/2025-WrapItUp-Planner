@@ -35,4 +35,12 @@ export class UserService {
     return this.http.post<UserModelDTO>(`${this.apiUrl}/upload-image`, formData, { withCredentials: true });
   }
 
+  banUser(userId: number): Observable<UserModelDTO> {
+    return this.http.post<UserModelDTO>(`${this.apiUrl}/${userId}/ban`, {}, { withCredentials: true });
+  }
+
+  unbanUser(userId: number): Observable<UserModelDTO> {
+    return this.http.post<UserModelDTO>(`${this.apiUrl}/${userId}/unban`, {}, { withCredentials: true });
+  }
+
 }
