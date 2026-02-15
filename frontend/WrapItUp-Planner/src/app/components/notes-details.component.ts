@@ -380,4 +380,28 @@ export class NoteDetailComponent implements OnInit {
       }
     });
   }
+
+  reportComment(commentId: number): void {
+    if (!confirm('Are you sure you want to report this comment?')) {
+      return;
+    }
+
+    this.commentService.reportComment(this.noteId, commentId).subscribe({
+      next: () => {
+        this.showCommentMenu = null;
+        this.loadComments(true);
+        alert('Comment reported successfully');
+      },
+      error: (err) => {
+        console.error('Error reporting comment:', err);
+        if (err.status === 401) {
+          alert('You must log in to report a comment');
+        } else if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          alert('Error reporting comment');
+        }
+      }
+    });
+  }
 }

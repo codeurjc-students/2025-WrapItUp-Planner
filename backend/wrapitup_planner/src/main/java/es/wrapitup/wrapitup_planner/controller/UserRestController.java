@@ -54,7 +54,9 @@ public class UserRestController {
                     .body("Logged user not found");
         }
 
-        if (!loggedUser.getId().equals(id)) {
+        // Allow admins to view any user profile
+        boolean isAdmin = loggedUser.getRoles() != null && loggedUser.getRoles().contains("ADMIN");
+        if (!loggedUser.getId().equals(id) && !isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("You cannot access other user's data");
         }
@@ -192,6 +194,72 @@ public class UserRestController {
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/{userId}/ban")
+    public ResponseEntity<?> banUser(@PathVariable Long userId, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("You must be authenticated");
+        }
+
+        UserModelDTO loggedUser = userService.findByName(principal.getName());
+
+        if (loggedUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Logged user not found");
+        }
+
+        // Only admins can ban users
+        boolean isAdmin = loggedUser.getRoles() != null && loggedUser.getRoles().contains("ADMIN");
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only admins can ban users");
+        }
+
+        UserModelDTO bannedUser = userService.banUser(userId);
+
+        if (bannedUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
+
+        return ResponseEntity.ok(bannedUser);
+    }
+
+    @PostMapping("/{userId}/unban")
+    public ResponseEntity<?> unbanUser(@PathVariable Long userId, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("You must be authenticated");
+        }
+
+        UserModelDTO loggedUser = userService.findByName(principal.getName());
+
+        if (loggedUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Logged user not found");
+        }
+
+        // Only admins can unban users
+        boolean isAdmin = loggedUser.getRoles() != null && loggedUser.getRoles().contains("ADMIN");
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only admins can unban users");
+        }
+
+        UserModelDTO unbannedUser = userService.unbanUser(userId);
+
+        if (unbannedUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
+
+        return ResponseEntity.ok(unbannedUser);
     }
 
 }

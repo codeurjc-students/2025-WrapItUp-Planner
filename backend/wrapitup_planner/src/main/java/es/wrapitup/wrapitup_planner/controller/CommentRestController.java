@@ -87,6 +87,9 @@ public class CommentRestController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
         }
     }
     
@@ -106,6 +109,26 @@ public class CommentRestController {
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/{commentId}/report")
+    public ResponseEntity<?> reportComment(@PathVariable Long noteId, @PathVariable Long commentId,
+                                          HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+        
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to report a comment"));
+        }
+        
+        try {
+            CommentDTO reported = commentService.reportComment(commentId, username);
+            return ResponseEntity.ok(reported);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
         }
     }

@@ -11,6 +11,7 @@ public class CommentDTO {
     private String username;
     private String userProfilePicUrl;
     private LocalDateTime createdAt;
+    private boolean isReported;
     
     public Long getId() {
         return id;
@@ -66,5 +67,13 @@ public class CommentDTO {
     
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public boolean isReported() {
+        return isReported;
+    }
+    
+    public void setReported(boolean reported) {
+        this.isReported = reported;
     }
 }

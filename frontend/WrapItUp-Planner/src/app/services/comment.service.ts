@@ -36,4 +36,38 @@ export class CommentService {
       { withCredentials: true }
     );
   }
+
+  reportComment(noteId: number, commentId: number): Observable<CommentDTO> {
+    return this.http.post<CommentDTO>(
+      `${this.apiUrl}/${noteId}/comments/${commentId}/report`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  getReportedComments(page: number = 0, size: number = 10): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<any>('https://localhost:443/api/v1/admin/reported-comments', {
+      params,
+      withCredentials: true
+    });
+  }
+
+  unreportComment(commentId: number): Observable<CommentDTO> {
+    return this.http.post<CommentDTO>(
+      `https://localhost:443/api/v1/admin/reported-comments/${commentId}/unreport`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  deleteReportedComment(commentId: number): Observable<void> {
+    return this.http.delete<void>(
+      `https://localhost:443/api/v1/admin/reported-comments/${commentId}`,
+      { withCredentials: true }
+    );
+  }
 }

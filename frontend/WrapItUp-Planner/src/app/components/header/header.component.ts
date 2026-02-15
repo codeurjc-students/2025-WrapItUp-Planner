@@ -10,6 +10,7 @@ import { filter } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit {
   isAuthenticated: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(
     private router: Router,
@@ -32,9 +33,11 @@ export class HeaderComponent implements OnInit {
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.isAuthenticated = !!user;
+        this.isAdmin = user?.roles?.includes('ADMIN') ?? false;
       },
       error: () => {
         this.isAuthenticated = false;
+        this.isAdmin = false;
       }
     });
   }

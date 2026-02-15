@@ -24,6 +24,7 @@ import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.NoteService;
@@ -535,5 +536,85 @@ public class NoteServiceUnitTest {
         assertThrows(SecurityException.class, () -> {
             noteService.findNotesSharedWithUser("admin", PageRequest.of(0, 10), null);
         });
+    }
+
+    // Banned user tests
+    @Test
+    void bannedUserCannotCreateNote() {
+        UserModel bannedUser = new UserModel();
+        bannedUser.setId(3L);
+        bannedUser.setUsername("banneduser");
+        bannedUser.setEmail("banned@example.com");
+        bannedUser.setRoles(java.util.List.of("USER"));
+        bannedUser.setStatus(UserStatus.BANNED);
+
+        NoteDTO noteDTO = new NoteDTO();
+        noteDTO.setTitle("Test Note");
+        noteDTO.setSummary("Summary");
+        noteDTO.setOverview("Overview");
+        noteDTO.setVisibility(NoteVisibility.PRIVATE);
+
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.createNote(noteDTO, "banneduser");
+        });
+
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void bannedUserCannotUpdateNote() {
+        UserModel bannedUser = new UserModel();
+        bannedUser.setId(1L);
+        bannedUser.setUsername("testuser");
+        bannedUser.setEmail("test@example.com");
+        bannedUser.setRoles(java.util.List.of("USER"));
+        bannedUser.setStatus(UserStatus.BANNED);
+
+        testNote.setUser(bannedUser);
+
+        NoteDTO updateDTO = new NoteDTO();
+        updateDTO.setTitle("Updated Title");
+        updateDTO.setSummary("Updated Summary");
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.updateNote(1L, updateDTO, "testuser");
+        });
+
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void activeUserCanCreateNote() {
+        UserModel activeUser = new UserModel();
+        activeUser.setId(1L);
+        activeUser.setUsername("testuser");
+        activeUser.setEmail("test@example.com");
+        activeUser.setRoles(java.util.List.of("USER"));
+        activeUser.setStatus(UserStatus.ACTIVE);
+
+        NoteDTO noteDTO = new NoteDTO();
+        noteDTO.setTitle("Test Note");
+        noteDTO.setSummary("Summary");
+        noteDTO.setOverview("Overview");
+        noteDTO.setVisibility(NoteVisibility.PRIVATE);
+        noteDTO.setCategory(NoteCategory.OTHERS);
+
+        Note savedNote = new Note();
+        savedNote.setId(1L);
+        savedNote.setTitle("Test Note");
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(activeUser));
+        when(noteRepository.save(any(Note.class))).thenReturn(savedNote);
+        when(noteMapper.toDto(any(Note.class))).thenReturn(noteDTO);
+
+        NoteDTO result = noteService.createNote(noteDTO, "testuser");
+
+        assertNotNull(result);
+        verify(noteRepository).save(any(Note.class));
     }
 }

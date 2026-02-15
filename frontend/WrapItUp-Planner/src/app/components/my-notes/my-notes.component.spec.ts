@@ -8,6 +8,7 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { MyNotesComponent } from './my-notes.component';
 import { NoteService } from '../../services/note.service';
 import { UserService } from '../../services/user.service';
+import { UserStatus } from '../../dtos/user-status.enum';
 
 // Dummy component for routing
 @Component({ template: '' })
@@ -52,7 +53,7 @@ describe('MyNotesComponent', () => {
       password: 'password123',
       roles: ['USER'],
       displayName: 'Test User',
-      status: 'ACTIVE'
+      status: UserStatus.ACTIVE
     }));
     
     noteService.getRecentNotes.and.returnValue(of({ 

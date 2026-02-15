@@ -6,6 +6,7 @@ import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
@@ -55,6 +56,7 @@ public class CommentServiceTest {
 
     private UserModel testUser;
     private UserModel otherUser;
+    private UserModel adminUser;
     private Note testNote;
     private Comment testComment;
     private CommentDTO testCommentDTO;
@@ -70,6 +72,11 @@ public class CommentServiceTest {
         otherUser.setId(2L);
         otherUser.setUsername("otheruser");
         otherUser.setRoles(java.util.List.of("USER"));
+
+        adminUser = new UserModel();
+        adminUser.setId(3L);
+        adminUser.setUsername("admin");
+        adminUser.setRoles(java.util.List.of("USER", "ADMIN"));
 
         testNote = new Note();
         testNote.setId(1L);
@@ -146,6 +153,23 @@ public class CommentServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             commentService.createComment(testCommentDTO, "invaliduser");
         });
+    }
+
+    @Test
+    void createCommentWithBannedUserThrowsSecurityException() {
+        UserModel bannedUser = new UserModel();
+        bannedUser.setId(3L);
+        bannedUser.setUsername("banneduser");
+        bannedUser.setStatus(UserStatus.BANNED);
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            commentService.createComment(testCommentDTO, "banneduser");
+        });
+
+        verify(commentRepository, never()).save(any(Comment.class));
     }
 
     // get comments tests
@@ -267,13 +291,8 @@ public class CommentServiceTest {
     // admin tests
     @Test
     void adminCanDeleteAnyComment() {
-        UserModel admin = new UserModel();
-        admin.setId(3L);
-        admin.setUsername("admin");
-        admin.setRoles(java.util.List.of("USER", "ADMIN"));
-
         when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
 
         assertDoesNotThrow(() -> commentService.deleteComment(1L, "admin"));
         verify(commentRepository).deleteById(1L);
@@ -281,16 +300,171 @@ public class CommentServiceTest {
 
     @Test
     void adminCanAccessPrivateNoteComments() {
-        UserModel admin = new UserModel();
-        admin.setId(3L);
-        admin.setUsername("admin");
-        admin.setRoles(java.util.List.of("USER", "ADMIN"));
-
         when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
 
         boolean result = commentService.canUserAccessComments(1L, "admin");
 
         assertTrue(result);
+    }
+
+    // Report/Unreport tests
+    @Test
+    void reportCommentMarksAsReported() {
+        testComment.setReported(false);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(commentRepository.save(any(Comment.class))).thenReturn(testComment);
+        when(commentMapper.toDto(any(Comment.class))).thenReturn(testCommentDTO);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        CommentDTO result = commentService.reportComment(1L, "testuser");
+
+        assertNotNull(result);
+        verify(commentRepository).save(argThat(comment -> comment.isReported()));
+    }
+
+    @Test
+    void reportCommentReturnsNullWhenCommentNotFound() {
+        when(commentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.reportComment(99L, "testuser");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void reportCommentThrowsExceptionWhenUserNotFound() {
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("unknownuser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.reportComment(1L, "unknownuser");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void reportCommentWorksOnAlreadyReportedComment() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(commentRepository.save(any(Comment.class))).thenReturn(testComment);
+        when(commentMapper.toDto(any(Comment.class))).thenReturn(testCommentDTO);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        CommentDTO result = commentService.reportComment(1L, "testuser");
+
+        assertNotNull(result);
+        verify(commentRepository).save(argThat(comment -> comment.isReported()));
+    }
+
+    @Test
+    void unreportCommentMarksAsNotReported() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(commentRepository.save(any(Comment.class))).thenReturn(testComment);
+        when(commentMapper.toDto(any(Comment.class))).thenReturn(testCommentDTO);
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+
+        CommentDTO result = commentService.unreportComment(1L, "admin");
+
+        assertNotNull(result);
+        verify(commentRepository).save(argThat(comment -> !comment.isReported()));
+    }
+
+    @Test
+    void unreportCommentReturnsNullWhenCommentNotFound() {
+        when(commentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.unreportComment(99L, "admin");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void unreportCommentThrowsExceptionWhenUserNotFound() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("unknownadmin")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.unreportComment(1L, "unknownadmin");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void unreportCommentByNonAdminThrowsException() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.unreportComment(1L, "testuser");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void getReportedCommentsReturnsPaginatedResults() {
+        Comment reportedComment1 = new Comment();
+        reportedComment1.setId(1L);
+        reportedComment1.setContent("Reported 1");
+        reportedComment1.setReported(true);
+        reportedComment1.setNote(testNote);
+        reportedComment1.setUser(testUser);
+
+        Comment reportedComment2 = new Comment();
+        reportedComment2.setId(2L);
+        reportedComment2.setContent("Reported 2");
+        reportedComment2.setReported(true);
+        reportedComment2.setNote(testNote);
+        reportedComment2.setUser(testUser);
+
+        List<Comment> reportedComments = Arrays.asList(reportedComment1, reportedComment2);
+        Page<Comment> commentPage = new PageImpl<>(reportedComments, PageRequest.of(0, 10), 2);
+
+        CommentDTO dto1 = new CommentDTO();
+        dto1.setId(1L);
+        dto1.setContent("Reported 1");
+
+        CommentDTO dto2 = new CommentDTO();
+        dto2.setId(2L);
+        dto2.setContent("Reported 2");
+
+        when(commentRepository.findByIsReportedTrueOrderByCreatedAtDesc(any(Pageable.class))).thenReturn(commentPage);
+        when(commentMapper.toDto(reportedComment1)).thenReturn(dto1);
+        when(commentMapper.toDto(reportedComment2)).thenReturn(dto2);
+
+        Page<CommentDTO> result = commentService.getReportedComments(PageRequest.of(0, 10));
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+        verify(commentRepository).findByIsReportedTrueOrderByCreatedAtDesc(any(Pageable.class));
+    }
+
+    @Test
+    void getReportedCommentsReturnsEmptyPageWhenNoReportedComments() {
+        Page<Comment> emptyPage = new PageImpl<>(Arrays.asList(), PageRequest.of(0, 10), 0);
+
+        when(commentRepository.findByIsReportedTrueOrderByCreatedAtDesc(any(Pageable.class))).thenReturn(emptyPage);
+
+        Page<CommentDTO> result = commentService.getReportedComments(PageRequest.of(0, 10));
+
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        assertTrue(result.getContent().isEmpty());
     }
 }

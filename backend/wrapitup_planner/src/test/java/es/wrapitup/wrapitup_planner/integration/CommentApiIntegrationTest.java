@@ -384,4 +384,239 @@ public class CommentApiIntegrationTest {
             .statusCode(OK.value())
             .body("content[0].content", equalTo("Private comment"));
     }
+
+    // Report and banned user tests
+
+    @Test
+    void userCanReportComment() {
+        Comment comment = new Comment("Comment to report", publicNote, testUser);
+        comment = commentRepository.save(comment);
+
+        given()
+            .cookie("AuthToken", otherAuthToken)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(OK.value())
+            .body("reported", equalTo(true));
+    }
+
+    @Test
+    void reportNonExistentCommentReturns400() {
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .post("/api/v1/notes/" + testNote.getId() + "/comments/999/report")
+        .then()
+            .statusCode(BAD_REQUEST.value());
+    }
+
+    @Test
+    void reportCommentNotAuthReturns401() {
+        Comment comment = new Comment("Comment to report", publicNote, testUser);
+        comment = commentRepository.save(comment);
+
+        given()
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
+
+    @Test
+    void reportCommentTwiceStillWorks() {
+        Comment comment = new Comment("Comment to report twice", publicNote, testUser);
+        comment = commentRepository.save(comment);
+
+        
+        given()
+            .cookie("AuthToken", otherAuthToken)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(OK.value())
+            .body("reported", equalTo(true));
+
+        
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments/" + comment.getId() + "/report")
+        .then()
+            .statusCode(OK.value())
+            .body("reported", equalTo(true));
+    }
+
+    @Test
+    void bannedUserCannotCreateComment() {
+        // Ban the other user
+        otherUser.setStatus(UserStatus.BANNED);
+        userRepository.save(otherUser);
+
+        String commentJson = """
+            {
+                "content": "This should fail"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", otherAuthToken)
+            .contentType(ContentType.JSON)
+            .body(commentJson)
+        .when()
+            .post("/api/v1/notes/" + publicNote.getId() + "/comments")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Banned users cannot create comments"));
+    }
+
+    // Admin reported comments endpoints
+
+    @Test
+    void adminCanGetReportedComments() {
+        Comment reportedComment1 = new Comment("Reported content 1", publicNote, testUser);
+        reportedComment1.setReported(true);
+        commentRepository.save(reportedComment1);
+
+        Comment reportedComment2 = new Comment("Reported content 2", publicNote, otherUser);
+        reportedComment2.setReported(true);
+        commentRepository.save(reportedComment2);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .get("/api/v1/admin/reported-comments?page=0&size=10")
+        .then()
+            .statusCode(OK.value())
+            .body("content", hasSize(greaterThanOrEqualTo(2)))
+            .body("content[0].reported", equalTo(true));
+    }
+
+    @Test
+    void nonAdminCannotGetReportedComments() {
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .get("/api/v1/admin/reported-comments")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Only admins can view reported comments"));
+    }
+
+    @Test
+    void getReportedCommentsWithoutAuthReturns401() {
+        given()
+        .when()
+            .get("/api/v1/admin/reported-comments")
+        .then()
+            .statusCode(UNAUTHORIZED.value())
+            .body("message", containsString("You must log in to view reported comments"));
+    }
+
+    @Test
+    void adminCanUnreportComment() {
+        Comment reportedComment = new Comment("Reported content", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .post("/api/v1/admin/reported-comments/" + reportedComment.getId() + "/unreport")
+        .then()
+            .statusCode(OK.value())
+            .body("reported", equalTo(false));
+    }
+
+    @Test
+    void nonAdminCannotUnreportComment() {
+        Comment reportedComment = new Comment("Reported content", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .post("/api/v1/admin/reported-comments/" + reportedComment.getId() + "/unreport")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Only admins can unreport comments"));
+    }
+
+    @Test
+    void unreportCommentWithoutAuthReturns401() {
+        Comment reportedComment = new Comment("Reported content", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+        .when()
+            .post("/api/v1/admin/reported-comments/" + reportedComment.getId() + "/unreport")
+        .then()
+            .statusCode(UNAUTHORIZED.value())
+            .body("message", containsString("You must log in to unreport comments"));
+    }
+
+    @Test
+    void adminCanDeleteReportedComment() {
+        Comment reportedComment = new Comment("Reported content to delete", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .delete("/api/v1/admin/reported-comments/" + reportedComment.getId())
+        .then()
+            .statusCode(NO_CONTENT.value());
+    }
+
+    @Test
+    void nonAdminCannotDeleteReportedComment() {
+        Comment reportedComment = new Comment("Reported content", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+            .cookie("AuthToken", authToken)
+        .when()
+            .delete("/api/v1/admin/reported-comments/" + reportedComment.getId())
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Only admins can delete comments from this view"));
+    }
+
+    @Test
+    void deleteReportedCommentWithoutAuthReturns401() {
+        Comment reportedComment = new Comment("Reported content", publicNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        given()
+        .when()
+            .delete("/api/v1/admin/reported-comments/" + reportedComment.getId())
+        .then()
+            .statusCode(UNAUTHORIZED.value())
+            .body("message", containsString("You must log in to delete comments"));
+    }
+
+    @Test
+    void unreportNonExistentCommentReturns400() {
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .post("/api/v1/admin/reported-comments/999999/unreport")
+        .then()
+            .statusCode(BAD_REQUEST.value());
+    }
+
+    @Test
+    void deleteNonExistentReportedCommentReturns400() {
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .delete("/api/v1/admin/reported-comments/999999")
+        .then()
+            .statusCode(BAD_REQUEST.value());
+    }
 }

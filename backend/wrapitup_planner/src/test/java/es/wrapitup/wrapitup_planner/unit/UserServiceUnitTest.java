@@ -307,4 +307,106 @@ public class UserServiceUnitTest {
 
         assertNull(result);
     }
+
+    // Ban/Unban tests
+    @Test
+    void banUserSetsStatusToBanned() {
+        UserModel user = new UserModel();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setStatus(UserStatus.ACTIVE);
+
+        UserModelDTO expectedDTO = new UserModelDTO();
+        expectedDTO.setId(1L);
+        expectedDTO.setUsername("testuser");
+        expectedDTO.setStatus(UserStatus.BANNED);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserModel.class))).thenReturn(user);
+        when(userMapper.toDto(any(UserModel.class))).thenReturn(expectedDTO);
+
+        UserModelDTO result = userService.banUser(1L);
+
+        assertNotNull(result);
+        assertEquals(UserStatus.BANNED, result.getStatus());
+        verify(userRepository).save(argThat(u -> u.getStatus() == UserStatus.BANNED));
+    }
+
+    @Test
+    void banUserReturnsNullWhenUserNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        UserModelDTO result = userService.banUser(99L);
+
+        assertNull(result);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void unbanUserSetsStatusToActive() {
+        UserModel user = new UserModel();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setStatus(UserStatus.BANNED);
+
+        UserModelDTO expectedDTO = new UserModelDTO();
+        expectedDTO.setId(1L);
+        expectedDTO.setUsername("testuser");
+        expectedDTO.setStatus(UserStatus.ACTIVE);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserModel.class))).thenReturn(user);
+        when(userMapper.toDto(any(UserModel.class))).thenReturn(expectedDTO);
+
+        UserModelDTO result = userService.unbanUser(1L);
+
+        assertNotNull(result);
+        assertEquals(UserStatus.ACTIVE, result.getStatus());
+        verify(userRepository).save(argThat(u -> u.getStatus() == UserStatus.ACTIVE));
+    }
+
+    @Test
+    void unbanUserReturnsNullWhenUserNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        UserModelDTO result = userService.unbanUser(99L);
+
+        assertNull(result);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void isUserBannedReturnsTrueForBannedUser() {
+        UserModel user = new UserModel();
+        user.setUsername("banneduser");
+        user.setStatus(UserStatus.BANNED);
+
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(user));
+
+        boolean result = userService.isUserBanned("banneduser");
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isUserBannedReturnsFalseForActiveUser() {
+        UserModel user = new UserModel();
+        user.setUsername("activeuser");
+        user.setStatus(UserStatus.ACTIVE);
+
+        when(userRepository.findByUsername("activeuser")).thenReturn(Optional.of(user));
+
+        boolean result = userService.isUserBanned("activeuser");
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isUserBannedReturnsFalseWhenUserNotFound() {
+        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
+
+        boolean result = userService.isUserBanned("nonexistent");
+
+        assertFalse(result);
+    }
 }
