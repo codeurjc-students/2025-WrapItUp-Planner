@@ -100,15 +100,15 @@ public class ModerationWebTest extends BaseWebTest {
         loginAsAdmin();
         driver.get(getBaseUrl() + "admin/reported-comments");
 
-        WebElement commentCard = findReportedCommentCard(commentText);
+        By commentCardByText = By.xpath("//div[contains(@class,'comment-card')][contains(., '" + commentText + "')]");
+        WebElement commentCard = wait.until(ExpectedConditions.visibilityOfElementLocated(commentCardByText));
         assertTrue(commentCard.getText().contains(commentText));
 
         commentCard.findElement(By.cssSelector(".btn-ignore")).click();
 
-        wait.until(driver -> driver.findElements(By.cssSelector(".comment-card")).stream()
-                .noneMatch(card -> card.getText().contains(commentText))
-                || driver.findElements(By.cssSelector(".no-comments")).stream()
-                        .anyMatch(WebElement::isDisplayed));
+        wait.until(ExpectedConditions.or(
+            ExpectedConditions.invisibilityOfElementLocated(commentCardByText),
+            ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".no-comments"))));
     }
 
     @Test
