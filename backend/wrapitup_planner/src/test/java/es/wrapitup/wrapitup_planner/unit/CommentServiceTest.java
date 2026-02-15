@@ -336,6 +336,33 @@ public class CommentServiceTest {
     }
 
     @Test
+    void reportCommentThrowsExceptionWhenUserNotFound() {
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("unknownuser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.reportComment(1L, "unknownuser");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void reportCommentWorksOnAlreadyReportedComment() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(commentRepository.save(any(Comment.class))).thenReturn(testComment);
+        when(commentMapper.toDto(any(Comment.class))).thenReturn(testCommentDTO);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        CommentDTO result = commentService.reportComment(1L, "testuser");
+
+        assertNotNull(result);
+        verify(commentRepository).save(argThat(comment -> comment.isReported()));
+    }
+
+    @Test
     void unreportCommentMarksAsNotReported() {
         testComment.setReported(true);
 
@@ -356,6 +383,20 @@ public class CommentServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> {
             commentService.unreportComment(99L, "admin");
+        });
+
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void unreportCommentThrowsExceptionWhenUserNotFound() {
+        testComment.setReported(true);
+
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
+        when(userRepository.findByUsername("unknownadmin")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.unreportComment(1L, "unknownadmin");
         });
 
         verify(commentRepository, never()).save(any());

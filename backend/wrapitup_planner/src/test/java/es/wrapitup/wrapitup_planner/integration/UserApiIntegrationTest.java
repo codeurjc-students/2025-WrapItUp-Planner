@@ -363,4 +363,52 @@ public class UserApiIntegrationTest {
             .statusCode(FORBIDDEN.value())
             .body(containsString("Only admins can unban users"));
     }
+
+    @Test
+    void banNonExistentUserReturns404() {
+        String adminUsername = "admin_notfound_" + System.currentTimeMillis();
+        createAdminUser(adminUsername, "admin123");
+        String adminToken = loginUser(adminUsername, "admin123");
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .post("/api/v1/users/999999/ban")
+        .then()
+            .statusCode(NOT_FOUND.value())
+            .body(containsString("User not found"));
+    }
+
+    @Test
+    void unbanNonExistentUserReturns404() {
+        String adminUsername = "admin_unban_notfound_" + System.currentTimeMillis();
+        createAdminUser(adminUsername, "admin123");
+        String adminToken = loginUser(adminUsername, "admin123");
+
+        given()
+            .cookie("AuthToken", adminToken)
+        .when()
+            .post("/api/v1/users/999999/unban")
+        .then()
+            .statusCode(NOT_FOUND.value())
+            .body(containsString("User not found"));
+    }
+
+    @Test
+    void banUserWithoutAuthReturns401() {
+        given()
+        .when()
+            .post("/api/v1/users/1/ban")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
+
+    @Test
+    void unbanUserWithoutAuthReturns401() {
+        given()
+        .when()
+            .post("/api/v1/users/1/unban")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
 }

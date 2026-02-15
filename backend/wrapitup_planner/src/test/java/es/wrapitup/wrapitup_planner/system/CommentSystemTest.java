@@ -339,6 +339,25 @@ public class CommentSystemTest {
     }
 
     @Test
+    void reportedCommentAppearsInGetReportedComments() {
+        Comment savedComment = commentRepository.save(
+            new Comment("Comment to report and retrieve", testNote, testUser)
+        );
+
+        
+        commentService.reportComment(savedComment.getId(), "othercommentsystemuser");
+
+        
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<CommentDTO> reportedComments = commentService.getReportedComments(pageable);
+
+        
+        assertNotNull(reportedComments);
+        assertTrue(reportedComments.getContent().stream()
+                .anyMatch(c -> c.getId().equals(savedComment.getId()) && c.isReported()));
+    }
+
+    @Test
     void bannedUserCannotCreateCommentSystemTest() {
         // Ban the user
         otherUser.setStatus(UserStatus.BANNED);
@@ -361,9 +380,38 @@ public class CommentSystemTest {
 
         Long commentId = comment.getId();
 
-        // Non-admin tries to unreport
+        
         assertThrows(IllegalArgumentException.class, () -> {
             commentService.unreportComment(commentId, "othercommentsystemuser");
+        });
+    }
+
+    @Test
+    void deleteReportedCommentRemovesFromDatabase() {
+        Comment reportedComment = new Comment("Reported to delete", testNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        Long commentId = reportedComment.getId();
+
+        
+        commentService.deleteComment(commentId, "admincommentsystemuser");
+
+        
+        Optional<Comment> deletedComment = commentRepository.findById(commentId);
+        assertFalse(deletedComment.isPresent());
+    }
+
+    @Test
+    void nonAdminCannotDeleteReportedComment() {
+        Comment reportedComment = new Comment("Reported comment", testNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        Long commentId = reportedComment.getId();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.deleteComment(commentId, "othercommentsystemuser");
         });
     }
 }
