@@ -23,6 +23,13 @@ public class UserModel {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Note> notes;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CalendarEvent> calendarEvents;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CalendarTask> calendarTasks;
+    
     public UserModel(String username, String email, String password, UserStatus status, String... roles) {
         this.username = username;
         this.email = email;
@@ -93,6 +100,18 @@ public class UserModel {
     }
     public void setProfilePic(Blob profilePic) {
         this.profilePic = profilePic;
+    }
+    public List<CalendarEvent> getCalendarEvents() {
+        return calendarEvents;
+    }
+    public void setCalendarEvents(List<CalendarEvent> calendarEvents) {
+        this.calendarEvents = calendarEvents;
+    }
+    public List<CalendarTask> getCalendarTasks() {
+        return calendarTasks;
+    }
+    public void setCalendarTasks(List<CalendarTask> calendarTasks) {
+        this.calendarTasks = calendarTasks;
     }
 
 }
