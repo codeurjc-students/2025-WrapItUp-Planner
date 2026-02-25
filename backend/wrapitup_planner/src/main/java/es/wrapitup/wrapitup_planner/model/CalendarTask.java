@@ -3,9 +3,15 @@ package es.wrapitup.wrapitup_planner.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "calendar_tasks")
+@Getter
+@Setter
+@NoArgsConstructor
 public class CalendarTask {
     
     @Id
@@ -37,12 +43,6 @@ public class CalendarTask {
     @Column(name = "last_modified")
     private LocalDateTime lastModified;
 
-    public CalendarTask() {
-        this.createdAt = LocalDateTime.now();
-        this.lastModified = LocalDateTime.now();
-        this.completed = false;
-    }
-
     public CalendarTask(UserModel user, String title, String description, LocalDate taskDate) {
         this.user = user;
         this.title = title;
@@ -52,81 +52,28 @@ public class CalendarTask {
         this.createdAt = LocalDateTime.now();
         this.lastModified = LocalDateTime.now();
     }
-
-    public Long getId() {
-        return id;
+    
+    
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (lastModified == null) {
+            lastModified = LocalDateTime.now();
+        }
+        if (completed == null) {
+            completed = false;
+        }
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public UserModel getUser() {
-        return user;
-    }
-
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDate getTaskDate() {
-        return taskDate;
-    }
-
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
-    }
-
-    public Boolean getCompleted() {
-        return completed;
-    }
-
+    
+    
     public void setCompleted(Boolean completed) {
         this.completed = completed;
-        if (completed) {
+        if (completed != null && completed) {
             this.completedAt = LocalDateTime.now();
         } else {
             this.completedAt = null;
         }
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(LocalDateTime lastModified) {
-        this.lastModified = lastModified;
     }
 }

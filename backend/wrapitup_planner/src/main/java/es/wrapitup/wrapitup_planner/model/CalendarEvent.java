@@ -2,9 +2,15 @@ package es.wrapitup.wrapitup_planner.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "calendar_events")
+@Getter
+@Setter
+@NoArgsConstructor
 public class CalendarEvent {
     
     @Id
@@ -40,11 +46,6 @@ public class CalendarEvent {
     @Column(name = "last_modified")
     private LocalDateTime lastModified;
 
-    public CalendarEvent() {
-        this.createdAt = LocalDateTime.now();
-        this.lastModified = LocalDateTime.now();
-    }
-
     public CalendarEvent(UserModel user, String title, String description, LocalDateTime startDate, LocalDateTime endDate, EventColor color, Boolean allDay) {
         this.user = user;
         this.title = title;
@@ -56,84 +57,14 @@ public class CalendarEvent {
         this.createdAt = LocalDateTime.now();
         this.lastModified = LocalDateTime.now();
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public UserModel getUser() {
-        return user;
-    }
-
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
-    }
-
-    public EventColor getColor() {
-        return color;
-    }
-
-    public void setColor(EventColor color) {
-        this.color = color;
-    }
-
-    public Boolean getAllDay() {
-        return allDay;
-    }
-
-    public void setAllDay(Boolean allDay) {
-        this.allDay = allDay;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(LocalDateTime lastModified) {
-        this.lastModified = lastModified;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (lastModified == null) {
+            lastModified = LocalDateTime.now();
+        }
     }
 }
