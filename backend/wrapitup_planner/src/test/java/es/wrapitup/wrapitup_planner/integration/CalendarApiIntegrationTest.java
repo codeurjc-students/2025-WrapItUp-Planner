@@ -4,8 +4,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,11 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import es.wrapitup.wrapitup_planner.model.EventColor;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
-import es.wrapitup.wrapitup_planner.repository.CalendarEventRepository;
-import es.wrapitup.wrapitup_planner.repository.CalendarTaskRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -32,12 +27,6 @@ public class CalendarApiIntegrationTest {
 
     @LocalServerPort
     int port;
-
-    @Autowired
-    private CalendarEventRepository eventRepository;
-
-    @Autowired
-    private CalendarTaskRepository taskRepository;
 
     @Autowired
     private UserRepository userRepository;
