@@ -893,4 +893,74 @@ public class NoteApiIntegrationTest {
             .body("message", equalTo("Admins do not have shared notes"));
     }
 
+    // Banned user tests
+
+    @Test
+    void bannedUserCannotCreateNote() {
+        // Ban the test user
+        testUser.setStatus(UserStatus.BANNED);
+        userRepository.save(testUser);
+
+        String noteJson = """
+            {
+                "title": "Banned user note",
+                "overview": "This should fail",
+                "summary": "Summary",
+                "jsonQuestions": "{}",
+                "visibility": "PRIVATE",
+                "category": "OTHERS"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", authToken)
+            .contentType(ContentType.JSON)
+            .body(noteJson)
+        .when()
+            .post("/api/v1/notes")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("Banned users cannot create notes"));
+    }
+
+    @Test
+    void bannedUserCannotUpdateNote() {
+        // Create note first
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Original Title");
+        note.setOverview("Original Overview");
+        note.setSummary("Original Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        // Ban the user
+        testUser.setStatus(UserStatus.BANNED);
+        userRepository.save(testUser);
+
+        String updateJson = """
+            {
+                "title": "Updated Title",
+                "overview": "Updated Overview",
+                "summary": "Updated Summary",
+                "jsonQuestions": "{}",
+                "visibility": "PRIVATE",
+                "category": "OTHERS"
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", authToken)
+            .contentType(ContentType.JSON)
+            .body(updateJson)
+        .when()
+            .put("/api/v1/notes/" + note.getId())
+        .then()
+            .statusCode(NOT_FOUND.value())
+            .body("message", containsString("Note not found"));
+    }
+
 }

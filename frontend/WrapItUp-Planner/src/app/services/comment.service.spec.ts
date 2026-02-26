@@ -11,6 +11,8 @@ describe('CommentService (integration with real API)', () => {
   const TEST_NOTE_ID = 1;
   const TEST_USERNAME = 'genericUser';
   const TEST_PASSWORD = '12345678';
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = '12345678';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -61,9 +63,9 @@ describe('CommentService (integration with real API)', () => {
     authService.login(TEST_USERNAME, TEST_PASSWORD).subscribe({
       next: (loginResponse) => {
         expect(loginResponse).toBeDefined();
-        
-        const newComment: CommentDTO = { 
-          content: `Test comment ${Date.now()}` 
+
+        const newComment: CommentDTO = {
+          content: `Test comment ${Date.now()}`
         };
 
         service.createComment(TEST_NOTE_ID, newComment).subscribe({
@@ -89,6 +91,56 @@ describe('CommentService (integration with real API)', () => {
     });
   }, 15000);
 
+  it('should report a comment after admin login', (done) => {
+    authService.login(ADMIN_USERNAME, ADMIN_PASSWORD).subscribe({
+      next: () => {
+        const newComment: CommentDTO = {
+          content: `Reportable comment ${Date.now()}`
+        };
+
+        service.createComment(TEST_NOTE_ID, newComment).subscribe({
+          next: (createdComment) => {
+            expect(createdComment).toBeDefined();
+            expect(createdComment.id).toBeDefined();
+
+            const commentId = createdComment.id!;
+
+            service.reportComment(TEST_NOTE_ID, commentId).subscribe({
+              next: (reportedComment) => {
+                expect(reportedComment).toBeDefined();
+                expect(reportedComment.id).toBe(commentId);
+
+                service.deleteComment(TEST_NOTE_ID, commentId).subscribe({
+                  next: () => done(),
+                  error: (err) => {
+                    console.error('Error cleaning up reported comment:', err);
+                    fail('Cleanup failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                    done();
+                  }
+                });
+              },
+              error: (err) => {
+                console.error('Error reporting comment:', err);
+                fail('Failed to report comment: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error creating comment for report test:', err);
+            fail('Failed to create comment: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Admin login error:', err);
+        fail('Admin login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 20000);
+
   it('should handle errors when fetching comments for non-existent note', (done) => {
     const nonExistentNoteId = 999999;
 
@@ -106,4 +158,3 @@ describe('CommentService (integration with real API)', () => {
     });
   }, 10000);
 });
-

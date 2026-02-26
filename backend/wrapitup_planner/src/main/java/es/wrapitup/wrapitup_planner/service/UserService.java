@@ -112,4 +112,34 @@ public class UserService {
         return user.map(UserModel::getProfilePic).orElse(null);
     }
 
+    public UserModelDTO banUser(Long userId) {
+        Optional<UserModel> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+        
+        UserModel user = userOpt.get();
+        user.setStatus(UserStatus.BANNED);
+        UserModel updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
+    }
+
+    public UserModelDTO unbanUser(Long userId) {
+        Optional<UserModel> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+        
+        UserModel user = userOpt.get();
+        user.setStatus(UserStatus.ACTIVE);
+        UserModel updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
+    }
+
+    public boolean isUserBanned(String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> user.getStatus() == UserStatus.BANNED)
+                .orElse(false);
+    }
+
 }

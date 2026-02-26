@@ -15,6 +15,7 @@ import es.wrapitup.wrapitup_planner.model.Comment;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
+import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
@@ -66,6 +67,10 @@ public class CommentService {
         
         Note note = noteOpt.get();
         UserModel user = userOpt.get();
+        
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot create comments");
+        }
         
         Comment comment = new Comment(commentDTO.getContent(), note, user);
         Comment saved = commentRepository.save(comment);
@@ -143,5 +148,55 @@ public class CommentService {
         
         return note.getSharedWith().stream()
                 .anyMatch(u -> u.getId().equals(user.getId()));
+    }
+    
+    public Page<CommentDTO> getReportedComments(Pageable pageable) {
+        return commentRepository.findByIsReportedTrueOrderByCreatedAtDesc(pageable)
+                                .map(commentMapper::toDto);
+    }
+    
+    @Transactional
+    public CommentDTO reportComment(Long commentId, String username) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            throw new IllegalArgumentException("Comment not found");
+        }
+        
+        Comment comment = commentOpt.get();
+        
+        // Verify user is authenticated
+        Optional<UserModel> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        
+        comment.setReported(true);
+        Comment saved = commentRepository.save(comment);
+        return commentMapper.toDto(saved);
+    }
+    
+    @Transactional
+    public CommentDTO unreportComment(Long commentId, String username) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            throw new IllegalArgumentException("Comment not found");
+        }
+        
+        Comment comment = commentOpt.get();
+        
+        // Only admins can unreport comments
+        Optional<UserModel> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        
+        UserModel user = userOpt.get();
+        if (!isAdmin(user)) {
+            throw new IllegalArgumentException("Only admins can unreport comments");
+        }
+        
+        comment.setReported(false);
+        Comment saved = commentRepository.save(comment);
+        return commentMapper.toDto(saved);
     }
 }

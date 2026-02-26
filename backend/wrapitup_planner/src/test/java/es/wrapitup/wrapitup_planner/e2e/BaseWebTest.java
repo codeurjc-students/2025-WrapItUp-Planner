@@ -73,7 +73,8 @@ public abstract class BaseWebTest {
 
         wait.until(ExpectedConditions.or(
             ExpectedConditions.urlToBe(getBaseUrl() + "profile"),
-            ExpectedConditions.urlToBe(getBaseUrl())
+            ExpectedConditions.urlToBe(getBaseUrl()),
+            ExpectedConditions.urlContains("/banned")
         ));
     }
 

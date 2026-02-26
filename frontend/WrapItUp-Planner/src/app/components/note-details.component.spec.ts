@@ -71,7 +71,7 @@ describe('NoteDetailComponent', () => {
   beforeEach(async () => {
     mockNoteService = jasmine.createSpyObj('NoteService', ['getNoteById', 'updateNote', 'shareNoteByUsername', 'deleteNote']);
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
-    mockCommentService = jasmine.createSpyObj('CommentService', ['getCommentsByNote', 'createComment', 'deleteComment']);
+    mockCommentService = jasmine.createSpyObj('CommentService', ['getCommentsByNote', 'createComment', 'deleteComment', 'reportComment']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -362,6 +362,33 @@ describe('NoteDetailComponent', () => {
 
       expect(component.canDeleteComment(userComment)).toBe(true);
       expect(component.canDeleteComment(otherComment)).toBe(false);
+    });
+
+    it('should not report comment when confirmation is cancelled', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.reportComment(1);
+
+      expect(mockCommentService.reportComment).not.toHaveBeenCalled();
+    });
+
+    it('should report comment and reload comments', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      mockCommentService.reportComment.and.returnValue(of(testComments[0]));
+      const reloadSpy = spyOn(component, 'loadComments').and.callThrough();
+
+      component.reportComment(1);
+
+      expect(mockCommentService.reportComment).toHaveBeenCalledWith(1, 1);
+      expect(reloadSpy).toHaveBeenCalledWith(true);
     });
   });
 });

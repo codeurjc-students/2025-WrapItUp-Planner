@@ -71,12 +71,18 @@
             </div>
             
             <!-- Three dots menu -->
-            <div class="comment-menu" *ngIf="canDeleteComment(comment)">
+            <div class="comment-menu" *ngIf="canDeleteComment(comment) || currentUser">
               <button class="menu-toggle" (click)="toggleCommentMenu(comment.id!)">⋮</button>
               <div class="menu-dropdown" *ngIf="showCommentMenu === comment.id">
-                <button class="menu-item delete" (click)="deleteComment(comment.id!)">
+                <button class="menu-item delete" *ngIf="canDeleteComment(comment)" (click)="deleteComment(comment.id!)">
                   Delete
                 </button>
+                <button class="menu-item report" *ngIf="!comment.isReported" (click)="reportComment(comment.id!)">
+                  Report
+                </button>
+                <span class="menu-item reported-label" *ngIf="comment.isReported">
+                  ⚠ Reported
+                </span>
               </div>
             </div>
           </div>

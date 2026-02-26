@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './user.service';
 import { UserModelDTO } from '../dtos/user.dto';
+import { UserStatus } from '../dtos/user-status.enum';
 import { AuthService } from './auth.service';
 
 describe('UserService (integration with real API)', () => {
@@ -9,6 +10,9 @@ describe('UserService (integration with real API)', () => {
   let authService: AuthService;
   const TEST_USERNAME = 'genericUser';
   const TEST_PASSWORD = '12345678';
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = '12345678';
+  const TARGET_USER_ID = 1;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -159,6 +163,42 @@ describe('UserService (integration with real API)', () => {
       }
     });
   }, 15000);
+
+  it('should ban and unban a user as admin', (done) => {
+    authService.login(ADMIN_USERNAME, ADMIN_PASSWORD).subscribe({
+      next: () => {
+        service.banUser(TARGET_USER_ID).subscribe({
+          next: (bannedUser) => {
+            expect(bannedUser).toBeDefined();
+            expect([UserStatus.BANNED, 'BANNED']).toContain(bannedUser.status ?? '');
+
+            service.unbanUser(TARGET_USER_ID).subscribe({
+              next: (unbannedUser) => {
+                expect(unbannedUser).toBeDefined();
+                expect([UserStatus.ACTIVE, 'ACTIVE']).toContain(unbannedUser.status ?? '');
+                done();
+              },
+              error: (err) => {
+                console.error('Error unbanning user:', err);
+                fail('Failed to unban user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error banning user:', err);
+            fail('Failed to ban user: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Admin login error:', err);
+        fail('Admin login failed: ' + (err?.error?.error || err?.message || JSON.stringify(err)));
+        done();
+      }
+    });
+  }, 20000);
 
   it('should handle error when getting current user without login', (done) => {
     authService.logout().subscribe({

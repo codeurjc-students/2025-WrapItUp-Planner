@@ -49,6 +49,9 @@
   justify-content: center;
   background: #f9f9f9;
   position: relative;
+}
+
+.avatar-container.clickable {
   cursor: pointer;
 }
 
@@ -177,10 +180,13 @@
 }
 
 .notes-button,
+.dashboard-button,
 .edit-button,
 .save-button,
 .cancel-button,
-.logout-button {
+.logout-button,
+.ban-button,
+.unban-button {
   width: 100%;
   padding: 12px;
   border-radius: 12px;
@@ -202,6 +208,17 @@
   border-color: #d0d0d0;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-button {
+  background: #2196f3;
+  color: #ffffff;
+}
+
+.dashboard-button:hover {
+  background: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .edit-button {
@@ -246,6 +263,28 @@
   background: #616161;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(117, 117, 117, 0.3);
+}
+
+.ban-button {
+  background: #ff9800;
+  color: #ffffff;
+}
+
+.ban-button:hover {
+  background: #fb8c00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.unban-button {
+  background: #f44336;
+  color: #ffffff;
+}
+
+.unban-button:hover {
+  background: #e53935;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
 }
 
 .success-message {

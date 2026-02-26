@@ -1,12 +1,12 @@
 <app-header></app-header>
 <div class="profile-container">
   <div class="profile-card" *ngIf="!loading">
-    <h2>Profile</h2>
+    <h2>{{ viewingOtherProfile ? getProfileTitle() : 'Profile' }}</h2>
     
     <div class="profile-content" *ngIf="user">
-      <div class="avatar-container" (click)="isEditing && fileInput.click()">
+      <div class="avatar-container" [class.clickable]="isEditing && !viewingOtherProfile" (click)="isEditing && !viewingOtherProfile && fileInput.click()">
         <img [src]="getImageUrl()" alt="User Avatar" class="avatar-image">
-        <div class="avatar-overlay" *ngIf="isEditing">
+        <div class="avatar-overlay" *ngIf="isEditing && !viewingOtherProfile">
           <span class="change-photo-text">Change Photo</span>
         </div>
       </div>
@@ -64,11 +64,14 @@
       </div>
 
       <div class="profile-actions">
-        <button class="edit-button" *ngIf="!isEditing" (click)="toggleEdit()">Edit Profile</button>
+        <button class="edit-button" *ngIf="!isEditing && !viewingOtherProfile" (click)="toggleEdit()">Edit Profile</button>
         <button class="save-button" *ngIf="isEditing" (click)="saveChanges()">Save Changes</button>
         <button class="cancel-button" *ngIf="isEditing" (click)="toggleEdit()">Cancel</button>
-        <button class="notes-button" *ngIf="!isEditing && !isAdmin()" routerLink="/my-notes">My Notes</button>
-        <button class="logout-button" *ngIf="!isEditing" (click)="logout()">Logout</button>
+        <button class="notes-button" *ngIf="!isEditing && !isAdmin() && !viewingOtherProfile" routerLink="/my-notes">My Notes</button>
+        <button class="dashboard-button" *ngIf="!isEditing && isAdmin() && !viewingOtherProfile" routerLink="/admin/reported-comments">Dashboard</button>
+        <button class="ban-button" *ngIf="viewingOtherProfile && isCurrentUserAdmin() && !isUserBanned()" (click)="banUser()">Ban User</button>
+        <button class="unban-button" *ngIf="viewingOtherProfile && isCurrentUserAdmin() && isUserBanned()" (click)="unbanUser()">Unban User</button>
+        <button class="logout-button" *ngIf="!isEditing && !viewingOtherProfile" (click)="logout()">Logout</button>
       </div>
     </div>
   </div>

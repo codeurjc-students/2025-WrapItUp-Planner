@@ -1,3 +1,5 @@
+import { UserStatus } from './user-status.enum';
+
 export interface UserModelDTO {
   id?: number;
   username: string;
@@ -6,5 +8,5 @@ export interface UserModelDTO {
   password: string;
   image?: string;
   roles?: string[];
-  status?: string;
+  status?: UserStatus;
 }

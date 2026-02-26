@@ -280,4 +280,138 @@ public class CommentSystemTest {
 
         assertTrue(result);
     }
+
+    // Report/unreport and banned user tests
+
+    @Test
+    void reportCommentPersistsInDatabase() {
+        Comment comment = new Comment("Comment to report", testNote, testUser);
+        comment = commentRepository.save(comment);
+
+        CommentDTO reported = commentService.reportComment(comment.getId(), "othercommentsystemuser");
+
+        assertNotNull(reported);
+        assertTrue(reported.isReported());
+        
+        // Verify in database
+        Optional<Comment> savedComment = commentRepository.findById(comment.getId());
+        assertTrue(savedComment.isPresent());
+        assertTrue(savedComment.get().isReported());
+    }
+
+    @Test
+    void unreportCommentPersistsInDatabase() {
+        Comment comment = new Comment("Reported comment", testNote, testUser);
+        comment.setReported(true);
+        comment = commentRepository.save(comment);
+
+        CommentDTO unreported = commentService.unreportComment(comment.getId(), "admincommentsystemuser");
+
+        assertNotNull(unreported);
+        assertFalse(unreported.isReported());
+        
+        // Verify in database
+        Optional<Comment> savedComment = commentRepository.findById(comment.getId());
+        assertTrue(savedComment.isPresent());
+        assertFalse(savedComment.get().isReported());
+    }
+
+    @Test
+    void getReportedCommentsPersistsInDatabase() {
+        // Create reported comments
+        Comment comment1 = new Comment("Reported 1", testNote, testUser);
+        comment1.setReported(true);
+        commentRepository.save(comment1);
+
+        Comment comment2 = new Comment("Reported 2", testNote, otherUser);
+        comment2.setReported(true);
+        commentRepository.save(comment2);
+
+        Comment comment3 = new Comment("Not reported", testNote, testUser);
+        commentRepository.save(comment3);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<CommentDTO> reportedComments = commentService.getReportedComments(pageable);
+
+        assertNotNull(reportedComments);
+        assertTrue(reportedComments.getTotalElements() >= 2);
+        reportedComments.getContent().forEach(comment -> assertTrue(comment.isReported()));
+    }
+
+    @Test
+    void reportedCommentAppearsInGetReportedComments() {
+        Comment savedComment = commentRepository.save(
+            new Comment("Comment to report and retrieve", testNote, testUser)
+        );
+
+        
+        commentService.reportComment(savedComment.getId(), "othercommentsystemuser");
+
+        
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<CommentDTO> reportedComments = commentService.getReportedComments(pageable);
+
+        
+        assertNotNull(reportedComments);
+        assertTrue(reportedComments.getContent().stream()
+                .anyMatch(c -> c.getId().equals(savedComment.getId()) && c.isReported()));
+    }
+
+    @Test
+    void bannedUserCannotCreateCommentSystemTest() {
+        // Ban the user
+        otherUser.setStatus(UserStatus.BANNED);
+        userRepository.save(otherUser);
+
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setContent("This should fail");
+        commentDTO.setNoteId(testNote.getId());
+
+        assertThrows(SecurityException.class, () -> {
+            commentService.createComment(commentDTO, "othercommentsystemuser");
+        });
+    }
+
+    @Test
+    void onlyAdminCanUnreportComment() {
+        Comment comment = new Comment("Reported comment", testNote, testUser);
+        comment.setReported(true);
+        comment = commentRepository.save(comment);
+
+        Long commentId = comment.getId();
+
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.unreportComment(commentId, "othercommentsystemuser");
+        });
+    }
+
+    @Test
+    void deleteReportedCommentRemovesFromDatabase() {
+        Comment reportedComment = new Comment("Reported to delete", testNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        Long commentId = reportedComment.getId();
+
+        
+        commentService.deleteComment(commentId, "admincommentsystemuser");
+
+        
+        Optional<Comment> deletedComment = commentRepository.findById(commentId);
+        assertFalse(deletedComment.isPresent());
+    }
+
+    @Test
+    void nonAdminCannotDeleteReportedComment() {
+        Comment reportedComment = new Comment("Reported comment", testNote, testUser);
+        reportedComment.setReported(true);
+        reportedComment = commentRepository.save(reportedComment);
+
+        Long commentId = reportedComment.getId();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            commentService.deleteComment(commentId, "othercommentsystemuser");
+        });
+    }
 }

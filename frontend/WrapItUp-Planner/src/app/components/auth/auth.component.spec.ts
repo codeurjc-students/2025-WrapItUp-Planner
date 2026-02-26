@@ -2,10 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
 import { AuthComponent } from './auth.component';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
+import { UserStatus } from '../../dtos/user-status.enum';
 import { Component } from '@angular/core';
 
 
@@ -16,16 +19,19 @@ describe('AuthComponent', () => {
   let component: AuthComponent;
   let fixture: ComponentFixture<AuthComponent>;
   let authSpy: jasmine.SpyObj<AuthService>;
+  let userSpy: jasmine.SpyObj<UserService>;
   let router: Router;
 
   beforeEach(async () => {
-    authSpy = jasmine.createSpyObj('AuthService', ['login', 'register']);
+    authSpy = jasmine.createSpyObj('AuthService', ['login', 'register', 'logout']);
+    userSpy = jasmine.createSpyObj('UserService', ['getCurrentUser']);
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule, RouterTestingModule.withRoutes([])],
+      imports: [FormsModule, RouterTestingModule.withRoutes([]), HttpClientTestingModule],
       declarations: [AuthComponent, AppHeaderStubComponent], 
       providers: [
-        { provide: AuthService, useValue: authSpy }
+        { provide: AuthService, useValue: authSpy },
+        { provide: UserService, useValue: userSpy }
       ]
     }).compileComponents();
 
@@ -45,6 +51,15 @@ describe('AuthComponent', () => {
     component.password = 'password123';
 
     authSpy.login.and.returnValue(of({ status: 'SUCCESS' }));
+    userSpy.getCurrentUser.and.returnValue(of({ 
+      id: 1, 
+      username: 'testuser', 
+      email: 'test@test.com',
+      password: 'password123',
+      roles: ['USER'],
+      displayName: 'Test User',
+      status: UserStatus.ACTIVE
+    }));
 
     const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 
@@ -52,6 +67,7 @@ describe('AuthComponent', () => {
 
     setTimeout(() => {
       expect(authSpy.login).toHaveBeenCalledWith('testuser', 'password123');
+      expect(userSpy.getCurrentUser).toHaveBeenCalled();
       expect(navSpy).toHaveBeenCalledWith(['/profile']);
       done();
     }, 600);
