@@ -68,6 +68,7 @@
         <button class="save-button" *ngIf="isEditing" (click)="saveChanges()">Save Changes</button>
         <button class="cancel-button" *ngIf="isEditing" (click)="toggleEdit()">Cancel</button>
         <button class="notes-button" *ngIf="!isEditing && !isAdmin() && !viewingOtherProfile" routerLink="/my-notes">My Notes</button>
+        <button class="calendar-button" *ngIf="!isEditing && !isAdmin() && !viewingOtherProfile" routerLink="/calendar">My Calendar</button>
         <button class="dashboard-button" *ngIf="!isEditing && isAdmin() && !viewingOtherProfile" routerLink="/admin/reported-comments">Dashboard</button>
         <button class="ban-button" *ngIf="viewingOtherProfile && isCurrentUserAdmin() && !isUserBanned()" (click)="banUser()">Ban User</button>
         <button class="unban-button" *ngIf="viewingOtherProfile && isCurrentUserAdmin() && isUserBanned()" (click)="unbanUser()">Unban User</button>
