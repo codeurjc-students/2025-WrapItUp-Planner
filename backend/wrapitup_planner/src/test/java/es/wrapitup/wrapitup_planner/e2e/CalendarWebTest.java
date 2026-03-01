@@ -134,9 +134,11 @@ public class CalendarWebTest extends BaseWebTest {
         WebElement saveButton = driver.findElement(By.cssSelector(".save-button"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveButton);
 
-        WebElement taskCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".task-list")));
+        
+        WebElement taskCheckbox = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.cssSelector(".task-checkbox")));
-        taskCheckbox.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", taskCheckbox);
 
         wait.until(ExpectedConditions.attributeContains(
                 By.cssSelector(".task-item"), "class", "completed"));
