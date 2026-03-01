@@ -108,7 +108,7 @@ public class CalendarWebTest extends BaseWebTest {
     }
 
     @Test
-    void testToggleTaskCompletion() {
+    void testToggleTaskCompletion() throws InterruptedException {
         long ts = System.currentTimeMillis();
         String username = "toggleUser" + ts;
         String email = "toggle+" + ts + "@example.com";
@@ -135,13 +135,14 @@ public class CalendarWebTest extends BaseWebTest {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveButton);
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".task-list")));
+        Thread.sleep(500); 
         
-        WebElement taskCheckbox = wait.until(ExpectedConditions.presenceOfElementLocated(
+        WebElement taskCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector(".task-checkbox")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", taskCheckbox);
 
-        wait.until(ExpectedConditions.attributeContains(
-                By.cssSelector(".task-item"), "class", "completed"));
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector(".task-item.completed")));
         
         WebElement completedTask = driver.findElement(By.cssSelector(".task-item.completed"));
         assertTrue(completedTask.isDisplayed(), "Task should show as completed");
