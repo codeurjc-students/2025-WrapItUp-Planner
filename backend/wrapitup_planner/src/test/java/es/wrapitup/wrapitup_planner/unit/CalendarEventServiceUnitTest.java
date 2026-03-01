@@ -376,4 +376,95 @@ public class CalendarEventServiceUnitTest {
 
         verify(eventRepository, never()).save(any(CalendarEvent.class));
     }
+
+    @Test
+    void updateEventByBannedUserThrowsSecurityException() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            eventService.updateEvent(1L, testEventDTO, "banneduser");
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void deleteEventByBannedUserThrowsSecurityException() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            eventService.deleteEvent(1L, "banneduser");
+        });
+
+        verify(eventRepository, never()).delete(any(CalendarEvent.class));
+    }
+
+    @Test
+    void getEventsByDateRangeWithInvalidUserThrowsException() {
+        LocalDateTime startDate = LocalDateTime.of(2026, 2, 25, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2026, 2, 25, 23, 59);
+
+        when(userRepository.findByUsername("invaliduser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.getEventsByDateRange("invaliduser", startDate, endDate);
+        });
+    }
+
+    @Test
+    void updateEventWithEmptyTitleThrowsException() {
+        CalendarEventDTO updateDTO = new CalendarEventDTO();
+        updateDTO.setTitle("");
+        updateDTO.setStartDate(LocalDateTime.of(2026, 2, 25, 10, 0));
+        updateDTO.setEndDate(LocalDateTime.of(2026, 2, 25, 11, 0));
+
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.updateEvent(1L, updateDTO, "testuser");
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void createEventWithNullUsernameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.createEvent(testEventDTO, null);
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void updateEventWithNullUsernameThrowsException() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.updateEvent(1L, testEventDTO, null);
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void deleteEventWithNullUsernameThrowsException() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.deleteEvent(1L, null);
+        });
+
+        verify(eventRepository, never()).delete(any(CalendarEvent.class));
+    }
+
+    @Test
+    void getAllUserEventsWithNullUsernameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.getAllUserEvents(null);
+        });
+    }
 }

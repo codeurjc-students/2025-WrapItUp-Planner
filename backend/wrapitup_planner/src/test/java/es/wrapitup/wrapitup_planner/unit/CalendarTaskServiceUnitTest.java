@@ -388,4 +388,124 @@ public class CalendarTaskServiceUnitTest {
         assertNotNull(result);
         verify(taskRepository).save(any(CalendarTask.class));
     }
+
+    @Test
+    void updateTaskByBannedUserThrowsSecurityException() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            taskService.updateTask(1L, testTaskDTO, "banneduser");
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void deleteTaskByBannedUserThrowsSecurityException() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            taskService.deleteTask(1L, "banneduser");
+        });
+
+        verify(taskRepository, never()).delete(any(CalendarTask.class));
+    }
+
+    @Test
+    void toggleTaskCompleteByBannedUserThrowsSecurityException() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            taskService.toggleTaskComplete(1L, "banneduser");
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void getTasksByDayWithInvalidUserThrowsException() {
+        LocalDate date = LocalDate.of(2026, 2, 25);
+
+        when(userRepository.findByUsername("invaliduser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.getTasksByDay("invaliduser", date);
+        });
+    }
+
+    @Test
+    void updateTaskWithEmptyTitleThrowsException() {
+        CalendarTaskDTO updateDTO = new CalendarTaskDTO();
+        updateDTO.setTitle("");
+        updateDTO.setTaskDate(LocalDate.of(2026, 2, 25));
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.updateTask(1L, updateDTO, "testuser");
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void createTaskWithNullUsernameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.createTask(testTaskDTO, null);
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void updateTaskWithNullUsernameThrowsException() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.updateTask(1L, testTaskDTO, null);
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void toggleTaskCompleteWithNullUsernameThrowsException() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.toggleTaskComplete(1L, null);
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void getTasksByDayWithNullUsernameThrowsException() {
+        LocalDate date = LocalDate.of(2026, 2, 25);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.getTasksByDay(null, date);
+        });
+    }
+
+    @Test
+    void getTasksByDateRangeWithNullUsernameThrowsException() {
+        LocalDate startDate = LocalDate.of(2026, 2, 25);
+        LocalDate endDate = LocalDate.of(2026, 2, 28);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.getTasksByDateRange(null, startDate, endDate);
+        });
+    }
+
+    @Test
+    void getPendingTasksWithNullUsernameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskService.getPendingTasks(null);
+        });
+    }
 }
