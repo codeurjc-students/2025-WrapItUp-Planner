@@ -17,7 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import es.wrapitup.wrapitup_planner.WrapitupPlannerApplication;
 
 @Tag("client-e2e")
-@SpringBootTest(classes = WrapitupPlannerApplication.class)
+@SpringBootTest(
+    classes = WrapitupPlannerApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+)
 public abstract class BaseWebTest {
 
     protected WebDriver driver;
