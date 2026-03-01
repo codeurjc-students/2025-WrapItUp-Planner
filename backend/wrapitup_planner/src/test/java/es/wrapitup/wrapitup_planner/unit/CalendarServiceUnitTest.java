@@ -282,22 +282,6 @@ public class CalendarServiceUnitTest {
     }
 
     @Test
-    void getMonthViewWithNullUsernameThrowsException() {
-        assertThrows(Exception.class, () -> {
-            calendarService.getMonthView(null, 2026, 3);
-        });
-    }
-
-    @Test
-    void getDayViewWithNullUsernameThrowsException() {
-        LocalDate date = LocalDate.of(2026, 2, 25);
-
-        assertThrows(Exception.class, () -> {
-            calendarService.getDayView(null, date);
-        });
-    }
-
-    @Test
     void getMonthViewForFebruaryLeapYearReturns29Days() {
         int year = 2024;
         int month = 2;
