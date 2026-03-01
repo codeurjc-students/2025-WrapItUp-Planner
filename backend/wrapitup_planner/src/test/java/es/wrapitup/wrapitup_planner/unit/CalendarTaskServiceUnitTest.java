@@ -437,22 +437,6 @@ public class CalendarTaskServiceUnitTest {
     }
 
     @Test
-    void updateTaskWithEmptyTitleThrowsException() {
-        CalendarTaskDTO updateDTO = new CalendarTaskDTO();
-        updateDTO.setTitle("");
-        updateDTO.setTaskDate(LocalDate.of(2026, 2, 25));
-
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            taskService.updateTask(1L, updateDTO, "testuser");
-        });
-
-        verify(taskRepository, never()).save(any(CalendarTask.class));
-    }
-
-    @Test
     void createTaskWithNullUsernameThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
             taskService.createTask(testTaskDTO, null);

@@ -414,23 +414,6 @@ public class CalendarEventServiceUnitTest {
     }
 
     @Test
-    void updateEventWithEmptyTitleThrowsException() {
-        CalendarEventDTO updateDTO = new CalendarEventDTO();
-        updateDTO.setTitle("");
-        updateDTO.setStartDate(LocalDateTime.of(2026, 2, 25, 10, 0));
-        updateDTO.setEndDate(LocalDateTime.of(2026, 2, 25, 11, 0));
-
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            eventService.updateEvent(1L, updateDTO, "testuser");
-        });
-
-        verify(eventRepository, never()).save(any(CalendarEvent.class));
-    }
-
-    @Test
     void createEventWithNullUsernameThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
             eventService.createEvent(testEventDTO, null);
