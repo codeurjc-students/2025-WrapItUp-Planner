@@ -363,4 +363,29 @@ public class CalendarTaskServiceUnitTest {
             taskService.getPendingTasks("nonexistent");
         });
     }
+
+    @Test
+    void createTaskByBannedUserThrowsSecurityException() {
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            taskService.createTask(testTaskDTO, "banneduser");
+        });
+
+        verify(taskRepository, never()).save(any(CalendarTask.class));
+    }
+
+    @Test
+    void toggleTaskCompleteChangesStatus() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(taskRepository.save(any(CalendarTask.class))).thenReturn(testTask);
+        when(taskMapper.toDto(testTask)).thenReturn(testTaskDTO);
+        testTask.setCompleted(false);
+
+        CalendarTaskDTO result = taskService.toggleTaskComplete(1L, "testuser");
+
+        assertNotNull(result);
+        verify(taskRepository).save(any(CalendarTask.class));
+    }
 }

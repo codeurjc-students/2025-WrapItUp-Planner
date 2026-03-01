@@ -214,4 +214,61 @@ public class CalendarServiceUnitTest {
         assertNotNull(result);
         assertEquals(2, result.getEvents().size()); 
     }
+
+    @Test
+    void getMonthViewForMarchReturns31Days() {
+        int year = 2026;
+        int month = 3;
+        String username = "testuser";
+
+        when(eventService.getEventsByDateRange(eq(username), any(LocalDateTime.class), any(LocalDateTime.class)))
+            .thenReturn(Collections.emptyList());
+        when(taskService.getTasksByDateRange(eq(username), any(LocalDate.class), any(LocalDate.class)))
+            .thenReturn(Collections.emptyList());
+
+        CalendarMonthDTO result = calendarService.getMonthView(username, year, month);
+
+        assertNotNull(result);
+        assertEquals(31, result.getDays().size());
+    }
+
+    @Test
+    void getMonthViewWithEventsPopulatesEventColors() {
+        int year = 2026;
+        int month = 2;
+        String username = "testuser";
+
+        List<CalendarEventDTO> events = Arrays.asList(testEvent1, testEvent2);
+        when(eventService.getEventsByDateRange(eq(username), any(LocalDateTime.class), any(LocalDateTime.class)))
+            .thenReturn(events);
+        when(taskService.getTasksByDateRange(eq(username), any(LocalDate.class), any(LocalDate.class)))
+            .thenReturn(Collections.emptyList());
+
+        CalendarMonthDTO result = calendarService.getMonthView(username, year, month);
+
+        assertNotNull(result);
+        CalendarDaySummaryDTO day25 = result.getDays().stream()
+            .filter(d -> d.getDate().getDayOfMonth() == 25)
+            .findFirst()
+            .orElse(null);
+        assertNotNull(day25);
+        assertTrue(day25.getTotalEvents() > 0);
+    }
+
+    @Test
+    void getDayViewWithTasksIncludesPendingAndCompleted() {
+        LocalDate date = LocalDate.of(2026, 2, 25);
+        String username = "testuser";
+
+        List<CalendarTaskDTO> tasks = Arrays.asList(testTask1, testTask2);
+        when(eventService.getEventsByDateRange(eq(username), any(LocalDateTime.class), any(LocalDateTime.class)))
+            .thenReturn(Collections.emptyList());
+        when(taskService.getTasksByDay(username, date))
+            .thenReturn(tasks);
+
+        CalendarDayDTO result = calendarService.getDayView(username, date);
+
+        assertNotNull(result);
+        assertEquals(2, result.getTasks().size());
+    }
 }

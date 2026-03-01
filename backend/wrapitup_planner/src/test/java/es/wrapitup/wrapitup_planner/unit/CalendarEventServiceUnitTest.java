@@ -353,4 +353,27 @@ public class CalendarEventServiceUnitTest {
             eventService.getAllUserEvents("nonexistent");
         });
     }
+
+    @Test
+    void createEventWithStartDateAfterEndDateThrowsException() {
+        testEventDTO.setStartDate(LocalDateTime.of(2026, 2, 25, 15, 0));
+        testEventDTO.setEndDate(LocalDateTime.of(2026, 2, 25, 10, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventService.createEvent(testEventDTO, "testuser");
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void createEventByBannedUserThrowsSecurityException() {
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            eventService.createEvent(testEventDTO, "banneduser");
+        });
+
+        verify(eventRepository, never()).save(any(CalendarEvent.class));
+    }
 }
