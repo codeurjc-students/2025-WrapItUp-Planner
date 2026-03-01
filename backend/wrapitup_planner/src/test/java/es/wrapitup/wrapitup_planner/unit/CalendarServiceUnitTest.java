@@ -271,4 +271,46 @@ public class CalendarServiceUnitTest {
         assertNotNull(result);
         assertEquals(2, result.getTasks().size());
     }
+
+    @Test
+    void getDayViewWithNullDateThrowsException() {
+        String username = "testuser";
+
+        assertThrows(Exception.class, () -> {
+            calendarService.getDayView(username, null);
+        });
+    }
+
+    @Test
+    void getMonthViewWithNullUsernameThrowsException() {
+        assertThrows(Exception.class, () -> {
+            calendarService.getMonthView(null, 2026, 3);
+        });
+    }
+
+    @Test
+    void getDayViewWithNullUsernameThrowsException() {
+        LocalDate date = LocalDate.of(2026, 2, 25);
+
+        assertThrows(Exception.class, () -> {
+            calendarService.getDayView(null, date);
+        });
+    }
+
+    @Test
+    void getMonthViewForFebruaryLeapYearReturns29Days() {
+        int year = 2024;
+        int month = 2;
+        String username = "testuser";
+
+        when(eventService.getEventsByDateRange(eq(username), any(LocalDateTime.class), any(LocalDateTime.class)))
+            .thenReturn(Collections.emptyList());
+        when(taskService.getTasksByDateRange(eq(username), any(LocalDate.class), any(LocalDate.class)))
+            .thenReturn(Collections.emptyList());
+
+        CalendarMonthDTO result = calendarService.getMonthView(username, year, month);
+
+        assertNotNull(result);
+        assertEquals(29, result.getDays().size());
+    }
 }
