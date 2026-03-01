@@ -22,6 +22,12 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { MyNotesComponent } from './components/my-notes/my-notes.component';
 import { ReportedCommentsComponent } from './components/reported-comments/reported-comments.component';
 import { BannedComponent } from './components/banned/banned.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
+import { DayViewDialogComponent } from './components/calendar/day-view-dialog.component';
+import { CreateEventDialogComponent } from './components/calendar/create-event-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -36,7 +42,10 @@ import { BannedComponent } from './components/banned/banned.component';
     ProfileComponent,
     MyNotesComponent,
     ReportedCommentsComponent,
-    BannedComponent
+    BannedComponent,
+    CalendarComponent,
+    DayViewDialogComponent,
+    CreateEventDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +55,10 @@ import { BannedComponent } from './components/banned/banned.component';
     MatToolbarModule,
     MatButtonModule,
     BrowserAnimationsModule,
-    MatCardModule
+    MatCardModule,
+    MatDialogModule,
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   providers: [NoteService, AuthService, provideAnimationsAsync()],
   bootstrap: [AppComponent]

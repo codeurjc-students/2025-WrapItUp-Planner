@@ -1,0 +1,179 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ getDateString() }}</h2>
+    <button class="close-button" (click)="close()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="add-event-button" (click)="openEventForm()" *ngIf="!showEventForm && !showTaskForm">
+      <span class="material-icons">event</span> Add Event
+    </button>
+    <button class="add-task-button" (click)="openTaskForm()" *ngIf="!showEventForm && !showTaskForm">
+      <span class="material-icons">check_box</span> Add Task
+    </button>
+  </div>
+
+  <div class="success-message" *ngIf="success">
+    {{ success }}
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="event-form" *ngIf="showEventForm">
+    <h3>{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
+    
+    <div class="form-group">
+      <label for="event-title">Title *</label>
+      <input id="event-title" type="text" [(ngModel)]="newEvent.title" placeholder="Event title" required>
+    </div>
+
+    <div class="form-group">
+      <label for="event-description">Description</label>
+      <textarea id="event-description" [(ngModel)]="newEvent.description" placeholder="Event description" rows="3"></textarea>
+    </div>
+
+    <div class="date-fields">
+      <div class="form-group">
+        <label for="start-date">Start Date *</label>
+        <input id="start-date" type="date" [(ngModel)]="startDate" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end-date">End Date *</label>
+        <input id="end-date" type="date" [(ngModel)]="endDate" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="event-color">Color *</label>
+      <div class="color-picker">
+        <div 
+          *ngFor="let color of eventColors" 
+          class="color-option"
+          [class.selected]="newEvent.color === color"
+          [style.background-color]="eventColorHex[color]"
+          (click)="newEvent.color = color">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <input id="event-allday" type="checkbox" [(ngModel)]="newEvent.allDay">
+      <label for="event-allday">All day event</label>
+    </div>
+
+    <div class="time-fields" *ngIf="!newEvent.allDay">
+      <div class="form-group">
+        <label for="start-time">Start Time *</label>
+        <input id="start-time" type="time" [(ngModel)]="startTime" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end-time">End Time *</label>
+        <input id="end-time" type="time" [(ngModel)]="endTime" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="save-button" (click)="saveEvent()">
+        {{ editingEvent ? 'Update' : 'Create' }}
+      </button>
+      <button class="cancel-button" (click)="cancelForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="task-form" *ngIf="showTaskForm">
+    <h3>{{ editingTask ? 'Edit Task' : 'New Task' }}</h3>
+    
+    <div class="form-group">
+      <label for="task-title">Title *</label>
+      <input id="task-title" type="text" [(ngModel)]="newTask.title" placeholder="Task title" required>
+    </div>
+
+    <div class="form-group">
+      <label for="task-description">Description</label>
+      <textarea id="task-description" [(ngModel)]="newTask.description" placeholder="Task description" rows="3"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="save-button" (click)="saveTask()">
+        {{ editingTask ? 'Update' : 'Create' }}
+      </button>
+      <button class="cancel-button" (click)="cancelForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="day-content" *ngIf="dayData && !loading">
+    <div class="events-section" *ngIf="dayData.events.length > 0">
+      <h3>
+        <span class="material-icons">event</span>
+        Events ({{ dayData.events.length }})
+      </h3>
+      
+      <div class="event-list">
+        <div *ngFor="let event of dayData.events" class="event-item">
+          <div class="event-color-bar" [style.background-color]="event.colorHex"></div>
+          <div class="event-content">
+            <div class="event-title">{{ event.title }}</div>
+            <div class="event-description" *ngIf="event.description">{{ event.description }}</div>
+            <div class="event-meta">
+              <span *ngIf="event.allDay">All day</span>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="edit-button-small" (click)="editEvent(event)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="delete-button-small" (click)="deleteEvent(event)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tasks-section" *ngIf="dayData.tasks.length > 0">
+      <h3>
+        <span class="material-icons">check_box</span>
+        Tasks ({{ dayData.tasks.length }})
+      </h3>
+      
+      <div class="task-list">
+        <div *ngFor="let task of dayData.tasks" class="task-item" [class.completed]="task.completed">
+          <div class="task-checkbox" (click)="toggleTask(task)">
+            <span class="material-icons">
+              {{ task.completed ? 'check_box' : 'check_box_outline_blank' }}
+            </span>
+          </div>
+          <div class="task-content">
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
+          </div>
+          <div class="task-actions">
+            <button class="edit-button-small" (click)="editTask(task)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="delete-button-small" (click)="deleteTask(task)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="dayData.events.length === 0 && dayData.tasks.length === 0">
+      <span class="material-icons">event_available</span>
+      <p>No events or tasks for this day</p>
+      <p class="hint">Click "Add Event" or "Add Task" to get started</p>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading...</p>
+  </div>
+</div>

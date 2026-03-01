@@ -186,6 +186,7 @@
 .cancel-button,
 .logout-button,
 .ban-button,
+.calendar-button,
 .unban-button {
   width: 100%;
   padding: 12px;
@@ -205,6 +206,19 @@
 
 .notes-button:hover {
   background: #f5f5f5;
+  border-color: #d0d0d0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-button {
+  background: #8B5CF6;
+  color: #ffffff;
+  border: 2px solid #e0e0e0;
+}
+
+.calendar-button:hover {
+  background: #7C3AED;
   border-color: #d0d0d0;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

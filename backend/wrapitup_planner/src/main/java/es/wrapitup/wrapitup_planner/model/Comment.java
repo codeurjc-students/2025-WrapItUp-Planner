@@ -2,8 +2,14 @@ package es.wrapitup.wrapitup_planner.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Comment {
     
     @Id
@@ -31,11 +37,9 @@ public class Comment {
     
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-    
-    public Comment() {
-        this.isReported = false;
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
     
     public Comment(String content, Note note, UserModel user) {
@@ -48,62 +52,11 @@ public class Comment {
         }
     }
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getContent() {
-        return content;
-    }
-    
-    public void setContent(String content) {
-        this.content = content;
-    }
-    
-    public Note getNote() {
-        return note;
-    }
-    
-    public void setNote(Note note) {
-        this.note = note;
-    }
-    
-    public UserModel getUser() {
-        return user;
-    }
     
     public void setUser(UserModel user) {
         this.user = user;
         if (user != null) {
             this.userProfilePicUrl = user.getImage();
         }
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public String getUserProfilePicUrl() {
-        return userProfilePicUrl;
-    }
-    
-    public void setUserProfilePicUrl(String userProfilePicUrl) {
-        this.userProfilePicUrl = userProfilePicUrl;
-    }
-    
-    public boolean isReported() {
-        return isReported;
-    }
-    
-    public void setReported(boolean reported) {
-        this.isReported = reported;
     }
 }

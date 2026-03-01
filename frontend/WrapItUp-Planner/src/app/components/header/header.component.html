@@ -11,6 +11,7 @@
   <!-- Buttons when authenticated -->
   <ng-container *ngIf="isAuthenticated">
     <button *ngIf="!isAdmin" [routerLink]="['/my-notes']" mat-button>My Notes</button>
+    <button *ngIf="!isAdmin" [routerLink]="['/calendar']" mat-button>Calendar</button>
     <button *ngIf="isAdmin" [routerLink]="['/admin/reported-comments']" mat-button>Dashboard</button>
     <button [routerLink]="['/profile']" mat-raised-button color="accent">Profile</button>
   </ng-container>

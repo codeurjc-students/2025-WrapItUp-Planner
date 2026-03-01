@@ -1,0 +1,77 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>New Multi-Day Event</h2>
+    <button class="close-button" (click)="cancel()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="success-message" *ngIf="success">
+    {{ success }}
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="event-form">
+    <div class="form-group">
+      <label for="event-title">Title *</label>
+      <input id="event-title" type="text" [(ngModel)]="newEvent.title" placeholder="Event title" required>
+    </div>
+
+    <div class="form-group">
+      <label for="event-description">Description</label>
+      <textarea id="event-description" [(ngModel)]="newEvent.description" placeholder="Event description" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="event-color">Color *</label>
+      <div class="color-picker">
+        <div 
+          *ngFor="let color of eventColors" 
+          class="color-option"
+          [class.selected]="newEvent.color === color"
+          [style.background-color]="eventColorHex[color]"
+          (click)="newEvent.color = color">
+        </div>
+      </div>
+    </div>
+
+    <div class="date-fields">
+      <div class="form-group">
+        <label for="start-date">Start Date *</label>
+        <input id="start-date" type="date" [(ngModel)]="startDate" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end-date">End Date *</label>
+        <input id="end-date" type="date" [(ngModel)]="endDate" required>
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <input id="event-allday" type="checkbox" [(ngModel)]="allDay">
+      <label for="event-allday">All day event</label>
+    </div>
+
+    <div class="time-fields" *ngIf="!allDay">
+      <div class="form-group">
+        <label for="start-time">Start Time *</label>
+        <input id="start-time" type="time" [(ngModel)]="startTime" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end-time">End Time *</label>
+        <input id="end-time" type="time" [(ngModel)]="endTime" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="save-button" (click)="saveEvent()" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Event' }}
+      </button>
+      <button class="cancel-button" (click)="cancel()" [disabled]="loading">Cancel</button>
+    </div>
+  </div>
+</div>

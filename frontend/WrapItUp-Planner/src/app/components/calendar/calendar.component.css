@@ -1,0 +1,259 @@
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  padding-top: 80px;
+  padding-bottom: 40px;
+  background: linear-gradient(135deg, #3a3a3a, #555);
+}
+
+.calendar-card {
+  background: #ffffff;
+  color: #222222;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 24px;
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #222222;
+  margin: 0;
+}
+
+.nav-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  color: #222222;
+}
+
+.nav-button:hover {
+  background: #f0f0f0;
+}
+
+.nav-button .material-icons {
+  font-size: 28px;
+}
+
+.calendar-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.new-event-button {
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: #10B981;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.new-event-button:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.new-event-button .material-icons {
+  font-size: 20px;
+}
+
+.today-button {
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: #3f51b5;
+  color: #ffffff;
+}
+
+.today-button:hover {
+  background: #303f9f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.weekday-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 0;
+  color: #555;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  position: relative;
+}
+
+.calendar-day:not(.empty):hover {
+  background: #f0f4ff;
+  border-color: #3f51b5;
+  box-shadow: 0 2px 8px rgba(63, 81, 181, 0.2);
+  transform: translateY(-2px);
+}
+
+.calendar-day.empty {
+  background: #f5f5f5;
+  cursor: default;
+  border-color: transparent;
+}
+
+.calendar-day.today {
+  background: #e3f2fd;
+  border: 2px solid #2196f3;
+  font-weight: 600;
+}
+
+.calendar-day.has-events {
+  background: #fff;
+}
+
+.day-number {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.day-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.event-dots {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.more-events {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+}
+
+.task-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+  margin-top: auto;
+}
+
+.task-icon {
+  font-size: 14px;
+}
+
+.task-count {
+  font-weight: 600;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: #ffffff;
+}
+
+.loading p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .calendar-card {
+    padding: 1rem;
+  }
+
+  .calendar-header h2 {
+    font-size: 22px;
+  }
+
+  .weekday-header {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+
+  .calendar-day {
+    padding: 4px;
+  }
+
+  .day-number {
+    font-size: 14px;
+  }
+
+  .event-dot {
+    width: 6px;
+    height: 6px;
+  }
+}

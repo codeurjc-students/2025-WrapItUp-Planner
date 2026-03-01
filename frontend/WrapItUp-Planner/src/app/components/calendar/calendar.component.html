@@ -1,0 +1,70 @@
+<app-header></app-header>
+
+<div class="calendar-container">
+  <div class="calendar-card" *ngIf="!loading">
+    <div class="calendar-header">
+      <button (click)="previousMonth()" class="nav-button">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <h2>{{ getMonthName() }} {{ currentYear }}</h2>
+      <button (click)="nextMonth()" class="nav-button">
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+
+    <div class="calendar-actions">
+      <button class="new-event-button" (click)="openNewEventDialog()">
+        <span class="material-icons">add</span> New Event
+      </button>
+      <button class="today-button" (click)="goToToday()">Today</button>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <div class="calendar-grid" *ngIf="monthData">
+      <div class="weekday-header" *ngFor="let day of weekDays">
+        {{ day }}
+      </div>
+
+      <ng-container *ngFor="let week of calendarDays">
+        <div 
+          *ngFor="let daySummary of week" 
+          class="calendar-day"
+          [class.empty]="!daySummary"
+          [class.today]="isToday(daySummary)"
+          [class.has-events]="daySummary && daySummary.totalEvents > 0"
+          (click)="openDayView(daySummary)">
+          
+          <div class="day-number" *ngIf="daySummary">
+            {{ getDayNumber(daySummary) }}
+          </div>
+
+          <div class="day-content" *ngIf="daySummary">
+            <div class="event-dots" *ngIf="daySummary.eventColors.length > 0">
+              <span 
+                *ngFor="let color of daySummary.eventColors" 
+                class="event-dot"
+                [style.background-color]="color">
+              </span>
+              <span class="more-events" *ngIf="daySummary.totalEvents > 3">
+                +
+              </span>
+            </div>
+
+            <div class="task-indicator" *ngIf="daySummary.pendingTasks > 0">
+              <span class="material-icons task-icon">check_box_outline_blank</span>
+              <span class="task-count">{{ daySummary.pendingTasks }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading calendar...</p>
+  </div>
+</div>
