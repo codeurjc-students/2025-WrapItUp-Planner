@@ -73,6 +73,6 @@ export class CreateNoteComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/my-notes']);
   }
 }

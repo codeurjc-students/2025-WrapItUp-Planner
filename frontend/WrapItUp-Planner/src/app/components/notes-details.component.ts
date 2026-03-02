@@ -100,12 +100,12 @@ export class NoteDetailComponent implements OnInit {
         
         else if (err.status === 403) {
           alert('You do not have permission to view this note');
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/my-notes']);
         }
         
         else if (err.status === 404) {
           alert('Note not found');
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/my-notes']);
         }
         
         else {
@@ -263,7 +263,7 @@ export class NoteDetailComponent implements OnInit {
     this.noteService.deleteNote(this.noteId).subscribe({
       next: () => {
         alert('Note deleted successfully');
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/my-notes']);
       },
       error: (err) => {
         console.error('Error deleting note:', err);

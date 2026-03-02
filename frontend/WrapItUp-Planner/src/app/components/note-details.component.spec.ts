@@ -237,7 +237,7 @@ describe('NoteDetailComponent', () => {
     component.deleteNote();
 
     expect(mockNoteService.deleteNote).toHaveBeenCalledWith(1);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/my-notes']);
   });
 
   it('should not delete note when user cancels confirmation', () => {
