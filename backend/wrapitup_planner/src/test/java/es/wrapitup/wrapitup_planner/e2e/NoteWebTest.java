@@ -263,7 +263,7 @@ public class NoteWebTest extends BaseWebTest {
 
         wait.until(ExpectedConditions.or(
             ExpectedConditions.urlToBe(getBaseUrl()),
-            ExpectedConditions.urlContains("/profile")
+            ExpectedConditions.urlContains("/my-notes")
         ));
         
         assertFalse(driver.getCurrentUrl().contains("/notes/create"));

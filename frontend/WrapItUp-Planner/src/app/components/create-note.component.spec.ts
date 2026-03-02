@@ -147,7 +147,7 @@ describe('CreateNoteComponent', () => {
   it('should navigate to profile when cancel is called', () => {
     component.cancel();
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/my-notes']);
   });
 
   it('should create note with empty optional fields', () => {
