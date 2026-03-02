@@ -117,6 +117,18 @@ public class WebSecurityConfig {
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/comments").hasAnyRole("USER", "ADMIN")
 					.requestMatchers(HttpMethod.DELETE, "/api/v1/notes/*/comments/*").hasAnyRole("USER", "ADMIN")
 
+					// Calendar - USER only 
+					.requestMatchers(HttpMethod.GET, "/api/v1/calendar/**").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/calendar/events").hasRole("USER")
+					.requestMatchers(HttpMethod.PUT, "/api/v1/calendar/events/*").hasRole("USER")
+					.requestMatchers(HttpMethod.DELETE, "/api/v1/calendar/events/*").hasRole("USER")
+					
+					.requestMatchers(HttpMethod.GET, "/api/v1/calendar/tasks").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/calendar/tasks").hasRole("USER")
+					.requestMatchers(HttpMethod.PUT, "/api/v1/calendar/tasks/*").hasRole("USER")
+					.requestMatchers(HttpMethod.PATCH, "/api/v1/calendar/tasks/*/toggle").hasRole("USER")
+					.requestMatchers(HttpMethod.DELETE, "/api/v1/calendar/tasks/*").hasRole("USER")
+
 					.anyRequest().permitAll()
 					);
 		
