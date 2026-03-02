@@ -77,6 +77,8 @@
     </div>
   </div>
 
+  <app-tasks-heatmap *ngIf="!loading && !viewingOtherProfile && !isAdmin()"></app-tasks-heatmap>
+
   <div class="loading" *ngIf="loading">
     <p>Loading...</p>
   </div>
