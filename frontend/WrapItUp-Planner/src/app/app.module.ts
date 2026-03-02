@@ -25,6 +25,7 @@ import { BannedComponent } from './components/banned/banned.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
 import { DayViewDialogComponent } from './components/calendar/day-view-dialog.component';
 import { CreateEventDialogComponent } from './components/calendar/create-event-dialog.component';
+import { TasksHeatmapComponent } from './components/profile/tasks-heatmap/tasks-heatmap.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -45,7 +46,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     BannedComponent,
     CalendarComponent,
     DayViewDialogComponent,
-    CreateEventDialogComponent
+    CreateEventDialogComponent,
+    TasksHeatmapComponent
   ],
   imports: [
     BrowserModule,

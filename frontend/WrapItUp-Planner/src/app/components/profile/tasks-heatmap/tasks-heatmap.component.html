@@ -1,0 +1,47 @@
+<div class="heatmap-container">
+  <h3 class="heatmap-title">{{ currentMonth }} - Pending Tasks</h3>
+  
+  <div *ngIf="loading" class="loading-message">
+    Loading heatmap...
+  </div>
+
+  <div *ngIf="!loading && monthData" class="heatmap-wrapper">
+    <div class="heatmap-grid">
+      <div class="weekdays">
+        <div *ngFor="let day of weekDays" class="weekday-label">
+          {{ day }}
+        </div>
+      </div>
+
+      <div class="calendar-weeks">
+        <div *ngFor="let week of weeks" class="calendar-week">
+          <div
+            *ngFor="let day of week"
+            class="day-cell"
+            [class.empty]="!day"
+            [class.today]="isToday(day)"
+            [style.background-color]="getHeatmapColor(day)"
+            [attr.data-tasks]="getPendingTasks(day)"
+            [title]="day ? getDayNumber(day) + ' - ' + getPendingTasks(day) + ' pending tasks' : ''"
+          >
+            <span class="day-number" *ngIf="day">{{ getDayNumber(day) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="heatmap-legend">
+      <span class="legend-label">Less</span>
+      <div class="legend-color" style="background-color: #f0f0f0;"></div>
+      <div class="legend-color" style="background-color: #f8bbd0;"></div>
+      <div class="legend-color" style="background-color: #f06292;"></div>
+      <div class="legend-color" style="background-color: #e91e63;"></div>
+      <div class="legend-color" style="background-color: #880e4f;"></div>
+      <span class="legend-label">More</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !monthData" class="error-message">
+    Unable to load heatmap data
+  </div>
+</div>

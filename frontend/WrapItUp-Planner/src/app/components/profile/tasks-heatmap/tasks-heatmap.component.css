@@ -1,0 +1,130 @@
+.heatmap-container {
+  margin: 20px 0;
+  margin-left: 100px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.heatmap-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.error-message {
+  color: #d32f2f;
+}
+
+.heatmap-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.heatmap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 50px);
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.weekday-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  text-align: center;
+}
+
+.calendar-weeks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 50px);
+  gap: 5px;
+}
+
+.day-cell {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+  position: relative;
+}
+
+.day-cell.empty {
+  background-color: transparent !important;
+  border: none;
+  cursor: default;
+}
+
+.day-cell:not(.empty):hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.day-cell.today {
+  border: 2px solid #ff22a7;
+  font-weight: bold;
+}
+
+.day-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.day-cell[style*='#880e4f'] .day-number,
+.day-cell[style*='#e91e63'] .day-number {
+  color: white;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.legend-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.legend-color {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+
