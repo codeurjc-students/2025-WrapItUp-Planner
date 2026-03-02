@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,15 +13,20 @@ import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import es.wrapitup.wrapitup_planner.model.CalendarEvent;
+import es.wrapitup.wrapitup_planner.model.CalendarTask;
+import es.wrapitup.wrapitup_planner.model.Comment;
+import es.wrapitup.wrapitup_planner.model.EventColor;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
-import es.wrapitup.wrapitup_planner.model.Comment;
+import es.wrapitup.wrapitup_planner.repository.CalendarEventRepository;
+import es.wrapitup.wrapitup_planner.repository.CalendarTaskRepository;
+import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
-import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import jakarta.annotation.PostConstruct;
 
 @Service
@@ -28,13 +35,18 @@ public class DatabaseInitizalizer {
     private final UserRepository userRepository;
     private final NoteRepository noteRepository;
     private final CommentRepository commentRepository;
+    private final CalendarEventRepository eventRepository;
+    private final CalendarTaskRepository taskRepository;
     private final PasswordEncoder passwordEncoder;
     
     public DatabaseInitizalizer(UserRepository userRepository, NoteRepository noteRepository, 
-                                CommentRepository commentRepository, PasswordEncoder passwordEncoder) {
+                                CommentRepository commentRepository, CalendarEventRepository eventRepository,
+                                CalendarTaskRepository taskRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.noteRepository = noteRepository;
         this.commentRepository = commentRepository;
+        this.eventRepository = eventRepository;
+        this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -320,10 +332,12 @@ public class DatabaseInitizalizer {
         Comment comment1 = new Comment("Useful, thanks", note1, secondUser);
         Comment comment2 = new Comment("Great tips!", note1, user);
         Comment comment3 = new Comment("Very helpful", note1, secondUser);
+        comment3.setReported(true);
         Comment comment4 = new Comment("Useful, thanks", note1, user);
         Comment comment5 = new Comment("Nice summary", note1, secondUser);
         Comment comment6 = new Comment("Useful, thanks", note1, user);
         Comment comment7 = new Comment("Good information", note1, secondUser);
+        comment7.setReported(true);
         Comment comment8 = new Comment("Useful, thanks", note1, user);
         Comment comment9 = new Comment("Well explained", note1, secondUser);
         Comment comment10 = new Comment("Useful, thanks", note1, user);
@@ -342,5 +356,249 @@ public class DatabaseInitizalizer {
         commentRepository.save(comment10);
         commentRepository.save(comment11);
         commentRepository.save(comment12);
+
+        CalendarEvent event1 = new CalendarEvent(
+            user,
+            "Math Study Session",
+            "Group study session for calculus exam",
+            LocalDateTime.of(2026, 3, 3, 14, 0),
+            LocalDateTime.of(2026, 3, 3, 16, 0),
+            EventColor.BLUE,
+            false
+        );
+
+        CalendarEvent event4 = new CalendarEvent(
+            user,
+            "History Lecture",
+            "Lecture on World War II",
+            LocalDateTime.of(2026, 3, 10, 9, 0),
+            LocalDateTime.of(2026, 3, 10, 11, 0),
+            EventColor.YELLOW,
+            false
+        );
+
+        CalendarEvent event6 = new CalendarEvent(
+            user,
+            "Language Workshop",
+            "Multi-day German pronunciation workshop",
+            LocalDateTime.of(2026, 3, 14, 9, 0),
+            LocalDateTime.of(2026, 3, 15, 17, 0),
+            EventColor.GREEN,
+            false
+        );
+
+        CalendarEvent event7 = new CalendarEvent(
+            user,
+            "Spring Festival",
+            "Spring festival celebration",
+            LocalDateTime.of(2026, 3, 14, 0, 0),
+            LocalDateTime.of(2026, 3, 14, 23, 59),
+            EventColor.RED,
+            true
+        );
+
+        CalendarEvent event11 = new CalendarEvent(
+            user,
+            "Physics Workshop",
+            "Multi-day Newton's laws practical workshop",
+            LocalDateTime.of(2026, 3, 21, 9, 0),
+            LocalDateTime.of(2026, 3, 22, 16, 0),
+            EventColor.GREEN,
+            false
+        );
+
+        CalendarEvent event13 = new CalendarEvent(
+            user,
+            "Project Deadline",
+            "Multi-day final project submission period",
+            LocalDateTime.of(2026, 3, 24, 0, 0),
+            LocalDateTime.of(2026, 3, 26, 23, 59),
+            EventColor.RED,
+            true
+        );
+
+        CalendarEvent event14 = new CalendarEvent(
+            user,
+            "Study Review",
+            "Multi-day comprehensive review session before exams",
+            LocalDateTime.of(2026, 3, 27, 9, 0),
+            LocalDateTime.of(2026, 3, 28, 17, 0),
+            EventColor.BLUE,
+            false
+        );
+
+        eventRepository.save(event1);
+        eventRepository.save(event4);
+        eventRepository.save(event6);
+        eventRepository.save(event7);
+        eventRepository.save(event11);
+        eventRepository.save(event13);
+        eventRepository.save(event14);
+
+        CalendarTask task1 = new CalendarTask(
+            user,
+            "Read Chapter 5 - Calculus",
+            "Read and take notes on differential equations",
+            LocalDate.of(2026, 3, 2)
+        );
+        task1.setCompleted(true);
+
+        CalendarTask task2 = new CalendarTask(
+            user,
+            "Prepare Lab Report",
+            "Write lab report for biology experiment",
+            LocalDate.of(2026, 3, 6)
+        );
+        task2.setCompleted(true);
+
+        CalendarTask task3 = new CalendarTask(
+            user,
+            "Review History Notes",
+            "Review notes from last week's lecture",
+            LocalDate.of(2026, 3, 8)
+        );
+        task3.setCompleted(true);
+
+        CalendarTask task4 = new CalendarTask(
+            user,
+            "Practice German Vocabulary",
+            "Study 50 new German words",
+            LocalDate.of(2026, 3, 11)
+        );
+        task4.setCompleted(true);
+
+        CalendarTask task5 = new CalendarTask(
+            user,
+            "Complete Math Assignment",
+            "Solve problems 1-20 from textbook",
+            LocalDate.of(2026, 3, 13)
+        );
+        task5.setCompleted(true);
+
+        CalendarTask task6 = new CalendarTask(
+            user,
+            "Buy Art Supplies",
+            "Purchase canvas and paints for art project",
+            LocalDate.of(2026, 3, 15)
+        );
+        task6.setCompleted(true);
+
+        CalendarTask task7 = new CalendarTask(
+            user,
+            "Research Renaissance Art",
+            "Research for art history presentation",
+            LocalDate.of(2026, 3, 17)
+        );
+        task7.setCompleted(false);
+
+        CalendarTask task8 = new CalendarTask(
+            user,
+            "Study Physics Formulas",
+            "Memorize Newton's laws and formulas",
+            LocalDate.of(2026, 3, 19)
+        );
+        task8.setCompleted(false);
+
+        CalendarTask task9 = new CalendarTask(
+            user,
+            "Create Project Presentation",
+            "Prepare slides for group project",
+            LocalDate.of(2026, 3, 22)
+        );
+        task9.setCompleted(false);
+
+        CalendarTask task10 = new CalendarTask(
+            user,
+            "Submit Project Report",
+            "Final submission of group project report",
+            LocalDate.of(2026, 3, 25)
+        );
+        task10.setCompleted(false);
+
+        CalendarTask task11 = new CalendarTask(
+            user,
+            "Review All Course Material",
+            "Comprehensive review for final exams",
+            LocalDate.of(2026, 3, 26)
+        );
+        task11.setCompleted(false);
+
+        CalendarTask task12 = new CalendarTask(
+            user,
+            "Organize Study Materials",
+            "Organize all notes and materials for exam week",
+            LocalDate.of(2026, 3, 28)
+        );
+        task12.setCompleted(false);
+
+        
+        CalendarTask task13 = new CalendarTask(
+            user,
+            "Morning Exercise",
+            "",
+            LocalDate.of(2026, 3, 5)
+        );
+        task13.setCompleted(false);
+
+        CalendarTask task14 = new CalendarTask(
+            user,
+            "Email Professor",
+            "",
+            LocalDate.of(2026, 3, 5)
+        );
+        task14.setCompleted(false);
+
+        CalendarTask task15 = new CalendarTask(
+            user,
+            "Library Books Return",
+            "",
+            LocalDate.of(2026, 3, 5)
+        );
+        task15.setCompleted(true);
+
+        CalendarTask task16 = new CalendarTask(
+            user,
+            "Grocery Shopping",
+            "",
+            LocalDate.of(2026, 3, 12)
+        );
+        task16.setCompleted(false);
+
+        CalendarTask task17 = new CalendarTask(
+            user,
+            "Call Family",
+            "",
+            LocalDate.of(2026, 3, 12)
+        );
+        task17.setCompleted(false);
+        
+
+        CalendarTask task18 = new CalendarTask(
+            user,
+            "Submit assignment",
+            "",
+            LocalDate.of(2026, 3, 12)
+        );
+
+        task18.setCompleted(false);
+
+        taskRepository.save(task1);
+        taskRepository.save(task2);
+        taskRepository.save(task3);
+        taskRepository.save(task4);
+        taskRepository.save(task5);
+        taskRepository.save(task6);
+        taskRepository.save(task7);
+        taskRepository.save(task8);
+        taskRepository.save(task9);
+        taskRepository.save(task10);
+        taskRepository.save(task11);
+        taskRepository.save(task12);
+        taskRepository.save(task13);
+        taskRepository.save(task14);
+        taskRepository.save(task15);
+        taskRepository.save(task16);
+        taskRepository.save(task17);
+        taskRepository.save(task18);
     }
 }
