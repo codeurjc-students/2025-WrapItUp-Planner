@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "e1fe5742-2ac7-4a1f-9f6e-79aa3c825118",
-		"name": "WrapItUp Planner",
-		"description": "",
+		"_postman_id": "bf2e1840-c98f-4852-a289-b5cab3d49704",
+		"name": "WrapItUp Planner Copy 3",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43213180"
+		"_exporter_id": "53156338",
+		"_collection_link": "https://gutierrezarturox1-160530.postman.co/workspace/Arturo-Gutierrez's-Workspace~ec95113d-fb1f-4e85-8ebd-ce7ab5da906d/collection/53156338-bf2e1840-c98f-4852-a289-b5cab3d49704?action=share&source=collection_link&creator=53156338"
 	},
 	"item": [
 		{
@@ -45,8 +45,7 @@
 								"notes",
 								"1"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -84,8 +83,7 @@
 								"notes",
 								"2"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -128,8 +126,7 @@
 								"1",
 								"comments"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				}
@@ -181,8 +178,7 @@
 								"auth",
 								"user"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -234,8 +230,7 @@
 								"auth",
 								"login"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -274,8 +269,7 @@
 								"v1",
 								"users"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -321,8 +315,7 @@
 								"v1",
 								"users"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -355,7 +348,6 @@
 							"formdata": [
 								{
 									"key": "image",
-									"description": "",
 									"type": "file",
 									"src": []
 								}
@@ -372,8 +364,7 @@
 								"users",
 								"upload-image"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -411,8 +402,7 @@
 								"profile-image",
 								"{{testUserId}}"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -460,8 +450,7 @@
 								"v1",
 								"notes"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -509,8 +498,7 @@
 								"v1",
 								"notes"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -557,8 +545,7 @@
 								"notes",
 								"{{testUserNote1Id}}"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -607,8 +594,7 @@
 								"{{testUserNote1Id}}",
 								"share"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -646,8 +632,7 @@
 								"auth",
 								"logout"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				}
@@ -699,8 +684,7 @@
 								"auth",
 								"login"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -756,8 +740,7 @@
 									"value": "SCIENCE"
 								}
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -804,8 +787,7 @@
 									"value": "0"
 								}
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -853,8 +835,7 @@
 									"value": "0"
 								}
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -904,8 +885,7 @@
 								"1",
 								"comments"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -940,8 +920,7 @@
 								"comments",
 								"{{genericUserCommentId}}"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -974,8 +953,153 @@
 								"notes",
 								"5"
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Report Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Comment reported successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.reported).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
 						},
-						"description": ""
+						"url": {
+							"raw": "{{baseURL}}/api/v1/notes/1/comments/2/report",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"1",
+								"comments",
+								"2",
+								"report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Calendar Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Event created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Study Session');",
+									"    pm.collectionVariables.set('eventId', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Study Session\",\n    \"description\": \"Math homework review\",\n    \"startDate\": \"2026-03-15T14:00:00\",\n    \"endDate\": \"2026-03-15T16:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/events",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Calendar Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Task created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Complete Assignment');",
+									"    pm.collectionVariables.set('taskId', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Complete Assignment\",\n    \"description\": \"Finish calculus problems\",\n    \"taskDate\": \"2026-03-20\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1008,8 +1132,7 @@
 								"auth",
 								"logout"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				}
@@ -1061,8 +1184,7 @@
 								"auth",
 								"login"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -1104,8 +1226,7 @@
 									"value": "10"
 								}
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -1154,8 +1275,7 @@
 								"1",
 								"comments"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -1188,8 +1308,7 @@
 								"notes",
 								"3"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -1224,8 +1343,207 @@
 								"comments",
 								"1"
 							]
-						},
-						"description": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reported Comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Reported comments list returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.content).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/admin/reported-comments?page=0&size=10",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"reported-comments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unreport Comment (Ignore Flag)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Comment unreported successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.reported).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/admin/reported-comments/3/unreport",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"reported-comments",
+								"3",
+								"unreport"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Reported Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/admin/reported-comments/7",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"reported-comments",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ban User (secondUser)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User banned successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('BANNED');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/users/2/ban",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"2",
+								"ban"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unban User (secondUser)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User unbanned successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('ACTIVE');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/users/2/unban",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"2",
+								"unban"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1263,8 +1581,578 @@
 								"auth",
 								"logout"
 							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Calendar Operations - genericUser",
+			"item": [
+				{
+					"name": "Login as genericUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Login successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"genericUser\",\n    \"password\": \"12345678\"\n}"
 						},
-						"description": ""
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Calendar Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Event created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Team Meeting');",
+									"    pm.expect(jsonData.color).to.eql('BLUE');",
+									"    pm.collectionVariables.set('calendarEventId', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Team Meeting\",\n    \"description\": \"Weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T11:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/events",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Calendar Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Task created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
+									"    pm.expect(jsonData.completed).to.eql(false);",
+									"    pm.collectionVariables.set('calendarTaskId', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Calendar Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Events list returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    pm.expect(jsonData.length).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/events",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Calendar Tasks (Pending Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Tasks list returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks?pendingOnly=true",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "pendingOnly",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tasks for Daily View (March 15)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Daily tasks returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks?date=2026-03-15",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-03-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events for Daily View (March 15)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Daily calendar data returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"    pm.expect(jsonData).to.have.property('events');",
+									"    pm.expect(jsonData).to.have.property('tasks');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/day?date=2026-03-15",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"day"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-03-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Monthly View Data (March 2026)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Monthly calendar data returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/month/2026/3",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"month",
+								"2026",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Created Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Event updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Updated Team Meeting');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Team Meeting\",\n    \"description\": \"Extended weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T12:00:00\",\n    \"color\": \"GREEN\",\n    \"allDay\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"events",
+								"{{calendarEventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Task As Done",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Task updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
+									"    pm.expect(jsonData.completed).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs - COMPLETED\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}/toggle",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks",
+								"{{calendarTaskId}}",
+								"toggle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Created Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"events",
+								"{{calendarEventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Created Task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"calendar",
+								"tasks",
+								"{{calendarTaskId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout genericUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Logout successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
 					},
 					"response": []
 				}
@@ -1295,41 +2183,51 @@
 		{
 			"key": "baseURL",
 			"value": "https://localhost:443",
-			"type": "string",
-			"description": {
-				"content": "",
-				"type": "text/plain"
-			}
+			"type": "string"
 		},
 		{
 			"key": "testUserNote1Id",
 			"value": "",
-			"type": "string",
-			"description": {
-				"content": "",
-				"type": "text/plain"
-			}
+			"type": "string"
 		},
 		{
 			"key": "testUserNote2Id",
 			"value": "",
-			"type": "string",
-			"description": {
-				"content": "",
-				"type": "text/plain"
-			}
+			"type": "string"
 		},
 		{
 			"key": "genericUserCommentId",
 			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testUserId",
+			"value": ""
+		},
+		{
+			"key": "calendarEventId",
+			"value": "",
 			"type": "string",
 			"description": {
-				"content": "",
+				"content": "ID of created calendar event for testing",
 				"type": "text/plain"
 			}
 		},
 		{
-			"key": "testUserId",
+			"key": "calendarTaskId",
+			"value": "",
+			"type": "string",
+			"description": {
+				"content": "ID of created calendar task for testing",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "eventId",
+			"value": ""
+		},
+		{
+			"key": "taskId",
 			"value": ""
 		}
 	]
