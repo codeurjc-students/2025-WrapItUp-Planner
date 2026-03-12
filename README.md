@@ -27,16 +27,15 @@ In addition to updating the moderation side of the application, this version int
 [![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
 *Account banned notification page*
 
-### Demo Video
+### Demo Videos
 
-Below is a demo video showcasing the application:
-
-[![Demo Video](https://img.youtube.com/vi/zgzQLEhDZpY/0.jpg)](https://youtu.be/zgzQLEhDZpY)
+**Version 0.2:**
+[![Demo Video v0.2](https://img.youtube.com/vi/h_z9azzQjCk/0.jpg)](https://youtu.be/h_z9azzQjCk)
 
 ---
 
 **Features demonstrated by user type:**
-- **Registered Users**: Report inappropriate comments, access the calendar, create, edit, and delete their own events and daily tasks, and view a **heat map** in their profile that visualizes their pending daily tasks.
+- **Registered Users**: Access the calendar, create, edit, and delete their own events and daily tasks, and view a **heat map** in their profile that visualizes their pending daily tasks.
 - **Administrators**: Access all reported comments through the admin dashboard, unflag comments if they were incorrectly reported, and ban users from the platform when necessary.
 
 ### Current Development Status
@@ -200,4 +199,4 @@ Project progress is documented through a [Medium blog](https://medium.com/@gutie
 
 ---
 
-*For detailed information about the complete project scope, planned features, methodology, and all future functionalities, see the [Project Beginning](docs/readme/Project-Beginning.md) documentation.*
+*For detailed information about the complete project scope, planned features, methodology, and all future functionalities, see the [Project Beginning](docs/readme/Project-Beginning.md) documentation. This document represents the original vision.*
