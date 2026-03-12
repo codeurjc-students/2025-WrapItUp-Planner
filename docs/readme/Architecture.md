@@ -13,7 +13,7 @@ All components communicate using standard **HTTP/HTTPS protocols**, and the SQL 
 
 The domain model represents the core entities and their relationships within the application:
 
-![Domain Model](../../images/v0.1/DomainModel.png)
+![Domain Model](../../images/v0.2/DomainModel.png)
 
 ## REST API
 
@@ -24,10 +24,10 @@ The application's REST API is automatically documented using **OpenAPI**. The do
 
 The backend follows a layered architecture pattern organized into distinct layers:
 
-![Server Architecture](../../images/v0.1/ServerArchitecture.png)
+![Server Architecture](../../images/v0.2/ServerArchitecture.png)
 
 ## Client Architecture
 
 The frontend is built using Angular and follows a component-based architecture:
 
-![Client Architecture](../../images/v0.1/ClientArchitecture.png)
+![Client Architecture](../../images/v0.2/ClientArchitecture.png)

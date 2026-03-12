@@ -10,22 +10,22 @@ Admins now have access to their own dashboard, where they can review user report
 
 In addition to updating the moderation side of the application, this version introduces the calendar feature, designed to help users organize their schedules. Using the calendar users can create daily tasks or multi-day events to better manage their time.
 
-### Screenshots
+### Screenshots (new functionality)
 
-[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
-*Landing page with application introduction*
+[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
+*Admin profile page with access to moderation dashboard*
 
-[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
-*About Us page with platform information*
+[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
+*Admin dashboard showing reported comments with moderation actions*
 
-[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
-*Personal notes organized by category*
+[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
+*User profile page with task heatmap visualization*
 
-[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
-*Note details page with comments section*
+[![Calendar](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
+*Calendar view with events and daily tasks*
 
-[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
-*User profile page*
+[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
+*Account banned notification page*
 
 ### Demo Video
 
@@ -47,34 +47,40 @@ The application is currently in development and will be continuously improved as
 
 The next release of WrapItUp Planner will focus on the AI component of the application, registered users will be able to upload notes to the platform, which will be processed using artificial intelligence to automatically generate an overview, a summary, and multiple-choice questions in JSON format. These outputs will allow users to access interactive quizzes derived from their uploaded materials.
 
-### Functionalities (Version 0.1)
+### Functionalities (Version 0.2)
 
-[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
-*Landing page with application introduction*
+**Admin Features:**
 
-[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
-*About Us page with platform information and goals*
+[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
+*Admin profile page with access to moderation dashboard*
 
-[![Login](images/v0.1/login.png)](images/v0.1/login.png)
-*Users will be able to login to their own account to have access to their personal notes and user's functionalities*
+[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
+*Admin dashboard showing reported comments with moderation actions (ignore, delete, view profile, view original note)*
 
-[![Register](images/v0.1/register.png)](images/v0.1/register.png)
-*Users will be able to create their own account to access to their own page*
+[![Banned User Profile](images/v.0.2/bannedUser.png)](images/v.0.2/bannedUser.png)
+*Admin view of a banned user profile with unban option*
 
-[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
-*Users and Admins can visit their own profile page and edit their personal data, such as their visible name, email and profile photo. They may also access the notes page (in the case of being a regular user)*
+**Moderation:**
 
-[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
-*Registered Users will be able to see all their notes in an organized format divided by categories, they will also be able to see notes that were shared with them*
+[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
+*Account banned notification page displayed when a banned user attempts to access the platform*
 
-[![Create Note](images/v0.1/create-note.png)](images/v0.1/create-note.png)
-*Registered users will be able to create their own personal notes as they see fit. They can also decide the visibility of said note.*
+**Calendar Features:**
 
-[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
-*Users will be able to see previously created notes and will have access to an available comment section to communicate with other users. The owners of these notes will be able to share the notes with other users which will give those users access to another user's private notes*
+[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
+*User profile page with task heatmap visualization showing pending tasks for the current month*
 
-[![Error Page](images/v0.1/error-page.png)](images/v0.1/error-page.png)
-*Error page for handling server errors*
+[![Calendar Monthly View](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
+*Calendar monthly view with events (colored dots) and daily tasks (checkbox indicators)*
+
+[![Calendar Daily View](images/v.0.2/daily-view.png)](images/v.0.2/daily-view.png)
+*Calendar daily view showing events and tasks for a specific day with add/edit/delete options*
+
+[![Create Task](images/v.0.2/createTask.png)](images/v.0.2/createTask.png)
+*Create new daily task dialog with title and description fields*
+
+[![Multi-day Event](images/v.0.2/Multi-day-event.png)](images/v.0.2/Multi-day-event.png)
+*Create multi-day event dialog with color selection, date range, and time configuration*
 
 ### Detailed Functionalities
 

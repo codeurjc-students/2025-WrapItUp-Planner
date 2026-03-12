@@ -139,7 +139,7 @@ To ensure the quality, security, and maintainability of WrapItUp Planner, **Sona
 
 ### Analysis Results
 
-The following captures summarize the results of the static code analysis as of the end of Phase 2:
+The following captures summarize the results of the static code analysis as of the end of Phase 3:
 
 ![SonarCloud Dashboard](../../images/sonarcloud_dashboard.png)  
 *Figure 3: SonarCloud dashboard showing overall code quality, including ratings for Security, Reliability, and Maintainability.*

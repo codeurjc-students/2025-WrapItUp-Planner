@@ -60,12 +60,11 @@ will be developed so that the client-side, server-side and database are
 all set up and connected. Furthermore, basic automatic tests will be
 written, and CI will be configured.
 
-**Phase 3 - Version 0.1 - Basic functionality and Docker (Deadline Dec.
-15)**
+**Phase 3 - Version 0.1 - Basic functionality and Docker (Deadline Dec.15)**
 
 Start Date - October 16th
 
-End Date - December 15th
+End Date - December 20th
 
 The functionality of the application will be expanded until the basic
 functionality is completed, automatic testing for this functionality
@@ -75,15 +74,15 @@ application will be released.
 
 **Phase 4 - Version 0.2 - Intermediate functionality (Deadline Mar. 1)**
 
-Start Date -
+Start Date - December 20th
 
-End Date -
+End Date - March 13th
 
 The project will be extended to cover up until the intermediate
 functionality and the corresponding automatic testing. A version 0.2 of
 the application will be released, and it will also be deployed.
 
-**Phase 5 - Version 0.2 - Advanced Functionality (Deadline Apr. 15)**
+**Phase 5 - Version 1.0 - Advanced Functionality (Deadline Apr. 15)**
 
 Start Date -
 
