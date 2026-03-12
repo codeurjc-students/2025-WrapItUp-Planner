@@ -30,6 +30,7 @@ In addition to updating the moderation side of the application, this version int
 ### Demo Videos
 
 **Version 0.2:**
+<br>
 [![Demo Video v0.2](https://img.youtube.com/vi/h_z9azzQjCk/0.jpg)](https://youtu.be/h_z9azzQjCk)
 
 ---
