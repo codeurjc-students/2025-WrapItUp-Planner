@@ -27,9 +27,9 @@ The testing strategy covers both the **backend (server)** and the **frontend (cl
 
 ### Functional Coverage
 
-The automated tests cover the complete basic functionality (Version 0.1) of WrapItUp Planner, making sure the application works according to what it was designed to accomplish:
+The automated tests cover the complete basic functionality (Version 0.2) of WrapItUp Planner, making sure the application works according to what it was designed to accomplish:
 
-#### Backend Tests
+#### Backend Tests - Version 0.1
 
 **Unit Tests:**
 - **Authentication Service**: User registration, login, password encoding, and token management
@@ -51,7 +51,23 @@ The automated tests cover the complete basic functionality (Version 0.1) of Wrap
 - **Note Web Tests**: Complete user flows for viewing and managing notes through the web interface
 - **User Web Tests**: User authentication and profile management flows
 
-#### Frontend Tests
+#### Backend Tests - Version 0.2
+
+**Unit Tests:**
+- **Comment Service**: Report and unreport functionality with user validation
+- **User Service**: Ban and unban operations with status persistence
+
+**Integration Tests (REST API):**
+- **Comment API**: Admin endpoints for reported comments (retrieve, unreport, delete) with authorization checks
+- **User API**: Ban and unban endpoints with authentication validation
+- **Calendar API**: Event and task CRUD operations with date handling
+
+**System Tests:**
+- **Comment System**: Reported comment workflows and admin deletion operations
+- **User System**: User ban/unban persistence and status management
+- **Calendar System**: Event and task management with user associations
+
+#### Frontend Tests - Version 0.1
 
 **Component Tests:**
 - **Authentication Component**: Login and registration forms with validation
@@ -66,6 +82,18 @@ The automated tests cover the complete basic functionality (Version 0.1) of Wrap
 - **Note Service**: Note CRUD operations with backend communication
 - **Comment Service**: Comment management with pagination
 - **User Service**: User profile operations
+
+#### Frontend Tests - Version 0.2
+
+**Component Tests:**
+- **Admin Dashboard Component**: Reported comments display and moderation actions
+- **Calendar Component**: Monthly and daily view rendering with event and task display
+- **Task Heatmap Component**: Visual representation of daily tasks in user profile
+
+**Service Tests (Integration with API):**
+- **Comment Service**: Report comment functionality and admin moderation endpoints
+- **Calendar Service**: Event and task CRUD operations with backend synchronization
+- **User Service**: Task heatmap data retrieval
 
 All tests ensure data consistency between frontend and backend, proper authentication flows, authorization checks, and correct handling of edge cases and errors.
  

@@ -2,9 +2,13 @@
 
 WrapItUp Planner is an All-In-One collaborative web platform designed to help students manage their academic journey more efficiently. The application combines study organization, knowledge sharing, and AI-powered tools into a single platform. Students can create and share notes, collaborate through comments, and organize their academic life effectively.
 
-## Version 0.1
+## Version 0.2
 
-Version 0.1 of WrapItUp Planner focuses on the note-taking and summary aspects of the application. Users can now create their own accounts, log in, and edit their profiles. The platform enables users to create, edit, delete, and view notes, which can be set as either public or private. Private note owners can share their content with specific users, allowing them to view and comment. Administrator functionality includes access to all notes and the ability to delete notes and comments when necessary. Users have a dedicated notes page where they can browse their content organized by categories and view notes that have been shared with them.
+Version 0.2 of WrapItUp Planner extends the functionality previously seen in version 0.1. This update introduces moderation tools for admins and also the application's calendar.
+
+Admins now have access to their own dashboard, where they can review user reported comments, a new feature that allows users and admins to flag comments as inappropiate. From the dashboard admins can decide whether the content is correctly flagged or not. If necessary admins may ban users from accessing the platform.
+
+In addition to updating the moderation side of the application, this version introduces the calendar feature, designed to help users organize their schedules. Using the calendar users can create daily tasks or multi-day events to better manage their time.
 
 ### Screenshots
 
@@ -32,9 +36,8 @@ Below is a demo video showcasing the application:
 ---
 
 **Features demonstrated by user type:**
-- **Unregistered Users**: View public notes, and landing page
-- **Registered Users**: Create accounts, manage notes, share content, leave comments, visit and edit their profile
-- **Administrators**: Moderate content, delete notes and comments
+- **Registered Users**: Report inappropriate comments, access the calendar, create, edit, and delete their own events and daily tasks, and view a **heat map** in their profile that visualizes their pending daily tasks.
+- **Administrators**: Access all reported comments through the admin dashboard, unflag comments if they were incorrectly reported, and ban users from the platform when necessary.
 
 ### Current Development Status
 
@@ -42,7 +45,7 @@ The application is currently in development and will be continuously improved as
 
 ## Future Versions
 
-The next release of WrapItUp Planner will focus on the calendar component of the application, enabling users to organize their tasks, create events, and maintain daily to-do lists to structure their day-to-day activities. The final release will add AI-powered functionalities to further enhance the notes component, including automatic generation of overviews, summaries, and interactive quizzes from uploaded study materials.
+The next release of WrapItUp Planner will focus on the AI component of the application, registered users will be able to upload notes to the platform, which will be processed using artificial intelligence to automatically generate an overview, a summary, and multiple-choice questions in JSON format. These outputs will allow users to access interactive quizzes derived from their uploaded materials.
 
 ### Functionalities (Version 0.1)
 
@@ -83,20 +86,20 @@ The next release of WrapItUp Planner will focus on the calendar component of the
 | Registered Users    | - Access a personal profile page.<br>- Access to their personal list of notes.<br>- View notes, whether their own or another user's.<br>- Leave comments on notes they have access to.<br>- Communicate with other authorized users through a comment section associated with each note. |
 | Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments. |
 
-### Planned Features
-
-**Intermediate Functionality - NEXT RELEASE (Version 0.2)**
+**Intermediate Functionality - IMPLEMENTED**
 
 | User Type           | Features |
 |--------------------|---------|
-| Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. |
+| Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. <br> - View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br> |
 | Administrators      | - Review user-reported comments in a ticket-based format. <br>- Ability to ban a user from accessing the platform. |
 
-**Advanced Functionality - PLANNED (Version 1.0)**
+### Planned Features
+
+**Advanced Functionality - NEXT RELEASE (Version 1.0)**
 
 | User Type           | Features |
 |--------------------|---------|
-| Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br>- View a line chart showing performance progression upon completing a quiz. |
+| Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a line chart showing performance progression upon completing a quiz. |
 
 ## How to Run the Application
 
@@ -142,7 +145,7 @@ The application comes with pre-loaded sample data for testing purposes. You can 
 The application is initialized with sample data to demonstrate its functionality:
 
 **Users**:
-- **genericUser**: Regular user with 12 notes across different categories and a profile picture
+- **genericUser**: Regular user with 12 notes across different categories, a profile picture, calendar events, and daily tasks
 - **secondUser**: Regular user with 6 notes and a profile picture
 - **admin**: Administrator account with full access to all notes and moderation capabilities, they have to access notes through an url in this phase
 
@@ -153,7 +156,20 @@ The application is initialized with sample data to demonstrate its functionality
 - Some notes are shared between users (e.g., genericUser's "Pythagorean Theorem" is shared with secondUser)
 
 **Comments**:
-- Comments from both genericUser and secondUser showing interaction between users
+- 12 comments from both genericUser and secondUser showing interaction between users
+- 2 reported comments flagged as inappropriate for admins to review
+
+**Calendar Events** (genericUser):
+- 7 events including study sessions, lectures, workshops, and deadlines
+- Mix of single-day and multi-day events
+- Both scheduled events and all-day events
+- Color-coded by type (Blue, Yellow, Green, Red)
+
+**Calendar Tasks** (genericUser):
+- 18 daily tasks spanning the current month
+- Mix of academic tasks and personal tasks
+- 6 completed tasks and 12 pending tasks
+- Tasks visualized in the profile heat map
 
 
 ## Documentation

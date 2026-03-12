@@ -16,8 +16,8 @@
   - Pull Requests are reviewed and pass automated quality gates before merging.  
 - **Metrics tracked**:
   - **Commits:** 135 commits in total.
-  - **Branches:** 20 branches.
-  - **Pull Requests:** 30 PR created and merged.
+  - **Branches:** 29 branches.
+  - **Pull Requests:** 40 PR created and merged.
 - **Repository activity visualizations**:
   - **Commits over time:**  
     ![Commits](../../images/Commits.png)
@@ -63,4 +63,20 @@
   - Full access to all notes and user profiles
   - Delete notes and comments
 
+### 5.3. Version 0.2  
+**Release Date:** March 2025
 
+**Features:**
+- **Calendar and Task Management:**
+  - Integrated calendar for personal planning
+  - Create, edit, and delete daily tasks
+  - Create and manage multi-day events
+
+- **User Interaction and Reporting:**
+  - Report inappropriate comments
+
+- **Administration:**
+  - Dedicated administrator dashboard
+  - Review and manage reported comments
+  - Unflag comments that were incorrectly reported
+  - Ban users from accessing the platform when necessary
