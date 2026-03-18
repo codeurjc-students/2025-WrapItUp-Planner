@@ -68,6 +68,10 @@ The automated tests cover the complete basic functionality (Version 0.2) of Wrap
 - **User System**: User ban/unban persistence and status management
 - **Calendar System**: Event and task management with user associations
 
+**End-to-End Tests:**
+- **Ban Web Tests**: Comment report and ban functionality flows
+- **Calendar Web Tests**: Task and Event creation, deletion and other expected usage flows.
+
 #### Frontend Tests - Version 0.1
 
 **Component Tests:**
