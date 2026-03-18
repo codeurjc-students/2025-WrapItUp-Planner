@@ -56,6 +56,7 @@ The automated tests cover the complete basic functionality (Version 0.2) of Wrap
 **Unit Tests:**
 - **Comment Service**: Report and unreport functionality with user validation
 - **User Service**: Ban and unban operations with status persistence
+- **Calendar Service**: CRUD operations, date filtering, and status-based access control across tasks and events
 
 **Integration Tests (REST API):**
 - **Comment API**: Admin endpoints for reported comments (retrieve, unreport, delete) with authorization checks
@@ -139,7 +140,7 @@ To ensure the quality, security, and maintainability of WrapItUp Planner, **Sona
 
 ### Analysis Results
 
-The following captures summarize the results of the static code analysis as of the end of Phase 3:
+The following captures summarize the results of the static code analysis as of the end of Phase 4:
 
 ![SonarCloud Dashboard](../../images/sonarcloud_dashboard.png)  
 *Figure 3: SonarCloud dashboard showing overall code quality, including ratings for Security, Reliability, and Maintainability.*
