@@ -22,15 +22,16 @@ The application is publicly available through **DockerHub**:
 - `latest` - Most recent development build
 - `dev` - Development version (auto-deployed from `main` branch)
 - `0.1` - Stable release version 0.1
+- `0.2` - Stable release version 0.2
 
 ### Quick Deployment
 
 To deploy the application pull and run:
 
 ```bash
-docker pull arturox2500/wrapitup_planner:0.1
-docker pull arturox2500/wrapitup_planner-compose:0.1
-docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.1 cmd.exe
+docker pull arturox2500/wrapitup_planner:0.2
+docker pull arturox2500/wrapitup_planner-compose:0.2
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.2 cmd.exe
 docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
 docker cp temp-compose:/.env ./.env
 docker rm temp-compose

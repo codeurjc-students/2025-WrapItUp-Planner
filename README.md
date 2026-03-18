@@ -2,39 +2,42 @@
 
 WrapItUp Planner is an All-In-One collaborative web platform designed to help students manage their academic journey more efficiently. The application combines study organization, knowledge sharing, and AI-powered tools into a single platform. Students can create and share notes, collaborate through comments, and organize their academic life effectively.
 
-## Version 0.1
+## Version 0.2
 
-Version 0.1 of WrapItUp Planner focuses on the note-taking and summary aspects of the application. Users can now create their own accounts, log in, and edit their profiles. The platform enables users to create, edit, delete, and view notes, which can be set as either public or private. Private note owners can share their content with specific users, allowing them to view and comment. Administrator functionality includes access to all notes and the ability to delete notes and comments when necessary. Users have a dedicated notes page where they can browse their content organized by categories and view notes that have been shared with them.
+Version 0.2 of WrapItUp Planner extends the functionality previously seen in version 0.1. This update introduces moderation tools for admins and also the application's calendar.
 
-### Screenshots
+Admins now have access to their own dashboard, where they can review user reported comments, a new feature that allows users and admins to flag comments as inappropiate. From the dashboard admins can decide whether the content is correctly flagged or not. If necessary admins may ban users from accessing the platform.
 
-[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
-*Landing page with application introduction*
+In addition to updating the moderation side of the application, this version introduces the calendar feature, designed to help users organize their schedules. Using the calendar users can create daily tasks or multi-day events to better manage their time.
 
-[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
-*About Us page with platform information*
+### Screenshots (new functionality)
 
-[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
-*Personal notes organized by category*
+[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
+*Admin profile page with access to moderation dashboard*
 
-[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
-*Note details page with comments section*
+[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
+*Admin dashboard showing reported comments with moderation actions*
 
-[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
-*User profile page*
+[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
+*User profile page with task heatmap visualization*
 
-### Demo Video
+[![Calendar](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
+*Calendar view with events and daily tasks*
 
-Below is a demo video showcasing the application:
+[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
+*Account banned notification page*
 
-[![Demo Video](https://img.youtube.com/vi/zgzQLEhDZpY/0.jpg)](https://youtu.be/zgzQLEhDZpY)
+### Demo Videos
+
+**Version 0.2:**
+<br>
+[![Demo Video v0.2](https://img.youtube.com/vi/h_z9azzQjCk/0.jpg)](https://youtu.be/h_z9azzQjCk)
 
 ---
 
 **Features demonstrated by user type:**
-- **Unregistered Users**: View public notes, and landing page
-- **Registered Users**: Create accounts, manage notes, share content, leave comments, visit and edit their profile
-- **Administrators**: Moderate content, delete notes and comments
+- **Registered Users**: Access the calendar, create, edit, and delete their own events and daily tasks, and view a **heat map** in their profile that visualizes their pending daily tasks.
+- **Administrators**: Access all reported comments through the admin dashboard, unflag comments if they were incorrectly reported, and ban users from the platform when necessary.
 
 ### Current Development Status
 
@@ -42,36 +45,42 @@ The application is currently in development and will be continuously improved as
 
 ## Future Versions
 
-The next release of WrapItUp Planner will focus on the calendar component of the application, enabling users to organize their tasks, create events, and maintain daily to-do lists to structure their day-to-day activities. The final release will add AI-powered functionalities to further enhance the notes component, including automatic generation of overviews, summaries, and interactive quizzes from uploaded study materials.
+The next release of WrapItUp Planner will focus on the AI component of the application, registered users will be able to upload notes to the platform, which will be processed using artificial intelligence to automatically generate an overview, a summary, and multiple-choice questions in JSON format. These outputs will allow users to access interactive quizzes derived from their uploaded materials.
 
-### Functionalities (Version 0.1)
+### Functionalities (Version 0.2)
 
-[![Landing Page](images/v0.1/landing.png)](images/v0.1/landing.png)
-*Landing page with application introduction*
+**Admin Features:**
 
-[![About Us](images/v0.1/about-us.png)](images/v0.1/about-us.png)
-*About Us page with platform information and goals*
+[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
+*Admin profile page with access to moderation dashboard*
 
-[![Login](images/v0.1/login.png)](images/v0.1/login.png)
-*Users will be able to login to their own account to have access to their personal notes and user's functionalities*
+[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
+*Admin dashboard showing reported comments with moderation actions (ignore, delete, view profile, view original note)*
 
-[![Register](images/v0.1/register.png)](images/v0.1/register.png)
-*Users will be able to create their own account to access to their own page*
+[![Banned User Profile](images/v.0.2/bannedUser.png)](images/v.0.2/bannedUser.png)
+*Admin view of a banned user profile with unban option*
 
-[![Profile](images/v0.1/profile.png)](images/v0.1/profile.png)
-*Users and Admins can visit their own profile page and edit their personal data, such as their visible name, email and profile photo. They may also access the notes page (in the case of being a regular user)*
+**Moderation:**
 
-[![My Notes](images/v0.1/my-notes.png)](images/v0.1/my-notes.png)
-*Registered Users will be able to see all their notes in an organized format divided by categories, they will also be able to see notes that were shared with them*
+[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
+*Account banned notification page displayed when a banned user attempts to access the platform*
 
-[![Create Note](images/v0.1/create-note.png)](images/v0.1/create-note.png)
-*Registered users will be able to create their own personal notes as they see fit. They can also decide the visibility of said note.*
+**Calendar Features:**
 
-[![Note Details](images/v0.1/note-details.png)](images/v0.1/note-details.png)
-*Users will be able to see previously created notes and will have access to an available comment section to communicate with other users. The owners of these notes will be able to share the notes with other users which will give those users access to another user's private notes*
+[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
+*User profile page with task heatmap visualization showing pending tasks for the current month*
 
-[![Error Page](images/v0.1/error-page.png)](images/v0.1/error-page.png)
-*Error page for handling server errors*
+[![Calendar Monthly View](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
+*Calendar monthly view with events (colored dots) and daily tasks (checkbox indicators)*
+
+[![Calendar Daily View](images/v.0.2/daily-view.png)](images/v.0.2/daily-view.png)
+*Calendar daily view showing events and tasks for a specific day with add/edit/delete options*
+
+[![Create Task](images/v.0.2/createTask.png)](images/v.0.2/createTask.png)
+*Create new daily task dialog with title and description fields*
+
+[![Multi-day Event](images/v.0.2/Multi-day-event.png)](images/v.0.2/Multi-day-event.png)
+*Create multi-day event dialog with color selection, date range, and time configuration*
 
 ### Detailed Functionalities
 
@@ -83,20 +92,20 @@ The next release of WrapItUp Planner will focus on the calendar component of the
 | Registered Users    | - Access a personal profile page.<br>- Access to their personal list of notes.<br>- View notes, whether their own or another user's.<br>- Leave comments on notes they have access to.<br>- Communicate with other authorized users through a comment section associated with each note. |
 | Administrators      | - Full access to all user profiles and uploaded notes.<br>- Ability to delete notes and comments. |
 
-### Planned Features
-
-**Intermediate Functionality - NEXT RELEASE (Version 0.2)**
+**Intermediate Functionality - IMPLEMENTED**
 
 | User Type           | Features |
 |--------------------|---------|
-| Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. |
+| Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. <br> - View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br> |
 | Administrators      | - Review user-reported comments in a ticket-based format. <br>- Ability to ban a user from accessing the platform. |
 
-**Advanced Functionality - PLANNED (Version 1.0)**
+### Planned Features
+
+**Advanced Functionality - NEXT RELEASE (Version 1.0)**
 
 | User Type           | Features |
 |--------------------|---------|
-| Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br>- View a line chart showing performance progression upon completing a quiz. |
+| Registered Users    | - Upload notes to the platform, which will be processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format.<br>- Access interactive quizzes derived from the JSON output for effective study sessions.<br>- View a line chart showing performance progression upon completing a quiz. |
 
 ## How to Run the Application
 
@@ -142,7 +151,7 @@ The application comes with pre-loaded sample data for testing purposes. You can 
 The application is initialized with sample data to demonstrate its functionality:
 
 **Users**:
-- **genericUser**: Regular user with 12 notes across different categories and a profile picture
+- **genericUser**: Regular user with 12 notes across different categories, a profile picture, calendar events, and daily tasks
 - **secondUser**: Regular user with 6 notes and a profile picture
 - **admin**: Administrator account with full access to all notes and moderation capabilities, they have to access notes through an url in this phase
 
@@ -153,7 +162,20 @@ The application is initialized with sample data to demonstrate its functionality
 - Some notes are shared between users (e.g., genericUser's "Pythagorean Theorem" is shared with secondUser)
 
 **Comments**:
-- Comments from both genericUser and secondUser showing interaction between users
+- 12 comments from both genericUser and secondUser showing interaction between users
+- 2 reported comments flagged as inappropriate for admins to review
+
+**Calendar Events** (genericUser):
+- 7 events including study sessions, lectures, workshops, and deadlines
+- Mix of single-day and multi-day events
+- Both scheduled events and all-day events
+- Color-coded by type (Blue, Yellow, Green, Red)
+
+**Calendar Tasks** (genericUser):
+- 18 daily tasks spanning the current month
+- Mix of academic tasks and personal tasks
+- 6 completed tasks and 12 pending tasks
+- Tasks visualized in the profile heat map
 
 
 ## Documentation
@@ -178,4 +200,4 @@ Project progress is documented through a [Medium blog](https://medium.com/@gutie
 
 ---
 
-*For detailed information about the complete project scope, planned features, methodology, and all future functionalities, see the [Project Beginning](docs/readme/Project-Beginning.md) documentation.*
+*For detailed information about the complete project scope, planned features, methodology, and all future functionalities, see the [Project Beginning](docs/readme/Project-Beginning.md) documentation. This document represents the original vision.*
