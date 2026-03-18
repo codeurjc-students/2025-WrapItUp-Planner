@@ -121,9 +121,9 @@ Before running the application, ensure you have Docker installed on your system:
 To run the application on your local machine, execute the following commands in your terminal:
 
 ```bash
-docker pull arturox2500/wrapitup_planner:0.1
-docker pull arturox2500/wrapitup_planner-compose:0.1
-docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.1 cmd.exe
+docker pull arturox2500/wrapitup_planner:0.2
+docker pull arturox2500/wrapitup_planner-compose:0.2
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.2 cmd.exe
 docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
 docker cp temp-compose:/.env ./.env
 docker rm temp-compose
