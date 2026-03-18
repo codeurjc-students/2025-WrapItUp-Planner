@@ -76,7 +76,7 @@ application will be released.
 
 Start Date - December 20th
 
-End Date - March 13th
+End Date - March 18th
 
 The project will be extended to cover up until the intermediate
 functionality and the corresponding automatic testing. A version 0.2 of
