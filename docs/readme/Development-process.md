@@ -15,9 +15,9 @@
   - Feature branches are created for each new functionality or bug fix.
   - Pull Requests are reviewed and pass automated quality gates before merging.  
 - **Metrics tracked**:
-  - **Commits:** 135 commits in total.
-  - **Branches:** 29 branches.
-  - **Pull Requests:** 40 PR created and merged.
+  - **Commits:** 209 commits in total.
+  - **Branches:** 32 branches.
+  - **Pull Requests:** 42 PR created and merged.
 - **Repository activity visualizations**:
   - **Commits over time:**  
     ![Commits](../../images/Commits.png)
