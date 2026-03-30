@@ -28,12 +28,27 @@ The application is publicly available through **DockerHub**:
 
 To deploy the application pull and run:
 
+To run the application, create a `.env` file in the same directory as the `docker-compose.yml` and define the required environment variables there. The file should include entries for the MySQL credentials, Spring datasource settings, and server SSL configuration using this format:
+
+```env
+MYSQL_ROOT_PASSWORD=<value>
+MYSQL_DATABASE=<value>
+MYSQL_USER=<value>
+MYSQL_PASSWORD=<value>
+
+SPRING_DATASOURCE_URL=<value>
+SPRING_DATASOURCE_USERNAME=<value>
+SPRING_DATASOURCE_PASSWORD=<value>
+SPRING_JPA_HIBERNATE_DDL_AUTO=<value>
+SERVER_PORT=<value>
+SERVER_SSL_KEY_STORE_PASSWORD=<value>
+```
+
 ```bash
 docker pull arturox2500/wrapitup_planner:0.2
 docker pull arturox2500/wrapitup_planner-compose:0.2
 docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.2 cmd.exe
 docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
-docker cp temp-compose:/.env ./.env
 docker rm temp-compose
 docker compose up -d
 ```
