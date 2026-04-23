@@ -1,16 +1,6 @@
 package es.wrapitup.wrapitup_planner.service;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
+import es.wrapitup.wrapitup_planner.dto.AiNoteResult;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
 import es.wrapitup.wrapitup_planner.model.Note;
@@ -20,19 +10,32 @@ import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteMapper noteMapper;
     private final UserRepository userRepository;
+    private final OpenAiService openAiService;
+    private final DocumentTextExtractorService documentTextExtractorService;
 
-    public NoteService(NoteRepository noteRepository, NoteMapper noteMapper, UserRepository userRepository) {
+    public NoteService(NoteRepository noteRepository, NoteMapper noteMapper, UserRepository userRepository, OpenAiService openAiService, DocumentTextExtractorService documentTextExtractorService) {
         this.noteRepository = noteRepository;
         this.noteMapper = noteMapper;
         this.userRepository = userRepository;
+        this.openAiService = openAiService;
+        this.documentTextExtractorService = documentTextExtractorService;
     }
-
     private boolean isAdmin(UserModel user) {
         return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
     }
@@ -81,6 +84,46 @@ public class NoteService {
             note.setCategory(noteDTO.getCategory());
         }
         
+        Note saved = noteRepository.save(note);
+        return noteMapper.toDto(saved);
+    }
+    public NoteDTO createNoteFromAi(MultipartFile file, String username, NoteVisibility visibility, NoteCategory category) {
+        Optional<UserModel> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        UserModel user = userOpt.get();
+
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot create notes");
+        }
+
+        if (isAdmin(user)) {
+            throw new SecurityException("Admins cannot create notes");
+        }
+
+        String extractedText = documentTextExtractorService.extractText(file);
+        AiNoteResult aiResult = openAiService.generateNoteFromText(extractedText);
+
+        String title = aiResult.getTitle();
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("AI did not generate a title");
+        }
+
+        Note note = new Note(
+            user,
+            title,
+            aiResult.getOverview() != null ? aiResult.getOverview() : "",
+            aiResult.getCompleteSummary() != null ? aiResult.getCompleteSummary() : "",
+            "",
+            visibility != null ? visibility : NoteVisibility.PRIVATE
+        );
+
+        if (category != null) {
+            note.setCategory(category);
+        }
+
         Note saved = noteRepository.save(note);
         return noteMapper.toDto(saved);
     }

@@ -8,11 +8,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
+import es.wrapitup.wrapitup_planner.model.NoteCategory;
+import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.service.NoteService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -135,6 +139,44 @@ public class NoteRestController {
         }
     }
 
+    @PostMapping(value = "/ai", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createNoteWithAi(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(required = false) String visibility,
+            @RequestParam(required = false) String category,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to create a note"));
+        }
+
+        try {
+            NoteVisibility visibilityValue = parseVisibility(visibility);
+            NoteCategory categoryValue = parseCategory(category);
+            NoteDTO created = noteService.createNoteFromAi(file, username, visibilityValue, categoryValue);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(created.getId())
+                    .toUri();
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .location(location)
+                    .body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(@PathVariable Long id, @RequestBody NoteDTO noteDTO, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
@@ -219,6 +261,20 @@ public class NoteRestController {
         public String getMessage() {
             return message;
         }
+    }
+
+    private NoteVisibility parseVisibility(String visibility) {
+        if (visibility == null || visibility.isBlank()) {
+            return null;
+        }
+        return NoteVisibility.valueOf(visibility.toUpperCase());
+    }
+
+    private NoteCategory parseCategory(String category) {
+        if (category == null || category.isBlank()) {
+            return null;
+        }
+        return NoteCategory.valueOf(category.toUpperCase());
     }
 }
 
