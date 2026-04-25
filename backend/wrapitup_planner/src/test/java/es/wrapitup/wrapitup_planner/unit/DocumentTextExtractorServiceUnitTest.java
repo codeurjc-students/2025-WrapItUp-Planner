@@ -143,4 +143,96 @@ public class DocumentTextExtractorServiceUnitTest {
 
         assertTrue(result.contains("PPTX content"));
     }
+    @Test
+    void extractTextWhenFileIsNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(null)
+        );
+    }
+    @Test
+    void extractTextWithNullFilenameThrowsUnsupported() {
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            null,
+            "text/plain",
+            "content".getBytes()
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(file)
+        );
+    }
+    
+    @Test
+    void extractTextWithNoExtensionThrowsException() {
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "file",
+            "text/plain",
+            "content".getBytes()
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(file)
+        );
+    }
+
+    @Test
+    void extractPdfWithNoTextThrowsException() throws Exception {
+
+        PDDocument document = new PDDocument();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        document.save(outputStream);
+        document.close();
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "empty.pdf",
+            "application/pdf",
+            outputStream.toByteArray()
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(file)
+        );
+    }
+    @Test
+    void extractDocxWithNoTextThrowsException() throws Exception {
+
+        XWPFDocument doc = new XWPFDocument();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        doc.write(out);
+        doc.close();
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "empty.docx",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            out.toByteArray()
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(file)
+        );
+    }
+    @Test
+    void extractPptxWithNoTextThrowsException() throws Exception {
+
+        XMLSlideShow ppt = new XMLSlideShow();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ppt.write(out);
+        ppt.close();
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "empty.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            out.toByteArray()
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.extractText(file)
+        );
+    }
+
 }
