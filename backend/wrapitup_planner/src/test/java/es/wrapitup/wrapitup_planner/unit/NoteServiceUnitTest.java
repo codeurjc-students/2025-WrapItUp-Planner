@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
+import es.wrapitup.wrapitup_planner.dto.AiNoteResult;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
@@ -27,7 +28,10 @@ import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
+import es.wrapitup.wrapitup_planner.service.DocumentTextExtractorService;
 import es.wrapitup.wrapitup_planner.service.NoteService;
+import es.wrapitup.wrapitup_planner.service.OpenAiService;
+import org.springframework.mock.web.MockMultipartFile;
 
 @Tag("unit")
 public class NoteServiceUnitTest {
@@ -40,6 +44,12 @@ public class NoteServiceUnitTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private OpenAiService openAiService;
+
+    @Mock
+    private DocumentTextExtractorService documentTextExtractorService;
 
     @InjectMocks
     private NoteService noteService;
@@ -131,6 +141,65 @@ public class NoteServiceUnitTest {
         assertThrows(IllegalArgumentException.class, () -> {
             noteService.createNote(inputDTO, "nonexistent");
         });
+    }
+
+    @Test
+    void createNoteFromAiSuccess() {
+        MockMultipartFile file = new MockMultipartFile("file", "note.txt", "text/plain", "ai text".getBytes());
+        AiNoteResult aiResult = new AiNoteResult();
+        aiResult.setTitle("AI Title");
+        aiResult.setOverview("AI Overview");
+        aiResult.setCompleteSummary("AI Summary");
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(documentTextExtractorService.extractText(file)).thenReturn("ai text");
+        when(openAiService.generateNoteFromText("ai text")).thenReturn(aiResult);
+        when(noteRepository.save(any(Note.class))).thenReturn(testNote);
+        when(noteMapper.toDto(any(Note.class))).thenReturn(testNoteDTO);
+
+        NoteDTO result = noteService.createNoteFromAi(file, "testuser", NoteVisibility.PUBLIC, NoteCategory.SCIENCE);
+
+        assertNotNull(result);
+        verify(documentTextExtractorService).extractText(file);
+        verify(openAiService).generateNoteFromText("ai text");
+        verify(noteRepository).save(any(Note.class));
+    }
+
+    @Test
+    void createNoteFromAiMissingTitleThrowsException() {
+        MockMultipartFile file = new MockMultipartFile("file", "note.txt", "text/plain", "ai text".getBytes());
+        AiNoteResult aiResult = new AiNoteResult();
+        aiResult.setTitle(" ");
+        aiResult.setOverview("AI Overview");
+        aiResult.setCompleteSummary("AI Summary");
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(documentTextExtractorService.extractText(file)).thenReturn("ai text");
+        when(openAiService.generateNoteFromText("ai text")).thenReturn(aiResult);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.createNoteFromAi(file, "testuser", NoteVisibility.PRIVATE, NoteCategory.OTHERS);
+        });
+
+        verify(noteRepository, never()).save(any(Note.class));
+    }
+
+    @Test
+    void createNoteFromAiBannedUserThrowsSecurityException() {
+        MockMultipartFile file = new MockMultipartFile("file", "note.txt", "text/plain", "ai text".getBytes());
+        UserModel bannedUser = new UserModel();
+        bannedUser.setUsername("banneduser");
+        bannedUser.setStatus(UserStatus.BANNED);
+
+        when(userRepository.findByUsername("banneduser")).thenReturn(Optional.of(bannedUser));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.createNoteFromAi(file, "banneduser", NoteVisibility.PRIVATE, NoteCategory.OTHERS);
+        });
+
+        verify(documentTextExtractorService, never()).extractText(any());
+        verify(openAiService, never()).generateNoteFromText(any());
+        verify(noteRepository, never()).save(any(Note.class));
     }
 
     // get note tests
