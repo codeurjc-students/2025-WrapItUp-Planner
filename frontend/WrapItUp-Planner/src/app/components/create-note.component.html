@@ -7,60 +7,138 @@
 
   <div class="form-content">
     <div class="form-group">
-      <label for="title">Title <span class="required">*</span></label>
-      <input 
-        type="text" 
-        id="title" 
-        [(ngModel)]="title"
-        class="form-control"
-        maxlength="100"
-        placeholder="Note title (max 100 characters)">
+      <label>Creation Mode</label>
+      <div class="mode-toggle">
+        <label class="mode-option">
+          <input
+            type="radio"
+            name="mode"
+            [value]="'manual'"
+            [ngModel]="mode"
+            (ngModelChange)="onModeChange($event)">
+          Manual
+        </label>
+        <label class="mode-option">
+          <input
+            type="radio"
+            name="mode"
+            [value]="'ai'"
+            [ngModel]="mode"
+            (ngModelChange)="onModeChange($event)">
+          Create with AI
+        </label>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="overview">Overview</label>
-      <textarea 
-        id="overview" 
-        [(ngModel)]="overview"
-        class="form-control"
-        rows="3"
-        placeholder="Brief overview of the note"></textarea>
+    <div class="form-group" *ngIf="mode === 'ai'">
+      <input
+        #aiFileInput
+        type="file"
+        id="aiFile"
+        class="file-input-hidden"
+        accept=".pdf,.docx,.pptx,.txt,.md"
+        (change)="onFileSelected($event)">
+      <div
+        class="dropzone"
+        [class.drag-over]="isDragOver"
+        [class.disabled]="isGenerating"
+        (click)="!isGenerating && aiFileInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)">
+        <div class="dropzone-title">Drag and drop your document</div>
+        <div class="dropzone-subtitle">or click to select a file (PDF, Word, PowerPoint, TXT, MD)</div>
+        <div class="dropzone-file" *ngIf="aiFile">Selected: {{ aiFile.name }}</div>
+      </div>
+      <div class="hint">Max {{ maxAiChars }} extracted characters.</div>
+      <div class="hint" *ngIf="aiFileCharCount">Detected {{ aiFileCharCount }} characters (text files only).</div>
+      <div class="error" *ngIf="aiFileError">{{ aiFileError }}</div>
+      <div class="ai-status" *ngIf="isGenerating">
+        <div class="spinner"></div>
+        <div class="ai-status-text">Waiting for your document generation...</div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="summary">Summary</label>
-      <textarea 
-        id="summary" 
-        [(ngModel)]="summary"
-        class="form-control"
-        rows="10"
-        placeholder="Detailed content of the note"></textarea>
-    </div>
+    <ng-container *ngIf="mode === 'ai'">
+      <div class="form-group">
+        <label for="visibilityAi">Visibility</label>
+        <select
+          id="visibilityAi"
+          [(ngModel)]="visibility"
+          class="form-control">
+          <option value="PUBLIC">Public</option>
+          <option value="PRIVATE">Private</option>
+        </select>
+      </div>
 
-    <div class="form-group">
-      <label for="visibility">Visibility</label>
-      <select 
-        id="visibility" 
-        [(ngModel)]="visibility"
-        class="form-control">
-        <option value="PUBLIC">Public</option>
-        <option value="PRIVATE">Private</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label for="categoryAi">Category</label>
+        <select
+          id="categoryAi"
+          [(ngModel)]="category"
+          class="form-control">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </ng-container>
 
-    <div class="form-group">
-      <label for="category">Category</label>
-      <select 
-        id="category" 
-        [(ngModel)]="category"
-        class="form-control">
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
-    </div>
+    <ng-container *ngIf="mode === 'manual'">
+      <div class="form-group">
+        <label for="title">Title <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="title" 
+          [(ngModel)]="title"
+          class="form-control"
+          maxlength="100"
+          placeholder="Note title (max 100 characters)">
+      </div>
+
+      <div class="form-group">
+        <label for="overview">Overview</label>
+        <textarea 
+          id="overview" 
+          [(ngModel)]="overview"
+          class="form-control"
+          rows="3"
+          placeholder="Brief overview of the note"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="summary">Summary</label>
+        <textarea 
+          id="summary" 
+          [(ngModel)]="summary"
+          class="form-control"
+          rows="10"
+          placeholder="Detailed content of the note"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="visibility">Visibility</label>
+        <select 
+          id="visibility" 
+          [(ngModel)]="visibility"
+          class="form-control">
+          <option value="PUBLIC">Public</option>
+          <option value="PRIVATE">Private</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select 
+          id="category" 
+          [(ngModel)]="category"
+          class="form-control">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </ng-container>
 
     <div class="button-group">
-      <button class="btn-cancel" (click)="cancel()">Cancel</button>
-      <button class="btn-create" (click)="createNote()">Create Note</button>
+      <button class="btn-cancel" (click)="cancel()" [disabled]="isGenerating">Cancel</button>
+      <button class="btn-create" (click)="createNote()" [disabled]="isGenerating">Create Note</button>
     </div>
   </div>
 </div>

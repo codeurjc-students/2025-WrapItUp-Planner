@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -19,6 +20,7 @@ describe('MyNotesComponent', () => {
   let fixture: ComponentFixture<MyNotesComponent>;
   let noteService: jasmine.SpyObj<NoteService>;
   let userService: jasmine.SpyObj<UserService>;
+  let router: Router;
 
   beforeEach(async () => {
     const noteServiceSpy = jasmine.createSpyObj('NoteService', ['getRecentNotes', 'getSharedWithMe', 'deleteNote']);
@@ -44,6 +46,7 @@ describe('MyNotesComponent', () => {
 
     noteService = TestBed.inject(NoteService) as jasmine.SpyObj<NoteService>;
     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    router = TestBed.inject(Router);
 
     // Mock default behavior
     userService.getCurrentUser.and.returnValue(of({ 
@@ -172,5 +175,75 @@ describe('MyNotesComponent', () => {
     
     expect(component.selectedCategory).toBeNull();
     expect(noteService.getRecentNotes).toHaveBeenCalledWith(0, 10, undefined, undefined);
+  });
+
+  it('should redirect admin users to home', () => {
+    userService.getCurrentUser.and.returnValue(of({
+      id: 1,
+      username: 'admin',
+      email: 'admin@test.com',
+      password: 'password123',
+      roles: ['ADMIN'],
+      displayName: 'Admin'
+    }));
+    const navSpy = spyOn(router, 'navigate');
+
+    const adminFixture = TestBed.createComponent(MyNotesComponent);
+    adminFixture.detectChanges();
+
+    expect(navSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should redirect to login when user load fails', () => {
+    userService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    const errorFixture = TestBed.createComponent(MyNotesComponent);
+    errorFixture.detectChanges();
+
+    expect(navSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should navigate to error when recent notes load fails with server error', () => {
+    noteService.getRecentNotes.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.loadRecentNotes();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should navigate to error when shared notes load fails with server error', () => {
+    noteService.getSharedWithMe.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.loadSharedNotes();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should alert on delete error for non-server error', () => {
+    const testNote = { id: 1, title: 'Test Note', overview: 'Overview', summary: 'Summary', category: 'MATHS' as const, visibility: 'PRIVATE' as const, userId: 1 };
+    component.filteredNotes = [testNote];
+    noteService.deleteNote.and.returnValue(throwError(() => ({ status: 400 })));
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(window, 'alert');
+    const mockEvent = new Event('click');
+
+    component.deleteNote(testNote.id!, mockEvent);
+
+    expect(window.alert).toHaveBeenCalledWith('Error deleting note');
+  });
+
+  it('should format dates in dd/mm/yyyy', () => {
+    expect(component.formatDate(undefined)).toBe('');
+    expect(component.formatDate('2025-04-25T10:00:00')).toBe('25/04/2025');
+  });
+
+  it('should resolve display names and icons', () => {
+    expect(component.getCategoryDisplayName('SHARED_WITH_ME')).toBe('Shared with Me');
+    expect(component.getCategoryDisplayName('SCIENCE')).toBe('Science');
+    expect(component.getCategoryIcon('SHARED_WITH_ME')).toBe('🤝');
+    expect(component.getCategoryIcon('ART')).toBe('🎨');
   });
 });

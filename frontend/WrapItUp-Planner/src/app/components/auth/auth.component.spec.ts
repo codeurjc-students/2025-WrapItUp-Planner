@@ -1,9 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { AuthComponent } from './auth.component';
 import { AuthService } from '../../services/auth.service';
@@ -89,5 +89,114 @@ describe('AuthComponent', () => {
       expect(navSpy).toHaveBeenCalledWith(['/login']);
       done();
     }, 0);
+  });
+
+  it('login: should require username and password', () => {
+    component.mode = 'login';
+    component.username = '';
+    component.password = '';
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Username and password are required');
+    expect(authSpy.login).not.toHaveBeenCalled();
+  });
+
+  it('login: should show bad credentials when status is not SUCCESS', () => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(of({ status: 'FAIL' }));
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Bad credentials');
+  });
+
+  it('login: should route to error on server error', () => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    component.onSubmit();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('login: should logout and redirect when user is banned', fakeAsync(() => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(of({ status: 'SUCCESS' }));
+    userSpy.getCurrentUser.and.returnValue(of({
+      id: 1,
+      username: 'testuser',
+      email: 'test@test.com',
+      password: 'password123',
+      roles: ['USER'],
+      displayName: 'Test User',
+      status: UserStatus.BANNED
+    }));
+    authSpy.logout.and.returnValue(of({}));
+    const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    component.onSubmit();
+    tick(300);
+
+    expect(authSpy.logout).toHaveBeenCalled();
+    expect(navSpy).toHaveBeenCalledWith(['/banned']);
+  }));
+
+  it('register: should require all fields', () => {
+    component.mode = 'register';
+    component.model = { username: '', email: '', password: '' };
+    component.repeatPassword = '';
+
+    component.onSubmit();
+
+    expect(component.error).toBe('All fields are required');
+    expect(authSpy.register).not.toHaveBeenCalled();
+  });
+
+  it('register: should require matching passwords', () => {
+    component.mode = 'register';
+    component.model = { username: 'newuser', email: 'a@b.com', password: 'password123' };
+    component.repeatPassword = 'different';
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Passwords do not match');
+    expect(authSpy.register).not.toHaveBeenCalled();
+  });
+
+  it('register: should require minimum password length', () => {
+    component.mode = 'register';
+    component.model = { username: 'newuser', email: 'a@b.com', password: 'short' };
+    component.repeatPassword = 'short';
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Password must be at least 8 characters');
+    expect(authSpy.register).not.toHaveBeenCalled();
+  });
+
+  it('register: should show server exists error when returned', () => {
+    component.mode = 'register';
+    component.model = { username: 'newuser', email: 'a@b.com', password: 'longpassword' };
+    component.repeatPassword = 'longpassword';
+
+    authSpy.register.and.returnValue(throwError(() => ({
+      status: 400,
+      error: { message: 'User already exists' }
+    })));
+
+    component.onSubmit();
+
+    expect(component.error).toBe('User already exists');
   });
 });
