@@ -193,6 +193,21 @@ describe('NoteDetailComponent', () => {
     expect(component.shareUsername).toBe('');
   });
 
+  it('should block share modal when user cannot share', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of({ ...testUser, id: 2 }));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.openShareModal();
+
+    expect(window.alert).toHaveBeenCalledWith('You do not have permission to share this note');
+    expect(component.showShareModal).toBe(false);
+  });
+
   it('should share note with username', () => {
     const sharedNote: NoteDTO = { ...testNote, sharedWithUserIds: [2] };
     mockNoteService.getNoteById.and.returnValue(of(testNote));
@@ -224,6 +239,51 @@ describe('NoteDetailComponent', () => {
     expect(mockNoteService.shareNoteByUsername).not.toHaveBeenCalled();
   });
 
+  it('should require username when sharing note', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.shareUsername = '   ';
+    component.shareWithUsername();
+
+    expect(component.shareError).toBe('Please enter a username');
+    expect(mockNoteService.shareNoteByUsername).not.toHaveBeenCalled();
+  });
+
+  it('should set error when sharing note with unknown user', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.shareNoteByUsername.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.shareUsername = 'missing';
+    component.shareWithUsername();
+
+    expect(component.shareError).toBe('User not found');
+  });
+
+  it('should set generic error when sharing note fails', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.shareNoteByUsername.and.returnValue(throwError(() => ({ status: 400 })));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.shareUsername = 'otheruser';
+    component.shareWithUsername();
+
+    expect(component.shareError).toBe('Error sharing note');
+  });
+
   it('should delete note when deleteNote is called', () => {
     mockNoteService.getNoteById.and.returnValue(of(testNote));
     mockUserService.getCurrentUser.and.returnValue(of(testUser));
@@ -238,6 +298,52 @@ describe('NoteDetailComponent', () => {
 
     expect(mockNoteService.deleteNote).toHaveBeenCalledWith(1);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/my-notes']);
+  });
+
+  it('should block delete when user cannot delete note', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of({ ...testUser, id: 2, roles: [] }));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.deleteNote();
+
+    expect(window.alert).toHaveBeenCalledWith('You do not have permission to delete this note');
+    expect(mockNoteService.deleteNote).not.toHaveBeenCalled();
+  });
+
+  it('should route to error on delete failure (server)', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.deleteNote.and.returnValue(throwError(() => ({ status: 500 })));
+    spyOn(window, 'confirm').and.returnValue(true);
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.deleteNote();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should show error message on delete failure (client)', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.deleteNote.and.returnValue(throwError(() => ({ status: 400 })));
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.deleteNote();
+
+    expect(window.alert).toHaveBeenCalledWith('Error deleting note');
   });
 
   it('should not delete note when user cancels confirmation', () => {
@@ -264,6 +370,99 @@ describe('NoteDetailComponent', () => {
 
     const result = component.getSharedUsernames();
     expect(result).toBe('Shared with 2 users');
+  });
+
+  it('should return not shared when shared list is empty', () => {
+    mockNoteService.getNoteById.and.returnValue(of({ ...testNote, sharedWithUserIds: [] }));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.getSharedUsernames()).toBe('Not shared');
+  });
+
+  it('should use singular label for one shared user', () => {
+    mockNoteService.getNoteById.and.returnValue(of({ ...testNote, sharedWithUserIds: [2] }));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.getSharedUsernames()).toBe('Shared with 1 user');
+  });
+
+  it('should block edit mode when user cannot edit', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of({ ...testUser, id: 2 }));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.toggleEditMode();
+
+    expect(window.alert).toHaveBeenCalledWith('You do not have permission to edit this note');
+    expect(component.editMode).toBe(false);
+  });
+
+  it('should require title when saving changes', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.editedTitle = '   ';
+    component.saveChanges();
+
+    expect(window.alert).toHaveBeenCalledWith('Title cannot be empty');
+    expect(mockNoteService.updateNote).not.toHaveBeenCalled();
+  });
+
+  it('should route to error on update failure (server)', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.updateNote.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.editedTitle = 'Updated Title';
+    component.saveChanges();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should show server message on update failure', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+    mockNoteService.updateNote.and.returnValue(throwError(() => ({ status: 400, error: { message: 'Bad update' } })));
+    spyOn(window, 'alert');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    component.editedTitle = 'Updated Title';
+    component.saveChanges();
+
+    expect(window.alert).toHaveBeenCalledWith('Bad update');
+  });
+
+  it('should handle getProfilePicUrl without url', () => {
+    expect(component.getProfilePicUrl({ id: 1, content: 'x', noteId: 1, username: 'u', displayName: 'd', createdAt: '2025-01-01T10:00:00' })).toBe('');
+  });
+
+  it('should handle getProfilePicUrl with url', () => {
+    const comment = { id: 1, content: 'x', noteId: 1, username: 'u', displayName: 'd', createdAt: '2025-01-01T10:00:00', userProfilePicUrl: '/img.png' } as CommentDTO;
+    expect(component.getProfilePicUrl(comment)).toBe('https://localhost/img.png');
   });
 
   // Comment Tests
@@ -313,6 +512,54 @@ describe('NoteDetailComponent', () => {
       expect(mockCommentService.getCommentsByNote).toHaveBeenCalledWith(1, 0, 10);
     });
 
+    it('should not create empty comment', () => {
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.newCommentContent = '   ';
+      component.addComment();
+
+      expect(mockCommentService.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should alert on comment create unauthorized', () => {
+      spyOn(window, 'alert');
+      mockCommentService.createComment.and.returnValue(throwError(() => ({ status: 401 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.newCommentContent = 'New comment';
+      component.addComment();
+
+      expect(window.alert).toHaveBeenCalledWith('You must log in to comment');
+    });
+
+    it('should alert on comment create forbidden', () => {
+      spyOn(window, 'alert');
+      mockCommentService.createComment.and.returnValue(throwError(() => ({ status: 403 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.newCommentContent = 'New comment';
+      component.addComment();
+
+      expect(window.alert).toHaveBeenCalledWith('You do not have permission to comment on this note');
+    });
+
+    it('should route to error on comment create server error', () => {
+      mockCommentService.createComment.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.newCommentContent = 'New comment';
+      component.addComment();
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
     it('should delete a comment and reload comments', () => {
       spyOn(window, 'confirm').and.returnValue(true);
       
@@ -331,6 +578,42 @@ describe('NoteDetailComponent', () => {
 
       expect(mockCommentService.deleteComment).toHaveBeenCalledWith(1, 1);
       expect(mockCommentService.getCommentsByNote).toHaveBeenCalledWith(1, 0, 10);
+    });
+
+    it('should not delete comment when confirmation is cancelled', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.deleteComment(1);
+
+      expect(mockCommentService.deleteComment).not.toHaveBeenCalled();
+    });
+
+    it('should handle delete comment error', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      mockCommentService.deleteComment.and.returnValue(throwError(() => ({ status: 400 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.deleteComment(1);
+
+      expect(window.alert).toHaveBeenCalledWith('Error deleting comment');
+    });
+
+    it('should route to error on delete comment server error', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      mockCommentService.deleteComment.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.deleteComment(1);
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
     });
 
     it('should load more comments with pagination', () => {
@@ -364,6 +647,13 @@ describe('NoteDetailComponent', () => {
       expect(component.canDeleteComment(otherComment)).toBe(false);
     });
 
+    it('should allow admin to delete any comment', () => {
+      component.currentUser = { ...testUser, roles: ['ADMIN'] };
+      const otherComment: CommentDTO = { ...testComments[1], username: 'otheruser' };
+
+      expect(component.canDeleteComment(otherComment)).toBe(true);
+    });
+
     it('should not report comment when confirmation is cancelled', () => {
       spyOn(window, 'confirm').and.returnValue(false);
       mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
@@ -390,5 +680,103 @@ describe('NoteDetailComponent', () => {
       expect(mockCommentService.reportComment).toHaveBeenCalledWith(1, 1);
       expect(reloadSpy).toHaveBeenCalledWith(true);
     });
+
+    it('should handle report comment unauthorized', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'alert');
+      mockCommentService.reportComment.and.returnValue(throwError(() => ({ status: 401 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.reportComment(1);
+
+      expect(window.alert).toHaveBeenCalledWith('You must log in to report a comment');
+    });
+
+    it('should route to error on report comment server error', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      mockCommentService.reportComment.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.reportComment(1);
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+  });
+
+  it('should handle loadCurrentUser error and clear permissions', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 500 })));
+    mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.canEdit).toBe(false);
+    expect(component.canShare).toBe(false);
+  });
+
+  it('should handle fetchNote 401 error', () => {
+    mockNoteService.getNoteById.and.returnValue(throwError(() => ({ status: 401 })));
+    spyOn(window, 'alert');
+
+    component.noteId = 1;
+    component.fetchNote();
+
+    expect(window.alert).toHaveBeenCalledWith('You must log in to view this note');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should handle fetchNote 403 error', () => {
+    mockNoteService.getNoteById.and.returnValue(throwError(() => ({ status: 403 })));
+    spyOn(window, 'alert');
+
+    component.noteId = 1;
+    component.fetchNote();
+
+    expect(window.alert).toHaveBeenCalledWith('You do not have permission to view this note');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/my-notes']);
+  });
+
+  it('should handle fetchNote 404 error', () => {
+    mockNoteService.getNoteById.and.returnValue(throwError(() => ({ status: 404 })));
+    spyOn(window, 'alert');
+
+    component.noteId = 1;
+    component.fetchNote();
+
+    expect(window.alert).toHaveBeenCalledWith('Note not found');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/my-notes']);
+  });
+
+  it('should handle fetchNote unexpected error', () => {
+    mockNoteService.getNoteById.and.returnValue(throwError(() => ({ status: 400 })));
+
+    component.noteId = 1;
+    component.fetchNote();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should handle loadComments server error', () => {
+    mockNoteService.getNoteById.and.returnValue(of(testNote));
+    mockUserService.getCurrentUser.and.returnValue(of(testUser));
+    mockCommentService.getCommentsByNote.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    expect(component.loadingComments).toBe(false);
+  });
+
+  it('should toggle comment menu', () => {
+    component.toggleCommentMenu(1);
+    expect(component.showCommentMenu).toBe(1);
+    component.toggleCommentMenu(1);
+    expect(component.showCommentMenu).toBeNull();
   });
 });

@@ -102,4 +102,48 @@ describe('CalendarComponent', () => {
     expect(dialogSpy.open).toHaveBeenCalled();
     expect(calendarServiceSpy.getMonthView).toHaveBeenCalled();
   });
+
+  it('previousMonth should decrement when not January', () => {
+    component.currentMonth = 6;
+    component.currentYear = 2026;
+
+    component.previousMonth();
+
+    expect(component.currentMonth).toBe(5);
+    expect(component.currentYear).toBe(2026);
+  });
+
+  it('nextMonth should increment when not December', () => {
+    component.currentMonth = 6;
+    component.currentYear = 2026;
+
+    component.nextMonth();
+
+    expect(component.currentMonth).toBe(7);
+    expect(component.currentYear).toBe(2026);
+  });
+
+  it('goToToday should set current month and year', () => {
+    const today = new Date();
+    component.currentMonth = 1;
+    component.currentYear = 2000;
+
+    component.goToToday();
+
+    expect(component.currentMonth).toBe(today.getMonth() + 1);
+    expect(component.currentYear).toBe(today.getFullYear());
+  });
+
+  it('getMonthName should return correct label', () => {
+    component.currentMonth = 2;
+    expect(component.getMonthName()).toBe('February');
+  });
+
+  it('getDayNumber should return null when day is missing', () => {
+    expect(component.getDayNumber(null)).toBeNull();
+  });
+
+  it('isToday should return false for null day', () => {
+    expect(component.isToday(null)).toBeFalse();
+  });
 });
