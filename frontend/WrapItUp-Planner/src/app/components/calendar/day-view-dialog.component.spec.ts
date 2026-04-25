@@ -94,6 +94,41 @@ describe('DayViewDialogComponent', () => {
     expect(component.showEventForm).toBeFalse();
   });
 
+  it('editEvent should set times for timed events', () => {
+    component.editEvent(mockEvent);
+    expect(component.showEventForm).toBeTrue();
+    expect(component.startTime).toBe('09:00');
+    expect(component.endTime).toBe('10:00');
+  });
+
+  it('editEvent should reset times for all-day events', () => {
+    const allDayEvent = { ...mockEvent, allDay: true };
+    component.editEvent(allDayEvent);
+    expect(component.startTime).toBe('09:00');
+    expect(component.endTime).toBe('10:00');
+  });
+
+  it('editTask should set task form and hide event form', () => {
+    component.editTask(mockTask);
+    expect(component.showTaskForm).toBeTrue();
+    expect(component.showEventForm).toBeFalse();
+  });
+
+  it('cancelForm should reset flags and messages', () => {
+    component.showEventForm = true;
+    component.error = 'err';
+    component.success = 'ok';
+
+    component.cancelForm();
+
+    expect(component.showEventForm).toBeFalse();
+    expect(component.showTaskForm).toBeFalse();
+    expect(component.editingEvent).toBeNull();
+    expect(component.editingTask).toBeNull();
+    expect(component.error).toBeNull();
+    expect(component.success).toBeNull();
+  });
+
   it('saveEvent should set error if title is empty', () => {
     component.newEvent.title = '';
     component.saveEvent();
@@ -125,6 +160,32 @@ describe('DayViewDialogComponent', () => {
     expect(calendarServiceSpy.updateEvent).toHaveBeenCalledWith(1, jasmine.any(Object));
   });
 
+  it('saveEvent should set error on update failure', () => {
+    calendarServiceSpy.updateEvent.and.returnValue(throwError(() => ({ error: { message: 'Update failed' } })));
+    component.editingEvent = mockEvent;
+    component.newEvent.title = 'Updated';
+    component.newEvent.allDay = true;
+    component.startDate = '2026-03-01';
+    component.endDate = '2026-03-01';
+
+    component.saveEvent();
+
+    expect(component.error).toBe('Update failed');
+  });
+
+  it('saveEvent should set error on create failure', () => {
+    calendarServiceSpy.createEvent.and.returnValue(throwError(() => ({ error: { message: 'Create failed' } })));
+    component.editingEvent = null;
+    component.newEvent.title = 'New Event';
+    component.newEvent.allDay = true;
+    component.startDate = '2026-03-01';
+    component.endDate = '2026-03-01';
+
+    component.saveEvent();
+
+    expect(component.error).toBe('Create failed');
+  });
+
   it('saveTask should set error if title is empty', () => {
     component.newTask.title = '';
     component.saveTask();
@@ -140,10 +201,36 @@ describe('DayViewDialogComponent', () => {
     expect(calendarServiceSpy.createTask).toHaveBeenCalledWith(jasmine.objectContaining({ title: 'New Task' }));
   });
 
+  it('saveTask should call updateTask when editing', () => {
+    calendarServiceSpy.updateTask.and.returnValue(of(mockTask));
+    component.editingTask = mockTask;
+    component.newTask.title = 'Updated Task';
+
+    component.saveTask();
+
+    expect(calendarServiceSpy.updateTask).toHaveBeenCalledWith(1, jasmine.any(Object));
+  });
+
+  it('saveTask should set error on update failure', () => {
+    calendarServiceSpy.updateTask.and.returnValue(throwError(() => ({ error: { message: 'Update failed' } })));
+    component.editingTask = mockTask;
+    component.newTask.title = 'Updated Task';
+
+    component.saveTask();
+
+    expect(component.error).toBe('Update failed');
+  });
+
   it('toggleTask should call toggleTaskComplete', () => {
     calendarServiceSpy.toggleTaskComplete.and.returnValue(of({ ...mockTask, completed: true }));
     component.toggleTask(mockTask);
     expect(calendarServiceSpy.toggleTaskComplete).toHaveBeenCalledWith(1);
+  });
+
+  it('toggleTask should set error on failure', () => {
+    calendarServiceSpy.toggleTaskComplete.and.returnValue(throwError(() => ({ status: 500 })));
+    component.toggleTask(mockTask);
+    expect(component.error).toBe('Error updating task');
   });
 
   it('deleteEvent should call service on confirm', () => {
@@ -157,6 +244,30 @@ describe('DayViewDialogComponent', () => {
     spyOn(window, 'confirm').and.returnValue(false);
     component.deleteEvent(mockEvent);
     expect(calendarServiceSpy.deleteEvent).not.toHaveBeenCalled();
+  });
+
+  it('deleteEvent should set error on failure', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    calendarServiceSpy.deleteEvent.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.deleteEvent(mockEvent);
+
+    expect(component.error).toBe('Error deleting event');
+  });
+
+  it('deleteTask should not call service when cancelled', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.deleteTask(mockTask);
+    expect(calendarServiceSpy.deleteTask).not.toHaveBeenCalled();
+  });
+
+  it('deleteTask should set error on failure', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    calendarServiceSpy.deleteTask.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.deleteTask(mockTask);
+
+    expect(component.error).toBe('Error deleting task');
   });
 
   it('close should close dialog with refresh', () => {

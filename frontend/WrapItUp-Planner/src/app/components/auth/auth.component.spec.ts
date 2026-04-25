@@ -45,6 +45,24 @@ describe('AuthComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should switch to register mode based on url', () => {
+    const navSpy = spyOnProperty(router, 'url', 'get').and.returnValue('/register');
+
+    component.ngOnInit();
+
+    expect(component.mode).toBe('register');
+    expect(component.error).toBeNull();
+    expect(component.message).toBeNull();
+  });
+
+  it('should default to login mode when url is not register', () => {
+    spyOnProperty(router, 'url', 'get').and.returnValue('/login');
+
+    component.ngOnInit();
+
+    expect(component.mode).toBe('login');
+  });
+
   it('login: should call AuthService.login and navigate to profile on success', (done) => {
     component.mode = 'login';
     component.username = 'testuser';
@@ -114,6 +132,18 @@ describe('AuthComponent', () => {
     expect(component.error).toBe('Bad credentials');
   });
 
+  it('login: should show bad credentials on non-server error', () => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(throwError(() => ({ status: 401 })));
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Bad credentials');
+  });
+
   it('login: should route to error on server error', () => {
     component.mode = 'login';
     component.username = 'testuser';
@@ -150,6 +180,45 @@ describe('AuthComponent', () => {
 
     expect(authSpy.logout).toHaveBeenCalled();
     expect(navSpy).toHaveBeenCalledWith(['/banned']);
+  }));
+
+  it('login: should redirect to banned even when logout fails', fakeAsync(() => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(of({ status: 'SUCCESS' }));
+    userSpy.getCurrentUser.and.returnValue(of({
+      id: 1,
+      username: 'testuser',
+      email: 'test@test.com',
+      password: 'password123',
+      roles: ['USER'],
+      displayName: 'Test User',
+      status: UserStatus.BANNED
+    }));
+    authSpy.logout.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    component.onSubmit();
+    tick(300);
+
+    expect(navSpy).toHaveBeenCalledWith(['/banned']);
+  }));
+
+  it('login: should navigate to profile when fetching user fails', fakeAsync(() => {
+    component.mode = 'login';
+    component.username = 'testuser';
+    component.password = 'password123';
+
+    authSpy.login.and.returnValue(of({ status: 'SUCCESS' }));
+    userSpy.getCurrentUser.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    component.onSubmit();
+    tick(300);
+
+    expect(navSpy).toHaveBeenCalledWith(['/profile']);
   }));
 
   it('register: should require all fields', () => {
@@ -198,5 +267,33 @@ describe('AuthComponent', () => {
     component.onSubmit();
 
     expect(component.error).toBe('User already exists');
+  });
+
+  it('register: should navigate to error on server error', () => {
+    component.mode = 'register';
+    component.model = { username: 'newuser', email: 'a@b.com', password: 'longpassword' };
+    component.repeatPassword = 'longpassword';
+
+    authSpy.register.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    component.onSubmit();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('register: should show generic error when server message is not exists', () => {
+    component.mode = 'register';
+    component.model = { username: 'newuser', email: 'a@b.com', password: 'longpassword' };
+    component.repeatPassword = 'longpassword';
+
+    authSpy.register.and.returnValue(throwError(() => ({
+      status: 400,
+      error: { message: 'Invalid input' }
+    })));
+
+    component.onSubmit();
+
+    expect(component.error).toBe('Registration error. Please try again.');
   });
 });

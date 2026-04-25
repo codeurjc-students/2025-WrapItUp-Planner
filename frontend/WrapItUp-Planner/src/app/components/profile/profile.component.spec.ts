@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { ProfileComponent } from './profile.component';
@@ -16,6 +17,7 @@ describe('ProfileComponent', () => {
   let fixture: ComponentFixture<ProfileComponent>;
   let userServiceSpy: jasmine.SpyObj<UserService>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     userServiceSpy = jasmine.createSpyObj('UserService', [
@@ -51,6 +53,7 @@ describe('ProfileComponent', () => {
     
     fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -74,6 +77,16 @@ describe('ProfileComponent', () => {
     
     expect(errorInstance.error).toBe('Error loading user data');
     expect(errorInstance.loading).toBe(false);
+  });
+
+  it('should route to error on load user server error', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    const errorComponent = TestBed.createComponent(ProfileComponent);
+    errorComponent.detectChanges();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
   });
 
   it('should toggle edit mode', () => {
@@ -146,6 +159,28 @@ describe('ProfileComponent', () => {
     }, 100);
   });
 
+  it('should reject non-image files', () => {
+    spyOn(console, 'error');
+    const mockFile = new File(['text'], 'note.txt', { type: 'text/plain' });
+    const event = { target: { files: [mockFile] } } as any;
+
+    component.onFileSelected(event);
+
+    expect(component.error).toBe('Please select an image file');
+    expect(userServiceSpy.uploadProfileImage).not.toHaveBeenCalled();
+  });
+
+  it('should reject oversized image files', () => {
+    const bigFile = new File(['x'.repeat(10)], 'big.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(bigFile, 'size', { value: 6 * 1024 * 1024 });
+    const event = { target: { files: [bigFile] } } as any;
+
+    component.onFileSelected(event);
+
+    expect(component.error).toBe('Image size must be less than 5MB');
+    expect(userServiceSpy.uploadProfileImage).not.toHaveBeenCalled();
+  });
+
   it('should not upload when no file is selected', () => {
     const event = {
       target: {
@@ -165,6 +200,15 @@ describe('ProfileComponent', () => {
     component.logout();
 
     expect(authServiceSpy.logout).toHaveBeenCalled();
+  });
+
+  it('should navigate to login even when logout fails', () => {
+    authServiceSpy.logout.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.logout();
+
+    expect(navSpy).toHaveBeenCalledWith(['/login']);
   });
 
   it('should clear success message after timeout', (done) => {
@@ -194,6 +238,81 @@ describe('ProfileComponent', () => {
 
     const imageUrl = component.user.image;
     expect(imageUrl).toBe('/api/v1/users/profile-image/5');
+  });
+
+  it('should return default image when no preview or image', () => {
+    component.imagePreview = null;
+    component.user = { username: 'test', email: 'test@test.com', displayName: 'Test', password: '' } as any;
+
+    expect(component.getImageUrl()).toBe('assets/genericUser.png');
+  });
+
+  it('should use preview image when available', () => {
+    component.imagePreview = 'data:image/png;base64,abc';
+
+    expect(component.getImageUrl()).toBe('data:image/png;base64,abc');
+  });
+
+  it('should format profile title from display name', () => {
+    component.user = { username: 'test', email: 'test@test.com', displayName: 'Test User', password: '' } as any;
+    expect(component.getProfileTitle()).toBe("Test User's Profile");
+  });
+
+  it('should format profile title from username when no display name', () => {
+    component.user = { username: 'tester', email: 'test@test.com', displayName: '', password: '' } as any;
+    expect(component.getProfileTitle()).toBe("tester's Profile");
+  });
+
+  it('should return user role name defaults', () => {
+    component.user = { username: 'tester', email: 'test@test.com', password: '', roles: [] } as any;
+    expect(component.getRoleName()).toBe('User');
+  });
+
+  it('should handle loadUserById forbidden', () => {
+    userServiceSpy.getUserById.and.returnValue(throwError(() => ({ status: 403 })));
+
+    component.loadUserById(2);
+
+    expect(component.error).toBe('You do not have permission to view this profile');
+  });
+
+  it('should handle loadUserById not found', () => {
+    userServiceSpy.getUserById.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.loadUserById(2);
+
+    expect(component.error).toBe('User not found');
+  });
+
+  it('should handle loadUserById server error', () => {
+    userServiceSpy.getUserById.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.loadUserById(2);
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should handle update user server error', () => {
+    component.editedUser = { username: 'test', email: 'test@test.com', displayName: 'Test', password: '' } as any;
+    userServiceSpy.updateUser.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.saveChanges();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should handle upload image error', () => {
+    const mockFile = new File(['image'], 'profile.jpg', { type: 'image/jpeg' });
+    component.selectedFile = mockFile;
+    userServiceSpy.uploadProfileImage.and.returnValue(throwError(() => ({ status: 400, error: 'Bad upload' })));
+
+    component.uploadImage();
+
+    expect(component.error).toBe('Bad upload');
+    expect(component.selectedFile).toBeNull();
+    expect(component.imagePreview).toBeNull();
   });
 
   it('should ban user when confirmed', () => {

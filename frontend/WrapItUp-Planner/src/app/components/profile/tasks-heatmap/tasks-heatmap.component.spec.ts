@@ -55,6 +55,13 @@ describe('TasksHeatmapComponent', () => {
     expect(component.maxTasks).toBe(5);
   });
 
+  it('should keep maxTasks at 0 when no month data', () => {
+    component.monthData = null;
+    component.maxTasks = 0;
+    component.calculateMaxTasks();
+    expect(component.maxTasks).toBe(0);
+  });
+
   it('should generate correct heatmap color based on task count', () => {
     component.maxTasks = 10;
     
@@ -67,6 +74,19 @@ describe('TasksHeatmapComponent', () => {
     expect(component.getHeatmapColor(day2)).toBe('#f8bbd0');
     expect(component.getHeatmapColor(day3)).toBe('#f06292');
     expect(component.getHeatmapColor(day4)).toBe('#880e4f');
+  });
+
+  it('should return day number for valid day', () => {
+    const day = { date: '2026-03-02', eventColors: [], totalEvents: 0, pendingTasks: 2 };
+    expect(component.getDayNumber(day)).toBe(2);
+  });
+
+  it('should return 0 for pending tasks when day is null', () => {
+    expect(component.getPendingTasks(null)).toBe(0);
+  });
+
+  it('should return false for isToday when day is null', () => {
+    expect(component.isToday(null)).toBeFalse();
   });
 
   it('should handle service error gracefully', () => {

@@ -78,6 +78,24 @@ describe('ReportedCommentsComponent', () => {
     expect(navSpy).toHaveBeenCalledWith(['/login']);
   });
 
+  it('should navigate to home on 403', () => {
+    commentServiceSpy.getReportedComments.and.returnValue(throwError(() => ({ status: 403 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.loadReportedComments();
+
+    expect(navSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should navigate to error on server error', () => {
+    commentServiceSpy.getReportedComments.and.returnValue(throwError(() => ({ status: 500 })));
+    const navSpy = spyOn(router, 'navigate');
+
+    component.loadReportedComments();
+
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+  });
+
   it('should unreport a comment and reload list', () => {
     const reloadSpy = spyOn(component, 'loadReportedComments');
     commentServiceSpy.unreportComment.and.returnValue(of({} as any));
@@ -87,6 +105,20 @@ describe('ReportedCommentsComponent', () => {
 
     expect(commentServiceSpy.unreportComment).toHaveBeenCalledWith(7);
     expect(reloadSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('should skip unreport when comment has no id', () => {
+    component.ignoreReport({} as CommentDTO);
+    expect(commentServiceSpy.unreportComment).not.toHaveBeenCalled();
+  });
+
+  it('should handle unreport error', () => {
+    spyOn(window, 'alert');
+    commentServiceSpy.unreportComment.and.returnValue(throwError(() => ({ status: 400 })));
+
+    component.ignoreReport({ id: 7 } as CommentDTO);
+
+    expect(window.alert).toHaveBeenCalledWith('Error ignoring report');
   });
 
   it('should delete reported comment and reload', () => {
@@ -101,15 +133,52 @@ describe('ReportedCommentsComponent', () => {
     expect(reloadSpy).toHaveBeenCalledWith(true);
   });
 
+  it('should skip delete when comment has no id', () => {
+    component.deleteComment({} as CommentDTO);
+    expect(commentServiceSpy.deleteReportedComment).not.toHaveBeenCalled();
+  });
+
+  it('should not delete when confirmation is cancelled', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.deleteComment({ id: 9 } as CommentDTO);
+    expect(commentServiceSpy.deleteReportedComment).not.toHaveBeenCalled();
+  });
+
+  it('should handle delete error', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(window, 'alert');
+    commentServiceSpy.deleteReportedComment.and.returnValue(throwError(() => ({ status: 400 })));
+
+    component.deleteComment({ id: 9 } as CommentDTO);
+
+    expect(window.alert).toHaveBeenCalledWith('Error deleting comment');
+  });
+
   it('should navigate to note when viewing original note', () => {
     const navSpy = spyOn(router, 'navigate');
     component.viewOriginalNote({ noteId: 3 } as CommentDTO);
     expect(navSpy).toHaveBeenCalledWith(['/notes', 3]);
   });
 
+  it('should not navigate when noteId is missing', () => {
+    const navSpy = spyOn(router, 'navigate');
+    component.viewOriginalNote({} as CommentDTO);
+    expect(navSpy).not.toHaveBeenCalled();
+  });
+
   it('should navigate to profile when viewing profile', () => {
     const navSpy = spyOn(router, 'navigate');
     component.viewProfile({ userId: 4 } as CommentDTO);
     expect(navSpy).toHaveBeenCalledWith(['/profile'], { queryParams: { userId: 4 } });
+  });
+
+  it('should not navigate to profile when userId missing', () => {
+    const navSpy = spyOn(router, 'navigate');
+    component.viewProfile({} as CommentDTO);
+    expect(navSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return empty profile pic url when missing', () => {
+    expect(component.getProfilePicUrl({} as CommentDTO)).toBe('');
   });
 });
