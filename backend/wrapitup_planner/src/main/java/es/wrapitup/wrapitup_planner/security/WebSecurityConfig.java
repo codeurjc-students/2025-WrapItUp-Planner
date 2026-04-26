@@ -109,6 +109,7 @@ public class WebSecurityConfig {
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes").hasRole("USER")
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes/ai").hasRole("USER")
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/ai/questions").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/quiz-results").hasRole("USER")
 					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*").hasRole("USER")
 					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*/share").hasRole("USER")
 					

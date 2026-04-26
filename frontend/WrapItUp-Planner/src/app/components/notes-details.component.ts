@@ -4,6 +4,7 @@ import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
 import { CommentService } from '../services/comment.service';
 import { NoteDTO, NoteCategory } from '../dtos/note.dto';
+import { QuizResultDTO } from '../dtos/quiz-result.dto';
 import { UserModelDTO } from '../dtos/user.dto';
 import { CommentDTO } from '../dtos/comment.dto';
 import { finalize } from 'rxjs';
@@ -64,6 +65,11 @@ export class NoteDetailComponent implements OnInit {
   isQuizGenerateOpen = false;
   isQuizDragOver = false;
   readonly quizSupportedExtensions = ['txt', 'md', 'pdf', 'docx', 'pptx'];
+  showQuizResultModal = false;
+  showQuizProgressChart = false;
+  quizResultMessage = '';
+  quizChartData: { name: string; series: { name: string; value: number }[] }[] = [];
+  quizSubmitError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -544,6 +550,9 @@ export class NoteDetailComponent implements OnInit {
 
   selectAnswer(questionIndex: number, optionIndex: number): void {
     this.selectedAnswers[questionIndex] = optionIndex;
+    if (this.quizSubmitError) {
+      this.quizSubmitError = '';
+    }
   }
 
   submitQuiz(): void {
@@ -551,16 +560,67 @@ export class NoteDetailComponent implements OnInit {
       return;
     }
 
+    if (this.getAnsweredCount() !== this.quizQuestions.length) {
+      this.quizSubmitError = 'Please answer all the questions before submitting';
+      return;
+    }
+
+    this.quizSubmitError = '';
+
     this.quizScore = this.quizQuestions.reduce((score, question, index) => {
       return score + (this.selectedAnswers[index] === question.correctOptionIndex ? 1 : 0);
     }, 0);
     this.quizSubmitted = true;
+
+    if (!this.currentUser) {
+      this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+      this.showQuizProgressChart = false;
+      this.quizChartData = [];
+      this.showQuizResultModal = true;
+      return;
+    }
+
+    const payload: QuizResultDTO = {
+      quizScore: this.quizScore,
+      quizMaxScore: this.quizQuestions.length
+    };
+
+    this.noteService.submitQuizResult(this.noteId, payload).subscribe({
+      next: (response) => {
+        this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+        const history = response.quizProgressPercentages ?? [];
+
+        this.showQuizProgressChart = history.length > 0;
+        this.quizChartData = this.showQuizProgressChart
+          ? [{
+              name: 'Progress',
+              series: history.map((value, index) => ({
+                name: `Attempt ${index + 1}`,
+                value: Number(value.toFixed(2))
+              }))
+            }]
+          : [];
+
+        this.showQuizResultModal = true;
+      },
+      error: () => {
+        this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+        this.showQuizProgressChart = false;
+        this.quizChartData = [];
+        this.showQuizResultModal = true;
+      }
+    });
+  }
+
+  closeQuizResultModal(): void {
+    this.showQuizResultModal = false;
   }
 
   resetQuiz(): void {
     this.selectedAnswers = new Array(this.quizQuestions.length).fill(-1);
     this.quizSubmitted = false;
     this.quizScore = 0;
+    this.quizSubmitError = '';
   }
 
   getAnsweredCount(): number {
@@ -595,6 +655,7 @@ export class NoteDetailComponent implements OnInit {
     this.selectedAnswers = [];
     this.quizSubmitted = false;
     this.quizScore = 0;
+    this.quizSubmitError = '';
 
     if (!jsonQuestions || !jsonQuestions.trim()) {
       return;

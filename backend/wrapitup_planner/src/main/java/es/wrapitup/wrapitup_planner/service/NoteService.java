@@ -3,12 +3,15 @@ package es.wrapitup.wrapitup_planner.service;
 import es.wrapitup.wrapitup_planner.dto.AiNoteResult;
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
+import es.wrapitup.wrapitup_planner.dto.QuizResultDTO;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
+import es.wrapitup.wrapitup_planner.model.QuizScore;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
+import es.wrapitup.wrapitup_planner.repository.QuizScoreRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -28,13 +31,15 @@ public class NoteService {
     private final UserRepository userRepository;
     private final OpenAiService openAiService;
     private final DocumentTextExtractorService documentTextExtractorService;
+    private final QuizScoreRepository quizScoreRepository;
 
-    public NoteService(NoteRepository noteRepository, NoteMapper noteMapper, UserRepository userRepository, OpenAiService openAiService, DocumentTextExtractorService documentTextExtractorService) {
+    public NoteService(NoteRepository noteRepository, NoteMapper noteMapper, UserRepository userRepository, OpenAiService openAiService, DocumentTextExtractorService documentTextExtractorService, QuizScoreRepository quizScoreRepository) {
         this.noteRepository = noteRepository;
         this.noteMapper = noteMapper;
         this.userRepository = userRepository;
         this.openAiService = openAiService;
         this.documentTextExtractorService = documentTextExtractorService;
+        this.quizScoreRepository = quizScoreRepository;
     }
     private boolean isAdmin(UserModel user) {
         return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
@@ -406,6 +411,47 @@ public class NoteService {
         
         noteRepository.delete(note);
         return true;
+    }
+
+    public QuizResultDTO saveQuizResult(Long noteId, String username, QuizResultDTO quizData) {
+        if (quizData == null || quizData.getQuizScore() == null || quizData.getQuizMaxScore() == null) {
+            throw new IllegalArgumentException("quizScore and quizMaxScore are required");
+        }
+
+        int score = quizData.getQuizScore();
+        int maxScore = quizData.getQuizMaxScore();
+
+        if (maxScore <= 0) {
+            throw new IllegalArgumentException("quizMaxScore must be greater than 0");
+        }
+
+        if (score < 0 || score > maxScore) {
+            throw new IllegalArgumentException("quizScore must be between 0 and quizMaxScore");
+        }
+
+        Optional<NoteDTO> permitted = findByIdWithPermissions(noteId, username);
+        if (permitted.isEmpty()) {
+            throw new SecurityException("You do not have permission to submit quiz results for this note");
+        }
+
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new IllegalArgumentException("Note not found"));
+
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        quizScoreRepository.save(new QuizScore(note, user, score, maxScore));
+
+        List<Double> progress = quizScoreRepository.findByNoteIdAndUserIdOrderByCreatedAtAsc(noteId, user.getId())
+                .stream()
+                .map(savedScore -> ((double) savedScore.getScore() / (double) savedScore.getMaxScore()) * 100.0)
+                .collect(Collectors.toList());
+
+        QuizResultDTO response = new QuizResultDTO();
+        response.setQuizScore(score);
+        response.setQuizMaxScore(maxScore);
+        response.setQuizProgressPercentages(progress);
+        return response;
     }
 }
 

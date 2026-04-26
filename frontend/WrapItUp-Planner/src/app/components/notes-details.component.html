@@ -93,13 +93,15 @@
         </div>
 
         <div class="quiz-actions">
-          <button class="btn-save" (click)="submitQuiz()" [disabled]="quizSubmitted || getAnsweredCount() !== quizQuestions.length">
+          <button class="btn-save" (click)="submitQuiz()" [disabled]="quizSubmitted">
             Submit Answers
           </button>
           <button class="btn-cancel" (click)="resetQuiz()" *ngIf="quizSubmitted">
             Retry Quiz
           </button>
         </div>
+
+        <p class="quiz-submit-error" *ngIf="quizSubmitError">{{ quizSubmitError }}</p>
 
         <div class="quiz-result" *ngIf="quizSubmitted">
           Score: {{ quizScore }} / {{ quizQuestions.length }}
@@ -273,6 +275,41 @@
     <div class="modal-footer">
       <button class="btn-cancel" (click)="closeShareModal()">Cancel</button>
       <button class="btn-confirm" (click)="shareWithUsername()">Share</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showQuizResultModal" (click)="closeQuizResultModal()">
+  <div class="modal-content quiz-result-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Quiz Result</h3>
+      <button class="close-btn" (click)="closeQuizResultModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="quiz-result-message">{{ quizResultMessage }}</p>
+
+      <div *ngIf="showQuizProgressChart" class="quiz-chart-wrap">
+        <h4 class="quiz-chart-title">Your progress</h4>
+        <ngx-charts-line-chart
+          [results]="quizChartData"
+          [legend]="false"
+          [xAxis]="true"
+          [yAxis]="true"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          [xAxisLabel]="'Attempts'"
+          [yAxisLabel]="'Score %'"
+          [autoScale]="false"
+          [yScaleMin]="0"
+          [yScaleMax]="100"
+          [animations]="true">
+        </ngx-charts-line-chart>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-confirm" (click)="closeQuizResultModal()">Close</button>
     </div>
   </div>
 </div>

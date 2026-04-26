@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NoteDTO } from '../dtos/note.dto';
 import { Page } from '../dtos/page.dto';
+import { QuizResultDTO } from '../dtos/quiz-result.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,10 @@ export class NoteService {
 
   generateQuestionsWithAi(id: number, formData: FormData): Observable<NoteDTO> {
     return this.http.post<NoteDTO>(`${this.apiUrl}/${id}/ai/questions`, formData, { withCredentials: true });
+  }
+
+  submitQuizResult(id: number, payload: QuizResultDTO): Observable<QuizResultDTO> {
+    return this.http.post<QuizResultDTO>(`${this.apiUrl}/${id}/quiz-results`, payload, { withCredentials: true });
   }
 
   updateNote(id: number, note: NoteDTO): Observable<NoteDTO> {
