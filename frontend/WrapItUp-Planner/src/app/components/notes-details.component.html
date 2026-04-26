@@ -30,6 +30,83 @@
       <p class="summary-text preserve-whitespace">{{ note.summary }}</p>
     </div>
 
+    <div class="section quiz-section" *ngIf="canShowQuizArea()">
+      <h3>Quiz</h3>
+
+      <div class="quiz-toolbar">
+        <button class="btn-edit" *ngIf="hasQuiz()" (click)="toggleQuizSection()">
+          {{ isQuizOpen ? 'Hide Quiz' : 'Take a Quiz' }}
+        </button>
+        <button class="btn-share" *ngIf="canEdit && !hasQuiz()" (click)="toggleQuizGenerateSection()">
+          {{ isQuizGenerateOpen ? 'Close' : 'Generate Quiz' }}
+        </button>
+      </div>
+
+      <div class="quiz-generator" *ngIf="canEdit && !hasQuiz() && isQuizGenerateOpen">
+        <p class="info-text">Upload a document and generate 5-10 multiple-choice questions with AI.</p>
+        <input
+          #quizFileInput
+          type="file"
+          class="file-input-hidden"
+          accept=".pdf,.docx,.pptx,.txt,.md"
+          (change)="onQuizFileSelected($event)">
+        <div
+          class="dropzone"
+          [class.drag-over]="isQuizDragOver"
+          [class.disabled]="quizGenerating"
+          (click)="!quizGenerating && quizFileInput.click()"
+          (dragover)="onQuizDragOver($event)"
+          (dragleave)="onQuizDragLeave()"
+          (drop)="onQuizDrop($event)">
+          <div class="dropzone-title">Drag and drop your document</div>
+          <div class="dropzone-subtitle">or click to select a file (PDF, Word, PowerPoint, TXT, MD)</div>
+          <div class="dropzone-file" *ngIf="quizUploadFile">Selected: {{ quizUploadFile.name }}</div>
+        </div>
+        <button class="btn-confirm quiz-generate-btn" (click)="generateQuizQuestionsFromFile()" [disabled]="quizGenerating">
+          {{ quizGenerating ? 'Generating...' : 'Generate Questions' }}
+        </button>
+        <div class="ai-status" *ngIf="quizGenerating">
+          <div class="spinner"></div>
+          <div class="ai-status-text">Waiting for your quiz generation...</div>
+        </div>
+        <div class="error-message" *ngIf="quizUploadError">{{ quizUploadError }}</div>
+      </div>
+
+      <div class="quiz-content" *ngIf="hasQuiz() && isQuizOpen">
+        <p class="quiz-meta">Answer all questions and submit to see your score.</p>
+
+        <div class="quiz-question" *ngFor="let question of quizQuestions; let i = index">
+          <p class="quiz-question-title">{{ i + 1 }}. {{ question.question }}</p>
+
+          <label class="quiz-option" *ngFor="let option of question.options; let j = index"
+               [class.selected]="selectedAnswers[i] === j"
+                 [class.correct]="isCorrectAnswer(i, j)"
+                 [class.incorrect]="isIncorrectSelectedAnswer(i, j)">
+            <input type="radio"
+                   [name]="'quiz-question-' + i"
+                   [value]="j"
+                   [checked]="selectedAnswers[i] === j"
+                   [disabled]="quizSubmitted"
+                   (change)="selectAnswer(i, j)">
+            <span>{{ option }}</span>
+          </label>
+        </div>
+
+        <div class="quiz-actions">
+          <button class="btn-save" (click)="submitQuiz()" [disabled]="quizSubmitted || getAnsweredCount() !== quizQuestions.length">
+            Submit Answers
+          </button>
+          <button class="btn-cancel" (click)="resetQuiz()" *ngIf="quizSubmitted">
+            Retry Quiz
+          </button>
+        </div>
+
+        <div class="quiz-result" *ngIf="quizSubmitted">
+          Score: {{ quizScore }} / {{ quizQuestions.length }}
+        </div>
+      </div>
+    </div>
+
     <!-- Comments Section -->
     <div class="section comments-section">
       <h3>Comments ({{ totalComments }})</h3>

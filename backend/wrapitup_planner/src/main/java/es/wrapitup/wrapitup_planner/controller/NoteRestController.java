@@ -177,6 +177,38 @@ public class NoteRestController {
         }
     }
 
+    @PostMapping(value = "/{id}/ai/questions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> generateQuestionsWithAi(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to generate note questions"));
+        }
+
+        try {
+            Optional<NoteDTO> updated = noteService.generateQuizForNoteFromAi(id, file, username);
+            if (updated.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("Note not found"));
+            }
+            return ResponseEntity.ok(updated.get());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(@PathVariable Long id, @RequestBody NoteDTO noteDTO, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();

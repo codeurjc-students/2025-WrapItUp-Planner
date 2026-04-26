@@ -116,7 +116,7 @@ public class NoteService {
             title,
             aiResult.getOverview() != null ? aiResult.getOverview() : "",
             aiResult.getCompleteSummary() != null ? aiResult.getCompleteSummary() : "",
-            "",
+            aiResult.getJsonQuestions() != null ? aiResult.getJsonQuestions() : "",
             visibility != null ? visibility : NoteVisibility.PRIVATE
         );
 
@@ -126,6 +126,41 @@ public class NoteService {
 
         Note saved = noteRepository.save(note);
         return noteMapper.toDto(saved);
+    }
+
+    public Optional<NoteDTO> generateQuizForNoteFromAi(Long noteId, MultipartFile file, String username) {
+        Optional<Note> noteOpt = noteRepository.findById(noteId);
+        if (noteOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<UserModel> currentUserOpt = userRepository.findByUsername(username);
+        if (currentUserOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        UserModel currentUser = currentUserOpt.get();
+        Note note = noteOpt.get();
+
+        if (currentUser.getStatus() == UserStatus.BANNED) {
+            throw new SecurityException("Banned users cannot generate quizzes");
+        }
+
+        if (isAdmin(currentUser)) {
+            throw new SecurityException("Admins cannot generate quizzes for notes");
+        }
+
+        if (!note.getUser().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You do not have permission to generate quiz questions for this note");
+        }
+
+        String extractedText = documentTextExtractorService.extractText(file);
+        String quizJson = openAiService.generateQuizFromText(extractedText);
+        note.setJsonQuestions(quizJson);
+        note.setLastModified(LocalDateTime.now());
+
+        Note updated = noteRepository.save(note);
+        return Optional.of(noteMapper.toDto(updated));
     }
 
     public List<NoteDTO> findUsersNotesById (String username) {
