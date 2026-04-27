@@ -1,12 +1,14 @@
 package es.wrapitup.wrapitup_planner.system;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
+import es.wrapitup.wrapitup_planner.dto.QuizResultDTO;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
+import es.wrapitup.wrapitup_planner.repository.QuizScoreRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.NoteService;
 
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,9 @@ public class NoteSystemTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private QuizScoreRepository quizScoreRepository;
 
     private UserModel testUser;
     private UserModel otherUser;
@@ -335,6 +341,40 @@ public class NoteSystemTest {
         boolean result = noteService.deleteNote(999999L, "systemuser");
 
         assertFalse(result);
+    }
+
+    @Test
+    void saveQuizResultPersistsAttemptsAndReturnsProgressHistory() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Quiz Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        QuizResultDTO firstAttempt = new QuizResultDTO();
+        firstAttempt.setQuizScore(2);
+        firstAttempt.setQuizMaxScore(4);
+        QuizResultDTO firstResponse = noteService.saveQuizResult(note.getId(), "systemuser", firstAttempt);
+
+        assertNotNull(firstResponse);
+        assertEquals(1, firstResponse.getQuizProgressPercentages().size());
+        assertEquals(50.0, firstResponse.getQuizProgressPercentages().get(0), 0.001);
+
+        QuizResultDTO secondAttempt = new QuizResultDTO();
+        secondAttempt.setQuizScore(3);
+        secondAttempt.setQuizMaxScore(4);
+        QuizResultDTO secondResponse = noteService.saveQuizResult(note.getId(), "systemuser", secondAttempt);
+
+        assertNotNull(secondResponse);
+        assertEquals(2, secondResponse.getQuizProgressPercentages().size());
+        assertEquals(50.0, secondResponse.getQuizProgressPercentages().get(0), 0.001);
+        assertEquals(75.0, secondResponse.getQuizProgressPercentages().get(1), 0.001);
+        assertEquals(2, quizScoreRepository.findByNoteIdAndUserIdOrderByCreatedAtAsc(note.getId(), testUser.getId()).size());
     }
 
     // admin tests

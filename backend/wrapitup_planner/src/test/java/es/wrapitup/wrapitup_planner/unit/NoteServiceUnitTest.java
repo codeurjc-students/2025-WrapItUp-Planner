@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -20,13 +21,16 @@ import org.springframework.data.domain.PageRequest;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
 import es.wrapitup.wrapitup_planner.dto.NoteMapper;
+import es.wrapitup.wrapitup_planner.dto.QuizResultDTO;
 import es.wrapitup.wrapitup_planner.dto.AiNoteResult;
 import es.wrapitup.wrapitup_planner.model.Note;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
+import es.wrapitup.wrapitup_planner.model.QuizScore;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
+import es.wrapitup.wrapitup_planner.repository.QuizScoreRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.DocumentTextExtractorService;
 import es.wrapitup.wrapitup_planner.service.NoteService;
@@ -50,6 +54,9 @@ public class NoteServiceUnitTest {
 
     @Mock
     private DocumentTextExtractorService documentTextExtractorService;
+
+    @Mock
+    private QuizScoreRepository quizScoreRepository;
 
     @InjectMocks
     private NoteService noteService;
@@ -685,5 +692,118 @@ public class NoteServiceUnitTest {
 
         assertNotNull(result);
         verify(noteRepository).save(any(Note.class));
+    }
+
+    @Test
+    void saveQuizResultSuccessReturnsProgress() {
+        testNote.setVisibility(NoteVisibility.PUBLIC);
+
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(3);
+        input.setQuizMaxScore(5);
+
+        QuizScore first = new QuizScore(testNote, testUser, 2, 5);
+        QuizScore second = new QuizScore(testNote, testUser, 3, 5);
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(noteMapper.toDto(testNote)).thenReturn(testNoteDTO);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(quizScoreRepository.findByNoteIdAndUserIdOrderByCreatedAtAsc(1L, 1L)).thenReturn(List.of(first, second));
+
+        QuizResultDTO result = noteService.saveQuizResult(1L, "testuser", input);
+
+        assertNotNull(result);
+        assertEquals(3, result.getQuizScore());
+        assertEquals(5, result.getQuizMaxScore());
+        assertNotNull(result.getQuizProgressPercentages());
+        assertEquals(2, result.getQuizProgressPercentages().size());
+        assertEquals(40.0, result.getQuizProgressPercentages().get(0), 0.001);
+        assertEquals(60.0, result.getQuizProgressPercentages().get(1), 0.001);
+
+        verify(quizScoreRepository).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultMissingValuesThrowsIllegalArgument() {
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(null);
+        input.setQuizMaxScore(5);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.saveQuizResult(1L, "testuser", input);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultWithoutAccessThrowsSecurityException() {
+        testNote.setVisibility(NoteVisibility.PRIVATE);
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(1);
+        input.setQuizMaxScore(2);
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote));
+        when(userRepository.findByUsername("otheruser")).thenReturn(Optional.of(otherUser));
+
+        assertThrows(SecurityException.class, () -> {
+            noteService.saveQuizResult(1L, "otheruser", input);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultNullPayloadThrowsIllegalArgument() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.saveQuizResult(1L, "testuser", null);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultWithInvalidMaxScoreThrowsIllegalArgument() {
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(0);
+        input.setQuizMaxScore(0);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.saveQuizResult(1L, "testuser", input);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultWithScoreOutOfRangeThrowsIllegalArgument() {
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(6);
+        input.setQuizMaxScore(5);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.saveQuizResult(1L, "testuser", input);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
+    }
+
+    @Test
+    void saveQuizResultUserNotFoundThrowsIllegalArgument() {
+        testNote.setVisibility(NoteVisibility.PUBLIC);
+
+        QuizResultDTO input = new QuizResultDTO();
+        input.setQuizScore(1);
+        input.setQuizMaxScore(2);
+
+        when(noteRepository.findById(1L)).thenReturn(Optional.of(testNote), Optional.of(testNote));
+        when(noteMapper.toDto(testNote)).thenReturn(testNoteDTO);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            noteService.saveQuizResult(1L, "testuser", input);
+        });
+
+        verify(quizScoreRepository, never()).save(any(QuizScore.class));
     }
 }

@@ -358,4 +358,76 @@ describe('ProfileComponent', () => {
 
     expect(userServiceSpy.unbanUser).not.toHaveBeenCalled();
   });
+
+  it('should safely return when save or upload is called without required data', () => {
+    component.editedUser = null;
+    component.selectedFile = null;
+
+    component.saveChanges();
+    component.uploadImage();
+
+    expect(userServiceSpy.updateUser).not.toHaveBeenCalled();
+    expect(userServiceSpy.uploadProfileImage).not.toHaveBeenCalled();
+  });
+
+  it('should cover helper methods for role/admin/status/title/image', () => {
+    component.imagePreview = null;
+    component.user = {
+      id: 22,
+      username: 'owner',
+      email: 'owner@test.com',
+      password: '',
+      roles: ['ADMIN'],
+      status: UserStatus.BANNED,
+      image: '/api/v1/users/profile-image/22'
+    } as any;
+    component.currentUser = {
+      id: 1,
+      username: 'admin',
+      email: 'admin@test.com',
+      password: '',
+      roles: ['ADMIN']
+    } as any;
+
+    expect(component.getRoleName()).toBe('ADMIN');
+    expect(component.isAdmin()).toBeTrue();
+    expect(component.isCurrentUserAdmin()).toBeTrue();
+    expect(component.isUserBanned()).toBeTrue();
+    expect(component.getProfileTitle()).toBe("owner's Profile");
+    expect(component.getImageUrl()).toBe('https://localhost:443/api/v1/users/profile-image/22');
+
+    component.user = null;
+    expect(component.getProfileTitle()).toBe('User Profile');
+  });
+
+  it('should handle loadUserById generic client error', () => {
+    userServiceSpy.getUserById.and.returnValue(throwError(() => ({ status: 400 })));
+
+    component.loadUserById(2);
+
+    expect(component.error).toBe('Error loading user data');
+  });
+
+  it('should handle ban and unban errors by status code', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    const navSpy = spyOn(router, 'navigate');
+    component.user = { id: 15, username: 'u', email: 'e', password: '', displayName: 'U', status: UserStatus.ACTIVE } as any;
+
+    userServiceSpy.banUser.and.returnValue(throwError(() => ({ status: 500 })));
+    component.banUser();
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+
+    userServiceSpy.banUser.and.returnValue(throwError(() => ({ status: 400, error: 'Cannot ban' })));
+    component.banUser();
+    expect(component.error).toBe('Cannot ban');
+
+    component.user = { id: 15, username: 'u', email: 'e', password: '', displayName: 'U', status: UserStatus.BANNED } as any;
+    userServiceSpy.unbanUser.and.returnValue(throwError(() => ({ status: 500 })));
+    component.unbanUser();
+    expect(navSpy).toHaveBeenCalledWith(['/error']);
+
+    userServiceSpy.unbanUser.and.returnValue(throwError(() => ({ status: 400, error: 'Cannot unban' })));
+    component.unbanUser();
+    expect(component.error).toBe('Cannot unban');
+  });
 });

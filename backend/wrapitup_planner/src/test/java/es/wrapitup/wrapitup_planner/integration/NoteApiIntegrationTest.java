@@ -55,6 +55,7 @@ public class NoteApiIntegrationTest {
     private UserModel otherUser;
     private UserModel adminUser;
     private String authToken;
+    private String otherAuthToken;
     private String adminToken;
 
     @BeforeEach
@@ -104,6 +105,14 @@ public class NoteApiIntegrationTest {
             .post("/api/v1/auth/login");
 
         authToken = loginResponse.getCookie("AuthToken");
+
+        Response otherLoginResponse = given()
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"" + otherUsername + "\", \"password\":\"password123\"}")
+        .when()
+            .post("/api/v1/auth/login");
+
+        otherAuthToken = otherLoginResponse.getCookie("AuthToken");
 
         
         Response adminLoginResponse = given()
@@ -553,6 +562,143 @@ public class NoteApiIntegrationTest {
             .delete("/api/v1/notes/999999")
         .then()
             .statusCode(FORBIDDEN.value());
+    }
+
+    // quiz results tests
+
+    @Test
+    void submitQuizResultAuthenticatedSuccessReturnsProgressHistory() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Quiz Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        String firstAttempt = """
+            {
+              "quizScore": 2,
+              "quizMaxScore": 4
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", authToken)
+            .contentType(ContentType.JSON)
+            .body(firstAttempt)
+        .when()
+            .post("/api/v1/notes/" + note.getId() + "/quiz-results")
+        .then()
+            .statusCode(OK.value())
+            .body("quizScore", equalTo(2))
+            .body("quizMaxScore", equalTo(4))
+            .body("quizProgressPercentages.size()", equalTo(1))
+            .body("quizProgressPercentages[0]", equalTo(50.0f));
+
+        String secondAttempt = """
+            {
+              "quizScore": 3,
+              "quizMaxScore": 4
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", authToken)
+            .contentType(ContentType.JSON)
+            .body(secondAttempt)
+        .when()
+            .post("/api/v1/notes/" + note.getId() + "/quiz-results")
+        .then()
+            .statusCode(OK.value())
+            .body("quizScore", equalTo(3))
+            .body("quizMaxScore", equalTo(4))
+            .body("quizProgressPercentages.size()", equalTo(2))
+            .body("quizProgressPercentages[0]", equalTo(50.0f))
+            .body("quizProgressPercentages[1]", equalTo(75.0f));
+    }
+
+    @Test
+    void submitQuizResultWithoutAuthReturns401() {
+        String payload = """
+            {
+              "quizScore": 1,
+              "quizMaxScore": 2
+            }
+            """;
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload)
+        .when()
+            .post("/api/v1/notes/1/quiz-results")
+        .then()
+            .statusCode(UNAUTHORIZED.value());
+    }
+
+    @Test
+    void submitQuizResultInvalidPayloadReturns400() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Invalid Quiz Payload Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        String payload = """
+            {
+              "quizScore": 1,
+              "quizMaxScore": 0
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", authToken)
+            .contentType(ContentType.JSON)
+            .body(payload)
+        .when()
+            .post("/api/v1/notes/" + note.getId() + "/quiz-results")
+        .then()
+            .statusCode(BAD_REQUEST.value())
+            .body("message", containsString("greater than 0"));
+    }
+
+    @Test
+    void submitQuizResultPrivateNoteWithoutPermissionReturns403() {
+        Note note = new Note();
+        note.setUser(testUser);
+        note.setTitle("Private Quiz Note");
+        note.setOverview("Overview");
+        note.setSummary("Summary");
+        note.setJsonQuestions("{}");
+        note.setVisibility(NoteVisibility.PRIVATE);
+        note.setCategory(NoteCategory.OTHERS);
+        note.setLastModified(LocalDateTime.now());
+        note = noteRepository.save(note);
+
+        String payload = """
+            {
+              "quizScore": 1,
+              "quizMaxScore": 2
+            }
+            """;
+
+        given()
+            .cookie("AuthToken", otherAuthToken)
+            .contentType(ContentType.JSON)
+            .body(payload)
+        .when()
+            .post("/api/v1/notes/" + note.getId() + "/quiz-results")
+        .then()
+            .statusCode(FORBIDDEN.value())
+            .body("message", containsString("permission"));
     }
 
     // Admin tests
