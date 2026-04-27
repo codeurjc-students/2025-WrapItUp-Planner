@@ -7,4 +7,5 @@ public class AiNoteResult {
     private String title;
     private String overview;
     private String completeSummary;
+    private String jsonQuestions;
 }

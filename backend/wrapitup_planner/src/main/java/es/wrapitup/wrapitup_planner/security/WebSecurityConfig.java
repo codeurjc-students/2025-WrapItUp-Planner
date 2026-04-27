@@ -107,6 +107,9 @@ public class WebSecurityConfig {
 					.requestMatchers(HttpMethod.GET, "/api/v1/notes").hasRole("USER")
 					.requestMatchers(HttpMethod.GET, "/api/v1/notes/shared").hasRole("USER")
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/ai").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/ai/questions").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/quiz-results").hasRole("USER")
 					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*").hasRole("USER")
 					.requestMatchers(HttpMethod.PUT, "/api/v1/notes/*/share").hasRole("USER")
 					
@@ -115,7 +118,13 @@ public class WebSecurityConfig {
 					
 					.requestMatchers(HttpMethod.GET, "/api/v1/notes/*/comments").hasAnyRole("USER", "ADMIN")
 					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/comments").hasAnyRole("USER", "ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/v1/notes/*/comments/*/report").hasAnyRole("USER", "ADMIN")
 					.requestMatchers(HttpMethod.DELETE, "/api/v1/notes/*/comments/*").hasAnyRole("USER", "ADMIN")
+
+					// Reported comments moderation - ADMIN only
+					.requestMatchers(HttpMethod.GET, "/api/v1/admin/reported-comments").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/v1/admin/reported-comments/*/unreport").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/v1/admin/reported-comments/*").hasRole("ADMIN")
 
 					// Calendar - USER only 
 					.requestMatchers(HttpMethod.GET, "/api/v1/calendar/**").hasRole("USER")

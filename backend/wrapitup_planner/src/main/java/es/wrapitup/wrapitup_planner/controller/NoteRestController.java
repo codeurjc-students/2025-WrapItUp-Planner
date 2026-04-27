@@ -15,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.wrapitup.wrapitup_planner.dto.NoteDTO;
+import es.wrapitup.wrapitup_planner.dto.QuizResultDTO;
 import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.service.NoteService;
@@ -177,6 +178,38 @@ public class NoteRestController {
         }
     }
 
+    @PostMapping(value = "/{id}/ai/questions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> generateQuestionsWithAi(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to generate note questions"));
+        }
+
+        try {
+            Optional<NoteDTO> updated = noteService.generateQuizForNoteFromAi(id, file, username);
+            if (updated.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("Note not found"));
+            }
+            return ResponseEntity.ok(updated.get());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(@PathVariable Long id, @RequestBody NoteDTO noteDTO, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
@@ -237,6 +270,28 @@ public class NoteRestController {
                     .body(new ErrorResponse("You do not have permission to delete this note"));
         }
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/quiz-results")
+    public ResponseEntity<?> submitQuizResult(@PathVariable Long id, @RequestBody QuizResultDTO quizResultDTO, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        String username = principal != null ? principal.getName() : null;
+
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("You must log in to save quiz results"));
+        }
+
+        try {
+            QuizResultDTO response = noteService.saveQuizResult(id, username, quizResultDTO);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     static class ShareRequest {

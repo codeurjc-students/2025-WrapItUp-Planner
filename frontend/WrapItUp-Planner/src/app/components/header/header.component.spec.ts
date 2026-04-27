@@ -78,6 +78,15 @@ describe('HeaderComponent', () => {
     expect(component.isAdmin).toBeFalse();
   });
 
+  it('should set unauthenticated when service returns null user', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(of(null as any));
+
+    component.checkAuthentication();
+
+    expect(component.isAuthenticated).toBeFalse();
+    expect(component.isAdmin).toBeFalse();
+  });
+
   it('should navigate home on goHome', () => {
     const navSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 

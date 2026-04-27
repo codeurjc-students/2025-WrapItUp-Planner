@@ -4,8 +4,17 @@ import { NoteService } from '../services/note.service';
 import { UserService } from '../services/user.service';
 import { CommentService } from '../services/comment.service';
 import { NoteDTO, NoteCategory } from '../dtos/note.dto';
+import { QuizResultDTO } from '../dtos/quiz-result.dto';
 import { UserModelDTO } from '../dtos/user.dto';
 import { CommentDTO } from '../dtos/comment.dto';
+import { finalize } from 'rxjs';
+import { Observable, catchError, forkJoin, of } from 'rxjs';
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+}
 
 @Component({
   selector: 'app-note-detail',
@@ -44,6 +53,24 @@ export class NoteDetailComponent implements OnInit {
   loadingComments = false;
   showCommentMenu: number | null = null;
 
+  // Quiz
+  quizQuestions: QuizQuestion[] = [];
+  selectedAnswers: number[] = [];
+  quizSubmitted = false;
+  quizScore = 0;
+  quizUploadFile: File | null = null;
+  quizUploadError = '';
+  quizGenerating = false;
+  isQuizOpen = false;
+  isQuizGenerateOpen = false;
+  isQuizDragOver = false;
+  readonly quizSupportedExtensions = ['txt', 'md', 'pdf', 'docx', 'pptx'];
+  showQuizResultModal = false;
+  showQuizProgressChart = false;
+  quizResultMessage = '';
+  quizChartData: { name: string; series: { name: string; value: number }[] }[] = [];
+  quizSubmitError = '';
+
   constructor(
     private route: ActivatedRoute,
     private noteService: NoteService,
@@ -76,18 +103,20 @@ export class NoteDetailComponent implements OnInit {
   }
 
   fetchNote(): void {
-    this.noteService.getNoteById(this.noteId).subscribe({
+    forkJoin({
+      note: this.noteService.getNoteById(this.noteId),
+      currentUser: this.getCurrentUserSafe()
+    }).subscribe({
       next: (data) => {
-        this.note = data;
-        this.editedTitle = data.title || '';
-        this.editedOverview = data.overview || '';
-        this.editedSummary = data.summary || '';
-        this.editedVisibility = data.visibility || 'PRIVATE';
-        this.editedCategory = data.category || 'OTHERS';
-        this.editedSummary = data.summary || '';
-        this.editedVisibility = data.visibility || 'PRIVATE';
-        
-        this.loadCurrentUser();
+        this.note = data.note;
+        this.currentUser = data.currentUser ?? undefined;
+        this.editedTitle = data.note.title || '';
+        this.editedOverview = data.note.overview || '';
+        this.editedSummary = data.note.summary || '';
+        this.editedVisibility = data.note.visibility || 'PRIVATE';
+        this.editedCategory = data.note.category || 'OTHERS';
+        this.parseQuizQuestions(data.note.jsonQuestions);
+        this.checkPermissions();
         this.loadComments();
       },
       error: (err) => {
@@ -403,5 +432,300 @@ export class NoteDetailComponent implements OnInit {
         }
       }
     });
+  }
+
+  onQuizFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.quizUploadError = '';
+
+    if (!file) {
+      this.quizUploadFile = null;
+      return;
+    }
+
+    const extension = this.getFileExtension(file.name);
+    if (!extension || !this.quizSupportedExtensions.includes(extension)) {
+      this.quizUploadFile = null;
+      this.quizUploadError = 'Unsupported file type. Use PDF, Word, PowerPoint, TXT, or MD.';
+      return;
+    }
+
+    this.quizUploadFile = file;
+  }
+
+  onQuizDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (!this.quizGenerating) {
+      this.isQuizDragOver = true;
+    }
+  }
+
+  onQuizDragLeave(): void {
+    this.isQuizDragOver = false;
+  }
+
+  onQuizDrop(event: DragEvent): void {
+    event.preventDefault();
+    if (this.quizGenerating) {
+      return;
+    }
+
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    this.isQuizDragOver = false;
+    this.quizUploadError = '';
+
+    if (!file) {
+      this.quizUploadFile = null;
+      return;
+    }
+
+    const extension = this.getFileExtension(file.name);
+    if (!extension || !this.quizSupportedExtensions.includes(extension)) {
+      this.quizUploadFile = null;
+      this.quizUploadError = 'Unsupported file type. Use PDF, Word, PowerPoint, TXT, or MD.';
+      return;
+    }
+
+    this.quizUploadFile = file;
+  }
+
+  toggleQuizSection(): void {
+    this.isQuizOpen = !this.isQuizOpen;
+  }
+
+  toggleQuizGenerateSection(): void {
+    if (!this.canEdit || this.hasQuiz()) {
+      return;
+    }
+    this.isQuizGenerateOpen = !this.isQuizGenerateOpen;
+    if (!this.isQuizGenerateOpen) {
+      this.quizUploadFile = null;
+      this.quizUploadError = '';
+      this.isQuizDragOver = false;
+    }
+  }
+
+  generateQuizQuestionsFromFile(): void {
+    if (!this.canEdit) {
+      alert('You do not have permission to generate quiz questions for this note');
+      return;
+    }
+
+    if (!this.quizUploadFile) {
+      this.quizUploadError = 'Please select a file first';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.quizUploadFile);
+
+    this.quizGenerating = true;
+    this.noteService.generateQuestionsWithAi(this.noteId, formData)
+      .pipe(finalize(() => {
+        this.quizGenerating = false;
+      }))
+      .subscribe({
+        next: (updatedNote) => {
+          this.note = updatedNote;
+          this.quizUploadFile = null;
+          this.quizUploadError = '';
+          this.isQuizGenerateOpen = false;
+          this.isQuizOpen = true;
+          this.parseQuizQuestions(updatedNote.jsonQuestions);
+          alert('Quiz questions generated successfully');
+        },
+        error: (err) => {
+          console.error('Error generating quiz questions:', err);
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          } else if (err.error && err.error.message) {
+            this.quizUploadError = err.error.message;
+          } else {
+            this.quizUploadError = 'Error generating quiz questions';
+          }
+        }
+      });
+  }
+
+  selectAnswer(questionIndex: number, optionIndex: number): void {
+    this.selectedAnswers[questionIndex] = optionIndex;
+    if (this.quizSubmitError) {
+      this.quizSubmitError = '';
+    }
+  }
+
+  submitQuiz(): void {
+    if (this.quizQuestions.length === 0) {
+      return;
+    }
+
+    if (this.getAnsweredCount() !== this.quizQuestions.length) {
+      this.quizSubmitError = 'Please answer all the questions before submitting';
+      return;
+    }
+
+    this.quizSubmitError = '';
+
+    this.quizScore = this.quizQuestions.reduce((score, question, index) => {
+      return score + (this.selectedAnswers[index] === question.correctOptionIndex ? 1 : 0);
+    }, 0);
+    this.quizSubmitted = true;
+
+    if (!this.currentUser) {
+      this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+      this.showQuizProgressChart = false;
+      this.quizChartData = [];
+      this.showQuizResultModal = true;
+      return;
+    }
+
+    const payload: QuizResultDTO = {
+      quizScore: this.quizScore,
+      quizMaxScore: this.quizQuestions.length
+    };
+
+    this.noteService.submitQuizResult(this.noteId, payload).subscribe({
+      next: (response) => {
+        this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+        const history = response.quizProgressPercentages ?? [];
+
+        this.showQuizProgressChart = history.length > 0;
+        this.quizChartData = this.showQuizProgressChart
+          ? [{
+              name: 'Progress',
+              series: history.map((value, index) => ({
+                name: `Attempt ${index + 1}`,
+                value: Number(value.toFixed(2))
+              }))
+            }]
+          : [];
+
+        this.showQuizResultModal = true;
+      },
+      error: () => {
+        this.quizResultMessage = `Score: ${this.quizScore} / ${this.quizQuestions.length}`;
+        this.showQuizProgressChart = false;
+        this.quizChartData = [];
+        this.showQuizResultModal = true;
+      }
+    });
+  }
+
+  closeQuizResultModal(): void {
+    this.showQuizResultModal = false;
+  }
+
+  resetQuiz(): void {
+    this.selectedAnswers = new Array(this.quizQuestions.length).fill(-1);
+    this.quizSubmitted = false;
+    this.quizScore = 0;
+    this.quizSubmitError = '';
+  }
+
+  getAnsweredCount(): number {
+    return this.selectedAnswers.filter((answer) => answer >= 0).length;
+  }
+
+  hasQuiz(): boolean {
+    return this.quizQuestions.length > 0;
+  }
+
+  canShowQuizArea(): boolean {
+    return this.hasQuiz() || this.canEdit;
+  }
+
+  isCorrectAnswer(questionIndex: number, optionIndex: number): boolean {
+    if (!this.quizSubmitted) {
+      return false;
+    }
+    return this.quizQuestions[questionIndex]?.correctOptionIndex === optionIndex;
+  }
+
+  isIncorrectSelectedAnswer(questionIndex: number, optionIndex: number): boolean {
+    if (!this.quizSubmitted) {
+      return false;
+    }
+
+    return this.selectedAnswers[questionIndex] === optionIndex && !this.isCorrectAnswer(questionIndex, optionIndex);
+  }
+
+  private parseQuizQuestions(jsonQuestions: string | undefined): void {
+    this.quizQuestions = [];
+    this.selectedAnswers = [];
+    this.quizSubmitted = false;
+    this.quizScore = 0;
+    this.quizSubmitError = '';
+
+    if (!jsonQuestions || !jsonQuestions.trim()) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(jsonQuestions) as unknown;
+      if (!parsed || typeof parsed !== 'object' || !('questions' in parsed)) {
+        return;
+      }
+
+      const questions = (parsed as { questions?: unknown }).questions;
+      if (!Array.isArray(questions)) {
+        return;
+      }
+
+      const normalizedQuestions = questions
+        .filter((question): question is QuizQuestion => this.isValidQuizQuestion(question))
+        .slice(0, 10);
+
+      if (normalizedQuestions.length === 0) {
+        return;
+      }
+
+      this.quizQuestions = normalizedQuestions;
+      this.selectedAnswers = new Array(this.quizQuestions.length).fill(-1);
+    } catch (err) {
+      console.error('Error parsing quiz questions JSON:', err);
+    }
+  }
+
+  private isValidQuizQuestion(question: unknown): question is QuizQuestion {
+    if (!question || typeof question !== 'object') {
+      return false;
+    }
+
+    const candidate = question as { question?: unknown; options?: unknown; correctOptionIndex?: unknown };
+    if (typeof candidate.question !== 'string' || !candidate.question.trim()) {
+      return false;
+    }
+
+    if (!Array.isArray(candidate.options) || candidate.options.length !== 4) {
+      return false;
+    }
+
+    if (candidate.options.some((option) => typeof option !== 'string' || !option.trim())) {
+      return false;
+    }
+
+    if (typeof candidate.correctOptionIndex !== 'number') {
+      return false;
+    }
+
+    return candidate.correctOptionIndex >= 0 && candidate.correctOptionIndex <= 3;
+  }
+
+  private getFileExtension(filename: string): string {
+    const parts = filename.toLowerCase().split('.');
+    return parts.length > 1 ? parts[parts.length - 1] : '';
+  }
+
+  private getCurrentUserSafe(): Observable<UserModelDTO | null> {
+    try {
+      const request = this.userService.getCurrentUser();
+      if (!request) {
+        return of(null);
+      }
+      return request.pipe(catchError(() => of(null)));
+    } catch {
+      return of(null);
+    }
   }
 }

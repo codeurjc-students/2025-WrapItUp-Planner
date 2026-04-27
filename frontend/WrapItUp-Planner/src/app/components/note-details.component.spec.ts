@@ -69,7 +69,14 @@ describe('NoteDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    mockNoteService = jasmine.createSpyObj('NoteService', ['getNoteById', 'updateNote', 'shareNoteByUsername', 'deleteNote']);
+    mockNoteService = jasmine.createSpyObj('NoteService', [
+      'getNoteById',
+      'updateNote',
+      'shareNoteByUsername',
+      'deleteNote',
+      'submitQuizResult',
+      'generateQuestionsWithAi'
+    ]);
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
     mockCommentService = jasmine.createSpyObj('CommentService', ['getCommentsByNote', 'createComment', 'deleteComment', 'reportComment']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
@@ -463,6 +470,527 @@ describe('NoteDetailComponent', () => {
   it('should handle getProfilePicUrl with url', () => {
     const comment = { id: 1, content: 'x', noteId: 1, username: 'u', displayName: 'd', createdAt: '2025-01-01T10:00:00', userProfilePicUrl: '/img.png' } as CommentDTO;
     expect(component.getProfilePicUrl(comment)).toBe('https://localhost/img.png');
+  });
+
+  describe('Quiz functionality', () => {
+    const quizNote: NoteDTO = {
+      ...testNote,
+      jsonQuestions: JSON.stringify({
+        questions: [
+          {
+            question: 'Question 1',
+            options: ['A', 'B', 'C', 'D'],
+            correctOptionIndex: 1
+          },
+          {
+            question: 'Question 2',
+            options: ['A', 'B', 'C', 'D'],
+            correctOptionIndex: 2
+          }
+        ]
+      })
+    };
+
+    it('should require all answers before submitting quiz', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.submitQuiz();
+
+      expect(component.quizSubmitError).toBe('Please answer all the questions before submitting');
+      expect(mockNoteService.submitQuizResult).not.toHaveBeenCalled();
+    });
+
+    it('should show score only for anonymous users', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 2);
+      component.submitQuiz();
+
+      expect(component.showQuizResultModal).toBe(true);
+      expect(component.showQuizProgressChart).toBe(false);
+      expect(component.quizChartData).toEqual([]);
+      expect(component.quizResultMessage).toBe('Score: 2 / 2');
+      expect(mockNoteService.submitQuizResult).not.toHaveBeenCalled();
+    });
+
+    it('should show progress chart for authenticated users when history exists', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      mockNoteService.submitQuizResult.and.returnValue(of({
+        quizScore: 2,
+        quizMaxScore: 2,
+        quizProgressPercentages: [50, 66.666]
+      }));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 2);
+      component.submitQuiz();
+
+      expect(mockNoteService.submitQuizResult).toHaveBeenCalledWith(1, {
+        quizScore: 2,
+        quizMaxScore: 2
+      });
+      expect(component.showQuizResultModal).toBe(true);
+      expect(component.showQuizProgressChart).toBe(true);
+      expect(component.quizChartData).toEqual([
+        {
+          name: 'Progress',
+          series: [
+            { name: 'Attempt 1', value: 50 },
+            { name: 'Attempt 2', value: 66.67 }
+          ]
+        }
+      ]);
+    });
+
+    it('should hide progress chart for authenticated users when history is empty', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      mockNoteService.submitQuizResult.and.returnValue(of({
+        quizScore: 1,
+        quizMaxScore: 2,
+        quizProgressPercentages: []
+      }));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 3);
+      component.submitQuiz();
+
+      expect(component.showQuizResultModal).toBe(true);
+      expect(component.showQuizProgressChart).toBe(false);
+      expect(component.quizChartData).toEqual([]);
+      expect(component.quizResultMessage).toBe('Score: 1 / 2');
+    });
+
+    it('should show fallback result when quiz submit request fails', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      mockNoteService.submitQuizResult.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 2);
+      component.submitQuiz();
+
+      expect(component.showQuizResultModal).toBe(true);
+      expect(component.showQuizProgressChart).toBe(false);
+      expect(component.quizChartData).toEqual([]);
+      expect(component.quizResultMessage).toBe('Score: 2 / 2');
+    });
+
+    it('should clear submit error when selecting an answer', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.quizSubmitError = 'Please answer all the questions before submitting';
+      component.selectAnswer(0, 0);
+
+      expect(component.quizSubmitError).toBe('');
+      expect(component.selectedAnswers[0]).toBe(0);
+    });
+
+    it('should reset quiz state correctly', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      mockNoteService.submitQuizResult.and.returnValue(of({
+        quizScore: 2,
+        quizMaxScore: 2,
+        quizProgressPercentages: [100]
+      }));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 2);
+      component.submitQuiz();
+
+      component.resetQuiz();
+
+      expect(component.quizSubmitted).toBe(false);
+      expect(component.quizScore).toBe(0);
+      expect(component.quizSubmitError).toBe('');
+      expect(component.selectedAnswers).toEqual([-1, -1]);
+    });
+
+    it('should not submit quiz when there are no questions', () => {
+      component.quizQuestions = [];
+      component.submitQuiz();
+
+      expect(mockNoteService.submitQuizResult).not.toHaveBeenCalled();
+      expect(component.showQuizResultModal).toBe(false);
+    });
+
+    it('should close quiz result modal', () => {
+      component.showQuizResultModal = true;
+      component.closeQuizResultModal();
+      expect(component.showQuizResultModal).toBe(false);
+    });
+
+    it('should evaluate correct and incorrect selected answers only after submission', () => {
+      mockNoteService.getNoteById.and.returnValue(of(quizNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+      mockNoteService.submitQuizResult.and.returnValue(of({
+        quizScore: 1,
+        quizMaxScore: 2,
+        quizProgressPercentages: [50]
+      }));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.isCorrectAnswer(0, 1)).toBe(false);
+      expect(component.isIncorrectSelectedAnswer(0, 0)).toBe(false);
+
+      component.selectAnswer(0, 1);
+      component.selectAnswer(1, 0);
+      component.submitQuiz();
+
+      expect(component.isCorrectAnswer(0, 1)).toBe(true);
+      expect(component.isIncorrectSelectedAnswer(1, 0)).toBe(true);
+    });
+
+    it('should return answered count from selected answers', () => {
+      component.selectedAnswers = [0, -1, 2, -1];
+      expect(component.getAnsweredCount()).toBe(2);
+    });
+
+    it('should derive hasQuiz and canShowQuizArea states', () => {
+      component.quizQuestions = [];
+      component.canEdit = false;
+      expect(component.hasQuiz()).toBe(false);
+      expect(component.canShowQuizArea()).toBe(false);
+
+      component.canEdit = true;
+      expect(component.canShowQuizArea()).toBe(true);
+
+      component.canEdit = false;
+      component.quizQuestions = [{ question: 'Q', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 }];
+      expect(component.hasQuiz()).toBe(true);
+      expect(component.canShowQuizArea()).toBe(true);
+    });
+
+    it('should toggle quiz open section', () => {
+      expect(component.isQuizOpen).toBe(false);
+      component.toggleQuizSection();
+      expect(component.isQuizOpen).toBe(true);
+      component.toggleQuizSection();
+      expect(component.isQuizOpen).toBe(false);
+    });
+
+    it('should not open generate quiz section when user cannot edit', () => {
+      component.canEdit = false;
+      component.quizQuestions = [];
+
+      component.toggleQuizGenerateSection();
+
+      expect(component.isQuizGenerateOpen).toBe(false);
+    });
+
+    it('should not open generate quiz section when quiz already exists', () => {
+      component.canEdit = true;
+      component.quizQuestions = [{ question: 'Q', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 }];
+
+      component.toggleQuizGenerateSection();
+
+      expect(component.isQuizGenerateOpen).toBe(false);
+    });
+
+    it('should toggle generate quiz section and reset upload state on close', () => {
+      component.canEdit = true;
+      component.quizQuestions = [];
+      component.quizUploadFile = new File(['x'], 'doc.txt', { type: 'text/plain' });
+      component.quizUploadError = 'err';
+      component.isQuizDragOver = true;
+
+      component.toggleQuizGenerateSection();
+      expect(component.isQuizGenerateOpen).toBe(true);
+
+      component.toggleQuizGenerateSection();
+      expect(component.isQuizGenerateOpen).toBe(false);
+      expect(component.quizUploadFile).toBeNull();
+      expect(component.quizUploadError).toBe('');
+      expect(component.isQuizDragOver).toBe(false);
+    });
+
+    it('should handle quiz file select with no file', () => {
+      const event = { target: { files: [] } } as unknown as Event;
+
+      component.onQuizFileSelected(event);
+
+      expect(component.quizUploadFile).toBeNull();
+      expect(component.quizUploadError).toBe('');
+    });
+
+    it('should reject unsupported quiz file extension on select', () => {
+      const file = new File(['x'], 'bad.exe', { type: 'application/octet-stream' });
+      const event = { target: { files: [file] } } as unknown as Event;
+
+      component.onQuizFileSelected(event);
+
+      expect(component.quizUploadFile).toBeNull();
+      expect(component.quizUploadError).toContain('Unsupported file type');
+    });
+
+    it('should accept supported quiz file extension on select', () => {
+      const file = new File(['x'], 'note.pdf', { type: 'application/pdf' });
+      const event = { target: { files: [file] } } as unknown as Event;
+
+      component.onQuizFileSelected(event);
+
+      expect(component.quizUploadFile).toEqual(file);
+      expect(component.quizUploadError).toBe('');
+    });
+
+    it('should set drag-over state only when not generating', () => {
+      const preventDefault = jasmine.createSpy('preventDefault');
+      const dragEvent = { preventDefault } as unknown as DragEvent;
+
+      component.quizGenerating = false;
+      component.onQuizDragOver(dragEvent);
+      expect(component.isQuizDragOver).toBe(true);
+
+      component.isQuizDragOver = false;
+      component.quizGenerating = true;
+      component.onQuizDragOver(dragEvent);
+      expect(component.isQuizDragOver).toBe(false);
+    });
+
+    it('should reset drag-over state on drag leave', () => {
+      component.isQuizDragOver = true;
+      component.onQuizDragLeave();
+      expect(component.isQuizDragOver).toBe(false);
+    });
+
+    it('should ignore quiz drop when generating', () => {
+      const preventDefault = jasmine.createSpy('preventDefault');
+      const file = new File(['x'], 'note.pdf', { type: 'application/pdf' });
+      const dragEvent = {
+        preventDefault,
+        dataTransfer: { files: [file] }
+      } as unknown as DragEvent;
+
+      component.quizGenerating = true;
+      component.onQuizDrop(dragEvent);
+
+      expect(component.quizUploadFile).toBeNull();
+    });
+
+    it('should handle quiz drop with no file', () => {
+      const preventDefault = jasmine.createSpy('preventDefault');
+      const dragEvent = {
+        preventDefault,
+        dataTransfer: { files: [] }
+      } as unknown as DragEvent;
+
+      component.quizGenerating = false;
+      component.isQuizDragOver = true;
+      component.quizUploadError = 'old';
+      component.onQuizDrop(dragEvent);
+
+      expect(component.isQuizDragOver).toBe(false);
+      expect(component.quizUploadError).toBe('');
+      expect(component.quizUploadFile).toBeNull();
+    });
+
+    it('should reject unsupported quiz drop file', () => {
+      const preventDefault = jasmine.createSpy('preventDefault');
+      const file = new File(['x'], 'note.zip', { type: 'application/zip' });
+      const dragEvent = {
+        preventDefault,
+        dataTransfer: { files: [file] }
+      } as unknown as DragEvent;
+
+      component.quizGenerating = false;
+      component.onQuizDrop(dragEvent);
+
+      expect(component.quizUploadFile).toBeNull();
+      expect(component.quizUploadError).toContain('Unsupported file type');
+    });
+
+    it('should accept supported quiz drop file', () => {
+      const preventDefault = jasmine.createSpy('preventDefault');
+      const file = new File(['x'], 'note.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+      const dragEvent = {
+        preventDefault,
+        dataTransfer: { files: [file] }
+      } as unknown as DragEvent;
+
+      component.quizGenerating = false;
+      component.onQuizDrop(dragEvent);
+
+      expect(component.quizUploadFile).toEqual(file);
+      expect(component.quizUploadError).toBe('');
+    });
+
+    it('should block quiz generation when user cannot edit', () => {
+      spyOn(window, 'alert');
+      component.canEdit = false;
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(window.alert).toHaveBeenCalledWith('You do not have permission to generate quiz questions for this note');
+      expect(mockNoteService.generateQuestionsWithAi).not.toHaveBeenCalled();
+    });
+
+    it('should require a file before quiz generation', () => {
+      component.canEdit = true;
+      component.quizUploadFile = null;
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(component.quizUploadError).toBe('Please select a file first');
+      expect(mockNoteService.generateQuestionsWithAi).not.toHaveBeenCalled();
+    });
+
+    it('should generate quiz successfully and open quiz section', () => {
+      const generatedNote: NoteDTO = {
+        ...testNote,
+        jsonQuestions: JSON.stringify({
+          questions: [
+            { question: 'New Q', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 }
+          ]
+        })
+      };
+      const file = new File(['x'], 'source.txt', { type: 'text/plain' });
+      spyOn(window, 'alert');
+      component.canEdit = true;
+      component.quizUploadFile = file;
+      component.isQuizGenerateOpen = true;
+      mockNoteService.generateQuestionsWithAi.and.returnValue(of(generatedNote));
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(mockNoteService.generateQuestionsWithAi).toHaveBeenCalled();
+      expect(component.quizGenerating).toBe(false);
+      expect(component.isQuizGenerateOpen).toBe(false);
+      expect(component.isQuizOpen).toBe(true);
+      expect(component.quizUploadFile).toBeNull();
+      expect(component.quizQuestions.length).toBe(1);
+      expect(window.alert).toHaveBeenCalledWith('Quiz questions generated successfully');
+    });
+
+    it('should route to error on quiz generation server error', () => {
+      const file = new File(['x'], 'source.txt', { type: 'text/plain' });
+      component.canEdit = true;
+      component.quizUploadFile = file;
+      mockNoteService.generateQuestionsWithAi.and.returnValue(throwError(() => ({ status: 500 })));
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(component.quizGenerating).toBe(false);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should show backend message on quiz generation client error', () => {
+      const file = new File(['x'], 'source.txt', { type: 'text/plain' });
+      component.canEdit = true;
+      component.quizUploadFile = file;
+      mockNoteService.generateQuestionsWithAi.and.returnValue(throwError(() => ({ status: 400, error: { message: 'Invalid content' } })));
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(component.quizGenerating).toBe(false);
+      expect(component.quizUploadError).toBe('Invalid content');
+    });
+
+    it('should show generic message on quiz generation unknown client error', () => {
+      const file = new File(['x'], 'source.txt', { type: 'text/plain' });
+      component.canEdit = true;
+      component.quizUploadFile = file;
+      mockNoteService.generateQuestionsWithAi.and.returnValue(throwError(() => ({ status: 400 })));
+
+      component.generateQuizQuestionsFromFile();
+
+      expect(component.quizGenerating).toBe(false);
+      expect(component.quizUploadError).toBe('Error generating quiz questions');
+    });
+
+    it('should parse invalid quiz payloads as empty quiz', () => {
+      mockNoteService.getNoteById.and.returnValue(of({ ...testNote, jsonQuestions: 'not-json' }));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.quizQuestions).toEqual([]);
+      expect(component.selectedAnswers).toEqual([]);
+    });
+
+    it('should ignore quiz payload with invalid question schema', () => {
+      const invalidSchemaNote: NoteDTO = {
+        ...testNote,
+        jsonQuestions: JSON.stringify({
+          questions: [
+            { question: '', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 1 },
+            { question: 'q', options: ['A', 'B'], correctOptionIndex: 1 },
+            { question: 'q', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 9 }
+          ]
+        })
+      };
+
+      mockNoteService.getNoteById.and.returnValue(of(invalidSchemaNote));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.quizQuestions).toEqual([]);
+      expect(component.selectedAnswers).toEqual([]);
+    });
+
+    it('should cap parsed quiz questions to 10 items', () => {
+      const manyQuestions = Array.from({ length: 12 }).map((_, index) => ({
+        question: `Question ${index}`,
+        options: ['A', 'B', 'C', 'D'],
+        correctOptionIndex: 0
+      }));
+
+      mockNoteService.getNoteById.and.returnValue(of({
+        ...testNote,
+        jsonQuestions: JSON.stringify({ questions: manyQuestions })
+      }));
+      mockUserService.getCurrentUser.and.returnValue(of(testUser));
+      mockCommentService.getCommentsByNote.and.returnValue(of(testCommentsPage));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.quizQuestions.length).toBe(10);
+      expect(component.selectedAnswers.length).toBe(10);
+      expect(component.selectedAnswers.every(answer => answer === -1)).toBeTrue();
+    });
   });
 
   // Comment Tests

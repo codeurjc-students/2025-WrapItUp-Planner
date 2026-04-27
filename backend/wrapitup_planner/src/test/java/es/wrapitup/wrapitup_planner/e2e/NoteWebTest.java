@@ -405,6 +405,33 @@ public class NoteWebTest extends BaseWebTest {
                    commentAuthor.getText().length() > 0);
     }
 
+        @Test
+        void testOwnerSeesGenerateQuizButtonWhenNoteHasNoQuiz() {
+                long ts = System.currentTimeMillis();
+                String username = "quizOwner" + ts;
+                String email = "quizOwner+" + ts + "@example.com";
+                String password = "Password123";
+                String noteTitle = "Quiz Owner Note " + ts;
+
+                registerAndLogin(username, email, password);
+
+                driver.get(getBaseUrl() + "notes/create");
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-container")));
+
+                driver.findElement(By.id("title")).sendKeys(noteTitle);
+                driver.findElement(By.id("overview")).sendKeys("Owner should see quiz generation controls");
+                driver.findElement(By.id("summary")).sendKeys("No quiz JSON initially");
+                driver.findElement(By.cssSelector(".btn-create")).click();
+
+                wait.until(ExpectedConditions.alertIsPresent()).accept();
+                wait.until(ExpectedConditions.urlContains("/notes/"));
+
+                WebElement generateQuizButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//button[contains(@class,'btn-share') and normalize-space()='Generate Quiz']")));
+
+                assertTrue(generateQuizButton.isDisplayed());
+        }
+
     @Test
     void testDeleteComment() {
         long ts = System.currentTimeMillis();
