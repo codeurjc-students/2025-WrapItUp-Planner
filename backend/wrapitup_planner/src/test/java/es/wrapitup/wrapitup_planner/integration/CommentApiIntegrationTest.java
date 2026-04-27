@@ -500,7 +500,7 @@ public class CommentApiIntegrationTest {
             .get("/api/v1/admin/reported-comments")
         .then()
             .statusCode(FORBIDDEN.value())
-            .body("message", containsString("Only admins can view reported comments"));
+            .body("message", containsString("Forbidden"));
     }
 
     @Test
@@ -510,7 +510,7 @@ public class CommentApiIntegrationTest {
             .get("/api/v1/admin/reported-comments")
         .then()
             .statusCode(UNAUTHORIZED.value())
-            .body("message", containsString("You must log in to view reported comments"));
+            .body("message", containsString("Full authentication is required to access this resource"));
     }
 
     @Test
@@ -540,7 +540,7 @@ public class CommentApiIntegrationTest {
             .post("/api/v1/admin/reported-comments/" + reportedComment.getId() + "/unreport")
         .then()
             .statusCode(FORBIDDEN.value())
-            .body("message", containsString("Only admins can unreport comments"));
+            .body("message", containsString("Forbidden"));
     }
 
     @Test
@@ -554,7 +554,7 @@ public class CommentApiIntegrationTest {
             .post("/api/v1/admin/reported-comments/" + reportedComment.getId() + "/unreport")
         .then()
             .statusCode(UNAUTHORIZED.value())
-            .body("message", containsString("You must log in to unreport comments"));
+            .body("message", containsString("Full authentication is required to access this resource"));
     }
 
     @Test
@@ -583,7 +583,7 @@ public class CommentApiIntegrationTest {
             .delete("/api/v1/admin/reported-comments/" + reportedComment.getId())
         .then()
             .statusCode(FORBIDDEN.value())
-            .body("message", containsString("Only admins can delete comments from this view"));
+            .body("message", containsString("Forbidden"));
     }
 
     @Test
@@ -597,7 +597,7 @@ public class CommentApiIntegrationTest {
             .delete("/api/v1/admin/reported-comments/" + reportedComment.getId())
         .then()
             .statusCode(UNAUTHORIZED.value())
-            .body("message", containsString("You must log in to delete comments"));
+            .body("message", containsString("Full authentication is required to access this resource"));
     }
 
     @Test
