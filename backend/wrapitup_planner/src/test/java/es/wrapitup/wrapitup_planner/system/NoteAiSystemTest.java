@@ -12,6 +12,8 @@ import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
+import es.wrapitup.wrapitup_planner.repository.CommentRepository;
+import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.DocumentTextExtractorService;
 import es.wrapitup.wrapitup_planner.service.NoteService;
@@ -37,6 +39,12 @@ public class NoteAiSystemTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
+
     @MockBean
     private OpenAiService openAiService;
 
@@ -49,6 +57,8 @@ public class NoteAiSystemTest {
 
     @BeforeEach
     void setUp() {
+        commentRepository.deleteAll();
+        noteRepository.deleteAll();
         userRepository.deleteAll();
 
         testUser = new UserModel();
