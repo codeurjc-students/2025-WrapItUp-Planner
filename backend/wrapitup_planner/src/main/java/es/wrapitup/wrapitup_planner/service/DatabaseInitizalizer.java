@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -97,6 +98,19 @@ public class DatabaseInitizalizer {
         secondUser.setImage("/api/v1/users/profile-image/" + secondUser.getId());
         userRepository.save(secondUser);
 
+        // User 3: thirdUser
+        UserModel thirdUser = new UserModel(
+            "thirdUser",
+            "thirdUser@example.com",
+            passwordEncoder.encode("12345678"),
+            UserStatus.ACTIVE,
+            "USER"
+        );
+        thirdUser.setProfilePic(saveImageFromFile("images/calendar.jpg"));
+        userRepository.save(thirdUser);
+        thirdUser.setImage("/api/v1/users/profile-image/" + thirdUser.getId());
+        userRepository.save(thirdUser);
+
         // admin
         UserModel admin = new UserModel(
             "admin", 
@@ -109,12 +123,140 @@ public class DatabaseInitizalizer {
         userRepository.save(admin);
 
         // Notes for genericUser
-        Note note1 = new Note(
+                String note1JsonQuestions = """
+                        {
+                            "questions": [
+                                {
+                                    "question": "What kind of triangle does the Pythagorean theorem apply to?",
+                                    "options": ["Equilateral triangle", "Right triangle", "Isosceles triangle", "Scalene triangle"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "What relationship does the theorem describe?",
+                                    "options": ["Angles and area", "Sides and the hypotenuse", "Perimeter and radius", "Base and height"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "Which formula represents the theorem?",
+                                    "options": ["a + b = c", "a^2 + b^2 = c^2", "a^2 - b^2 = c^2", "2a + 2b = c"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "What is the hypotenuse?",
+                                    "options": ["The shortest side", "The side opposite the right angle", "Any side in the triangle", "The line inside the triangle"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "If the legs are 3 and 4, what is the hypotenuse?",
+                                    "options": ["5", "6", "7", "8"],
+                                    "correctOptionIndex": 0
+                                }
+                            ]
+                        }
+                        """;
+
+                String note2JsonQuestions = """
+                        {
+                            "questions": [
+                                {
+                                    "question": "What do plants convert sunlight into during photosynthesis?",
+                                    "options": ["Mechanical energy", "Chemical energy", "Electrical energy", "Thermal energy"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "Which organelle is mainly responsible for photosynthesis?",
+                                    "options": ["Nucleus", "Mitochondria", "Chloroplast", "Ribosome"],
+                                    "correctOptionIndex": 2
+                                },
+                                {
+                                    "question": "Which gas do plants take in for photosynthesis?",
+                                    "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Helium"],
+                                    "correctOptionIndex": 2
+                                },
+                                {
+                                    "question": "Which substance is commonly produced and stored as energy?",
+                                    "options": ["Glucose", "Salt", "Protein", "Water"],
+                                    "correctOptionIndex": 0
+                                },
+                                {
+                                    "question": "What is released as a byproduct of photosynthesis?",
+                                    "options": ["Carbon monoxide", "Oxygen", "Hydrogen", "Methane"],
+                                    "correctOptionIndex": 1
+                                }
+                            ]
+                        }
+                        """;
+
+                String note3JsonQuestions = """
+                        {
+                            "questions": [
+                                {
+                                    "question": "In which country did the French Revolution begin?",
+                                    "options": ["Italy", "France", "Spain", "Germany"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "During which century did the French Revolution take place?",
+                                    "options": ["16th century", "17th century", "18th century", "19th century"],
+                                    "correctOptionIndex": 2
+                                },
+                                {
+                                    "question": "What kind of change did the French Revolution bring?",
+                                    "options": ["Only economic change", "Radical social and political change", "Only artistic change", "No lasting change"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "What historical system was strongly challenged during the revolution?",
+                                    "options": ["Feudalism", "Monarchy", "Republic", "Democracy"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "The French Revolution had an impact on",
+                                    "options": ["Only France", "Only Europe", "France and world history", "Only the military"],
+                                    "correctOptionIndex": 2
+                                }
+                            ]
+                        }
+                        """;
+
+                String note4JsonQuestions = """
+                        {
+                            "questions": [
+                                {
+                                    "question": "Where did the Italian Renaissance originate?",
+                                    "options": ["France", "Italy", "England", "Portugal"],
+                                    "correctOptionIndex": 1
+                                },
+                                {
+                                    "question": "During which century did the Renaissance begin?",
+                                    "options": ["12th century", "13th century", "14th century", "16th century"],
+                                    "correctOptionIndex": 2
+                                },
+                                {
+                                    "question": "What was the Renaissance characterized by?",
+                                    "options": ["Cultural flourishing", "Industrial decline", "Only military growth", "Religious isolation"],
+                                    "correctOptionIndex": 0
+                                },
+                                {
+                                    "question": "Which area was strongly associated with the Renaissance?",
+                                    "options": ["Art and culture", "Space exploration", "Computer science", "Automobile design"],
+                                    "correctOptionIndex": 0
+                                },
+                                {
+                                    "question": "The Renaissance is best described as a period of",
+                                    "options": ["Cultural stagnation", "Great cultural flourishing", "Only political unrest", "Economic collapse"],
+                                    "correctOptionIndex": 1
+                                }
+                            ]
+                        }
+                        """;
+
+                Note note1 = new Note(
             user,
             "Pythagorean Theorem",
             "Fundamentals of geometry",
             "The Pythagorean theorem states that in any right triangle, the square of the hypotenuse equals the sum of the squares of the other two sides.",
-            "{}",
+                        note1JsonQuestions,
             NoteVisibility.PUBLIC
         );
         note1.setCategory(NoteCategory.MATHS);
@@ -124,7 +266,7 @@ public class DatabaseInitizalizer {
             "Photosynthesis",
             "Biological process in plants",
             "Photosynthesis is the process by which plants convert sunlight into chemical energy.",
-            "{}",
+            note2JsonQuestions,
             NoteVisibility.PRIVATE
         );
         note2.setCategory(NoteCategory.SCIENCE);
@@ -134,7 +276,7 @@ public class DatabaseInitizalizer {
             "French Revolution",
             "18th century historical event",
             "The French Revolution was a period of radical social and political change in France that had a lasting impact on the country's and the world's history.",
-            "{}",
+            note3JsonQuestions,
             NoteVisibility.PUBLIC
         );
         note3.setCategory(NoteCategory.HISTORY);
@@ -144,7 +286,7 @@ public class DatabaseInitizalizer {
             "Italian Renaissance",
             "Cultural and artistic movement",
             "The Renaissance was a period of great cultural flourishing that originated in Italy during the 14th century.",
-            "{}",
+            note4JsonQuestions,
             NoteVisibility.PUBLIC
         );
         note4.setCategory(NoteCategory.ART);
@@ -229,6 +371,16 @@ public class DatabaseInitizalizer {
         );
         note18.setCategory(NoteCategory.OTHERS);
 
+        Note note21 = new Note(
+            user,
+            "Creative Writing",
+            "Short writing ideas",
+            "Ideas for stories, essays, and imaginative writing exercises.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note21.setCategory(NoteCategory.OTHERS);
+
         // Notes for secondUser
         Note note6 = new Note(
             secondUser,
@@ -290,6 +442,66 @@ public class DatabaseInitizalizer {
         );
         note11.setCategory(NoteCategory.OTHERS);
 
+        Note note22 = new Note(
+            secondUser,
+            "Organic Chemistry",
+            "Functional groups and reactions",
+            "Overview of alkanes, alkenes, alcohols, acids, and common reaction patterns.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note22.setCategory(NoteCategory.SCIENCE);
+
+        Note note23 = new Note(
+            secondUser,
+            "World History Timeline",
+            "Major historical milestones",
+            "A timeline of major events from antiquity to the modern era.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note23.setCategory(NoteCategory.HISTORY);
+
+        Note note19 = new Note(
+            thirdUser,
+            "Project Ideas",
+            "Brainstorming notes",
+            "A collection of ideas for upcoming projects and experiments.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note19.setCategory(NoteCategory.OTHERS);
+
+        Note note20 = new Note(
+            thirdUser,
+            "Machine Learning Basics",
+            "Introductory concepts",
+            "Basic concepts about supervised learning, classification, and model evaluation.",
+            "{}",
+            NoteVisibility.PRIVATE
+        );
+        note20.setCategory(NoteCategory.SCIENCE);
+
+        Note note24 = new Note(
+            thirdUser,
+            "Data Structures",
+            "Core programming concepts",
+            "Notes about arrays, linked lists, stacks, queues, trees, and hash maps.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note24.setCategory(NoteCategory.OTHERS);
+
+        Note note25 = new Note(
+            thirdUser,
+            "Statistics Basics",
+            "Intro to data analysis",
+            "Core ideas about averages, variance, probability, and data interpretation.",
+            "{}",
+            NoteVisibility.PUBLIC
+        );
+        note25.setCategory(NoteCategory.SCIENCE);
+
         noteRepository.save(note1);
         noteRepository.save(note2);
         noteRepository.save(note3);
@@ -301,6 +513,13 @@ public class DatabaseInitizalizer {
         noteRepository.save(note9);
         noteRepository.save(note10);
         noteRepository.save(note11);
+        noteRepository.save(note21);
+        noteRepository.save(note22);
+        noteRepository.save(note23);
+        noteRepository.save(note19);
+        noteRepository.save(note20);
+        noteRepository.save(note24);
+        noteRepository.save(note25);
         noteRepository.save(note12);
         noteRepository.save(note13);
         noteRepository.save(note14);
@@ -328,6 +547,21 @@ public class DatabaseInitizalizer {
         note9.setSharedWith(sharedWith9);
         noteRepository.save(note9);
 
+        // thirdUser comments on notes from genericUser and secondUser
+        Comment comment13 = new Comment("Nice explanation, very clear", note1, thirdUser);
+        Comment comment14 = new Comment("This helped me understand it better", note6, thirdUser);
+        Comment comment15 = new Comment("I like how this is structured", note3, thirdUser);
+        Comment comment16 = new Comment("Great overview, thanks for sharing", note22, user);
+        Comment comment17 = new Comment("The timeline format works well", note23, user);
+        Comment comment18 = new Comment("Good intro to the topic", note24, user);
+
+        commentRepository.save(comment13);
+        commentRepository.save(comment14);
+        commentRepository.save(comment15);
+        commentRepository.save(comment16);
+        commentRepository.save(comment17);
+        commentRepository.save(comment18);
+
 
         Comment comment1 = new Comment("Useful, thanks", note1, secondUser);
         Comment comment2 = new Comment("Great tips!", note1, user);
@@ -343,6 +577,9 @@ public class DatabaseInitizalizer {
         Comment comment10 = new Comment("Useful, thanks", note1, user);
         Comment comment11 = new Comment("Thanks for sharing", note1, secondUser);
         Comment comment12 = new Comment("Useful, thanks", note1, user);
+        Comment comment19 = new Comment("Very complete notes", note22, secondUser);
+        Comment comment20 = new Comment("This is a solid summary", note23, thirdUser);
+        Comment comment21 = new Comment("These ideas are very useful", note21, secondUser);
 
         commentRepository.save(comment1);
         commentRepository.save(comment2);
@@ -356,13 +593,16 @@ public class DatabaseInitizalizer {
         commentRepository.save(comment10);
         commentRepository.save(comment11);
         commentRepository.save(comment12);
+        commentRepository.save(comment19);
+        commentRepository.save(comment20);
+        commentRepository.save(comment21);
 
         CalendarEvent event1 = new CalendarEvent(
             user,
             "Math Study Session",
             "Group study session for calculus exam",
-            LocalDateTime.of(2026, 3, 3, 14, 0),
-            LocalDateTime.of(2026, 3, 3, 16, 0),
+            currentMonthDateTime(3, 14, 0),
+            currentMonthDateTime(3, 16, 0),
             EventColor.BLUE,
             false
         );
@@ -371,8 +611,8 @@ public class DatabaseInitizalizer {
             user,
             "History Lecture",
             "Lecture on World War II",
-            LocalDateTime.of(2026, 3, 10, 9, 0),
-            LocalDateTime.of(2026, 3, 10, 11, 0),
+            currentMonthDateTime(10, 9, 0),
+            currentMonthDateTime(10, 11, 0),
             EventColor.YELLOW,
             false
         );
@@ -381,8 +621,8 @@ public class DatabaseInitizalizer {
             user,
             "Language Workshop",
             "Multi-day German pronunciation workshop",
-            LocalDateTime.of(2026, 3, 14, 9, 0),
-            LocalDateTime.of(2026, 3, 15, 17, 0),
+            currentMonthDateTime(14, 9, 0),
+            currentMonthDateTime(15, 17, 0),
             EventColor.GREEN,
             false
         );
@@ -391,8 +631,8 @@ public class DatabaseInitizalizer {
             user,
             "Spring Festival",
             "Spring festival celebration",
-            LocalDateTime.of(2026, 3, 14, 0, 0),
-            LocalDateTime.of(2026, 3, 14, 23, 59),
+            currentMonthDateTime(14, 0, 0),
+            currentMonthDateTime(14, 23, 59),
             EventColor.RED,
             true
         );
@@ -401,8 +641,8 @@ public class DatabaseInitizalizer {
             user,
             "Physics Workshop",
             "Multi-day Newton's laws practical workshop",
-            LocalDateTime.of(2026, 3, 21, 9, 0),
-            LocalDateTime.of(2026, 3, 22, 16, 0),
+            currentMonthDateTime(21, 9, 0),
+            currentMonthDateTime(22, 16, 0),
             EventColor.GREEN,
             false
         );
@@ -411,8 +651,8 @@ public class DatabaseInitizalizer {
             user,
             "Project Deadline",
             "Multi-day final project submission period",
-            LocalDateTime.of(2026, 3, 24, 0, 0),
-            LocalDateTime.of(2026, 3, 26, 23, 59),
+            currentMonthDateTime(24, 0, 0),
+            currentMonthDateTime(26, 23, 59),
             EventColor.RED,
             true
         );
@@ -421,8 +661,8 @@ public class DatabaseInitizalizer {
             user,
             "Study Review",
             "Multi-day comprehensive review session before exams",
-            LocalDateTime.of(2026, 3, 27, 9, 0),
-            LocalDateTime.of(2026, 3, 28, 17, 0),
+            currentMonthDateTime(27, 9, 0),
+            currentMonthDateTime(28, 17, 0),
             EventColor.BLUE,
             false
         );
@@ -435,11 +675,56 @@ public class DatabaseInitizalizer {
         eventRepository.save(event13);
         eventRepository.save(event14);
 
+        CalendarEvent event15 = new CalendarEvent(
+            secondUser,
+            "Chemistry Lab Prep",
+            "Prepare materials for the organic chemistry lab",
+            currentMonthDateTime(8, 8, 30),
+            currentMonthDateTime(8, 10, 30),
+            EventColor.YELLOW,
+            false
+        );
+
+        CalendarEvent event16 = new CalendarEvent(
+            secondUser,
+            "History Debate",
+            "Debate session about key historical events",
+            currentMonthDateTime(19, 16, 0),
+            currentMonthDateTime(19, 18, 0),
+            EventColor.BLUE,
+            false
+        );
+
+        CalendarEvent event17 = new CalendarEvent(
+            thirdUser,
+            "Coding Practice",
+            "Practice session for data structures and algorithms",
+            currentMonthDateTime(9, 11, 0),
+            currentMonthDateTime(9, 13, 0),
+            EventColor.GREEN,
+            false
+        );
+
+        CalendarEvent event18 = new CalendarEvent(
+            thirdUser,
+            "Statistics Revision",
+            "Review probability and statistics basics",
+            currentMonthDateTime(23, 17, 0),
+            currentMonthDateTime(23, 18, 30),
+            EventColor.RED,
+            false
+        );
+
+        eventRepository.save(event15);
+        eventRepository.save(event16);
+        eventRepository.save(event17);
+        eventRepository.save(event18);
+
         CalendarTask task1 = new CalendarTask(
             user,
             "Read Chapter 5 - Calculus",
             "Read and take notes on differential equations",
-            LocalDate.of(2026, 3, 2)
+            currentMonthDate(2)
         );
         task1.setCompleted(true);
 
@@ -447,7 +732,7 @@ public class DatabaseInitizalizer {
             user,
             "Prepare Lab Report",
             "Write lab report for biology experiment",
-            LocalDate.of(2026, 3, 6)
+            currentMonthDate(6)
         );
         task2.setCompleted(true);
 
@@ -455,7 +740,7 @@ public class DatabaseInitizalizer {
             user,
             "Review History Notes",
             "Review notes from last week's lecture",
-            LocalDate.of(2026, 3, 8)
+            currentMonthDate(8)
         );
         task3.setCompleted(true);
 
@@ -463,7 +748,7 @@ public class DatabaseInitizalizer {
             user,
             "Practice German Vocabulary",
             "Study 50 new German words",
-            LocalDate.of(2026, 3, 11)
+            currentMonthDate(11)
         );
         task4.setCompleted(true);
 
@@ -471,7 +756,7 @@ public class DatabaseInitizalizer {
             user,
             "Complete Math Assignment",
             "Solve problems 1-20 from textbook",
-            LocalDate.of(2026, 3, 13)
+            currentMonthDate(13)
         );
         task5.setCompleted(true);
 
@@ -479,7 +764,7 @@ public class DatabaseInitizalizer {
             user,
             "Buy Art Supplies",
             "Purchase canvas and paints for art project",
-            LocalDate.of(2026, 3, 15)
+            currentMonthDate(15)
         );
         task6.setCompleted(true);
 
@@ -487,7 +772,7 @@ public class DatabaseInitizalizer {
             user,
             "Research Renaissance Art",
             "Research for art history presentation",
-            LocalDate.of(2026, 3, 17)
+            currentMonthDate(17)
         );
         task7.setCompleted(false);
 
@@ -495,7 +780,7 @@ public class DatabaseInitizalizer {
             user,
             "Study Physics Formulas",
             "Memorize Newton's laws and formulas",
-            LocalDate.of(2026, 3, 19)
+            currentMonthDate(19)
         );
         task8.setCompleted(false);
 
@@ -503,7 +788,7 @@ public class DatabaseInitizalizer {
             user,
             "Create Project Presentation",
             "Prepare slides for group project",
-            LocalDate.of(2026, 3, 22)
+            currentMonthDate(22)
         );
         task9.setCompleted(false);
 
@@ -511,7 +796,7 @@ public class DatabaseInitizalizer {
             user,
             "Submit Project Report",
             "Final submission of group project report",
-            LocalDate.of(2026, 3, 25)
+            currentMonthDate(25)
         );
         task10.setCompleted(false);
 
@@ -519,7 +804,7 @@ public class DatabaseInitizalizer {
             user,
             "Review All Course Material",
             "Comprehensive review for final exams",
-            LocalDate.of(2026, 3, 26)
+            currentMonthDate(26)
         );
         task11.setCompleted(false);
 
@@ -527,7 +812,7 @@ public class DatabaseInitizalizer {
             user,
             "Organize Study Materials",
             "Organize all notes and materials for exam week",
-            LocalDate.of(2026, 3, 28)
+            currentMonthDate(28)
         );
         task12.setCompleted(false);
 
@@ -536,7 +821,7 @@ public class DatabaseInitizalizer {
             user,
             "Morning Exercise",
             "",
-            LocalDate.of(2026, 3, 5)
+            currentMonthDate(5)
         );
         task13.setCompleted(false);
 
@@ -544,7 +829,7 @@ public class DatabaseInitizalizer {
             user,
             "Email Professor",
             "",
-            LocalDate.of(2026, 3, 5)
+            currentMonthDate(5)
         );
         task14.setCompleted(false);
 
@@ -552,7 +837,7 @@ public class DatabaseInitizalizer {
             user,
             "Library Books Return",
             "",
-            LocalDate.of(2026, 3, 5)
+            currentMonthDate(5)
         );
         task15.setCompleted(true);
 
@@ -560,7 +845,7 @@ public class DatabaseInitizalizer {
             user,
             "Grocery Shopping",
             "",
-            LocalDate.of(2026, 3, 12)
+            currentMonthDate(12)
         );
         task16.setCompleted(false);
 
@@ -568,7 +853,7 @@ public class DatabaseInitizalizer {
             user,
             "Call Family",
             "",
-            LocalDate.of(2026, 3, 12)
+            currentMonthDate(12)
         );
         task17.setCompleted(false);
         
@@ -577,10 +862,78 @@ public class DatabaseInitizalizer {
             user,
             "Submit assignment",
             "",
-            LocalDate.of(2026, 3, 12)
+            currentMonthDate(12)
         );
 
         task18.setCompleted(false);
+
+        CalendarTask task19 = new CalendarTask(
+            secondUser,
+            "Review Chemistry Notes",
+            "Go through organic chemistry reactions and examples",
+            currentMonthDate(7)
+        );
+        task19.setCompleted(true);
+
+        CalendarTask task20 = new CalendarTask(
+            secondUser,
+            "Prepare History Summary",
+            "Summarize the main milestones from the world history timeline",
+            currentMonthDate(14)
+        );
+        task20.setCompleted(false);
+
+        CalendarTask task21 = new CalendarTask(
+            secondUser,
+            "Language Review",
+            "Practice irregular verbs and vocabulary",
+            currentMonthDate(21)
+        );
+        task21.setCompleted(true);
+
+        CalendarTask task22 = new CalendarTask(
+            thirdUser,
+            "Build Practice App",
+            "Create a small app using stacks and queues",
+            currentMonthDate(9)
+        );
+        task22.setCompleted(false);
+
+        CalendarTask task23 = new CalendarTask(
+            thirdUser,
+            "Statistics Exercises",
+            "Solve exercises about averages and variance",
+            currentMonthDate(16)
+        );
+        task23.setCompleted(true);
+
+        CalendarTask task24 = new CalendarTask(
+            thirdUser,
+            "Machine Learning Reading",
+            "Read about supervised learning and evaluation metrics",
+            currentMonthDate(24)
+        );
+        task24.setCompleted(false);
+
+        CalendarEvent thirdUserEvent1 = new CalendarEvent(
+            thirdUser,
+            "Third User Workshop",
+            "Hands-on practice session for project ideas",
+            currentMonthDateTime(7, 10, 0),
+            currentMonthDateTime(7, 12, 0),
+            EventColor.YELLOW,
+            false
+        );
+
+        CalendarEvent thirdUserEvent2 = new CalendarEvent(
+            thirdUser,
+            "Model Review Meeting",
+            "Review meeting for machine learning basics",
+            currentMonthDateTime(18, 15, 0),
+            currentMonthDateTime(18, 16, 30),
+            EventColor.BLUE,
+            false
+        );
 
         taskRepository.save(task1);
         taskRepository.save(task2);
@@ -600,5 +953,25 @@ public class DatabaseInitizalizer {
         taskRepository.save(task16);
         taskRepository.save(task17);
         taskRepository.save(task18);
+        taskRepository.save(task19);
+        taskRepository.save(task20);
+        taskRepository.save(task21);
+        taskRepository.save(task22);
+        taskRepository.save(task23);
+        taskRepository.save(task24);
+
+        eventRepository.save(thirdUserEvent1);
+        eventRepository.save(thirdUserEvent2);
+    }
+
+    private LocalDate currentMonthDate(int dayOfMonth) {
+        YearMonth currentMonth = YearMonth.now();
+        int safeDay = Math.min(dayOfMonth, currentMonth.lengthOfMonth());
+        return LocalDate.of(currentMonth.getYear(), currentMonth.getMonth(), safeDay);
+    }
+
+    private LocalDateTime currentMonthDateTime(int dayOfMonth, int hour, int minute) {
+        LocalDate date = currentMonthDate(dayOfMonth);
+        return LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), hour, minute);
     }
 }
