@@ -10,6 +10,7 @@ public class CommentDTO {
     private Long noteId;
     private Long userId;
     private String username;
+    private String displayName;
     private String userProfilePicUrl;
     private LocalDateTime createdAt;
     private boolean isReported;

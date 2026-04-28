@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>es.wrapitup</groupId>
 	<artifactId>wrapitup_planner</artifactId>
-	<version>0.2.0</version>
+	<version>1.0.0</version>
 	<name>wrapitup_planner</name>
 	<description>All-In-One collaborative web platform</description>
 	<url/>

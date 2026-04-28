@@ -7,6 +7,7 @@ import es.wrapitup.wrapitup_planner.model.NoteCategory;
 import es.wrapitup.wrapitup_planner.model.NoteVisibility;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
+import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.QuizScoreRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
@@ -40,6 +41,9 @@ public class NoteSystemTest {
     private NoteRepository noteRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -51,6 +55,7 @@ public class NoteSystemTest {
 
     @BeforeEach
     void setUp() {
+        commentRepository.deleteAll();
         noteRepository.deleteAll();
         userRepository.deleteAll();
 
