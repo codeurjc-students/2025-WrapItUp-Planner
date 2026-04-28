@@ -580,6 +580,13 @@ public class DatabaseInitizalizer {
         Comment comment19 = new Comment("Very complete notes", note22, secondUser);
         Comment comment20 = new Comment("This is a solid summary", note23, thirdUser);
         Comment comment21 = new Comment("These ideas are very useful", note21, secondUser);
+        Comment comment22 = new Comment("Could use a little more detail", note24, user);
+        Comment comment23 = new Comment("This explanation feels incomplete", note25, secondUser);
+        Comment comment24 = new Comment("I do not agree with this approach", note19, thirdUser);
+
+        comment22.setReported(true);
+        comment23.setReported(true);
+        comment24.setReported(true);
 
         commentRepository.save(comment1);
         commentRepository.save(comment2);
@@ -596,6 +603,9 @@ public class DatabaseInitizalizer {
         commentRepository.save(comment19);
         commentRepository.save(comment20);
         commentRepository.save(comment21);
+        commentRepository.save(comment22);
+        commentRepository.save(comment23);
+        commentRepository.save(comment24);
 
         CalendarEvent event1 = new CalendarEvent(
             user,
