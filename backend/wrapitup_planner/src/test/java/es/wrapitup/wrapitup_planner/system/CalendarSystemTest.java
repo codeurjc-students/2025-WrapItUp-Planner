@@ -23,8 +23,10 @@ import es.wrapitup.wrapitup_planner.model.CalendarTask;
 import es.wrapitup.wrapitup_planner.model.EventColor;
 import es.wrapitup.wrapitup_planner.model.UserModel;
 import es.wrapitup.wrapitup_planner.model.UserStatus;
+import es.wrapitup.wrapitup_planner.repository.CommentRepository;
 import es.wrapitup.wrapitup_planner.repository.CalendarEventRepository;
 import es.wrapitup.wrapitup_planner.repository.CalendarTaskRepository;
+import es.wrapitup.wrapitup_planner.repository.NoteRepository;
 import es.wrapitup.wrapitup_planner.repository.UserRepository;
 import es.wrapitup.wrapitup_planner.service.CalendarEventService;
 import es.wrapitup.wrapitup_planner.service.CalendarService;
@@ -51,6 +53,12 @@ public class CalendarSystemTest {
     private CalendarTaskRepository taskRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private UserModel testUser;
@@ -59,6 +67,8 @@ public class CalendarSystemTest {
 
     @BeforeEach
     void setUp() {
+        commentRepository.deleteAll();
+        noteRepository.deleteAll();
         eventRepository.deleteAll();
         taskRepository.deleteAll();
         userRepository.deleteAll();
