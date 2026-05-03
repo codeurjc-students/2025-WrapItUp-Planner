@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommentService } from '../../services/comment.service';
 import { UserService } from '../../services/user.service';
 import { CommentDTO } from '../../dtos/comment.dto';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-reported-comments',
@@ -129,6 +130,6 @@ export class ReportedCommentsComponent implements OnInit {
     if (!comment.userProfilePicUrl) {
       return '';
     }
-    return `https://localhost${comment.userProfilePicUrl}`;
+    return `${environment.apiUrl}${comment.userProfilePicUrl}`;
   }
 }
