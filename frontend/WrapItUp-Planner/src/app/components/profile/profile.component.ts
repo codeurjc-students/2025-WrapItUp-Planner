@@ -224,7 +224,7 @@ export class ProfileComponent implements OnInit {
       return this.imagePreview;
     }
     if (this.user?.image) {
-      return `${environment.apiUrl}` + this.user.image;
+      return `` + this.user.image;
     }
     return 'assets/genericUser.png';
   }
