@@ -80,3 +80,11 @@
   - Review and manage reported comments
   - Unflag comments that were incorrectly reported
   - Ban users from accessing the platform when necessary
+
+### 5.4. Version 1.0
+**Release Date:** May 2025
+
+**Features:**
+- **AI-Powered Notes:**
+  - Automatic quiz generation from note content powered by OpenAI GPT-4o
+  - Users can test their knowledge directly from their notes

@@ -19,7 +19,7 @@ The development process follows an **iterative and incremental methodology**, wi
 | Category             | Details                                                                                      |
 |---------------------|----------------------------------------------------------------------------------------------|
 | **Type**             | Web SPA with Spring Boot backend and REST API                                               |
-| **Technologies**     | Angular (frontend), Spring Boot (backend), Java 21, SQL, OpenAPI                             |
+| **Technologies** | Angular (frontend), Spring Boot (backend), Java 21, SQL, OpenAPI, OpenAI GPT-4o |
 | **Tools**            | VSCode with Spring Boot and Java extensions, Postman, GitHub, GitHub Projects, SonarQube Cloud   |
 | **Quality Control**  | Unit and integration tests with RestAssured (Java), frontend tests with Karma and Jasmine, e2e testing with Selenium, coverage with JaCoCo, static code analysis with SonarQube, CI with GitHub Actions |
 | **Deployment** | Continuous integration and delivery with GitHub Actions. Docker containerization with images published to Docker Hub |

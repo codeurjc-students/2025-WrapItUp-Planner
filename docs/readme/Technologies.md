@@ -17,3 +17,6 @@ URL: [Angular](https://angular.io)
 
 7. **Testing Frameworks** – The project implements unit, integration, and end-to-end testing to guarantee reliability and maintainability. The backend uses **REST Assured** and **Mockito** to test business logic and RESTful API endpoints. The frontend relies on **Karma** and **Jasmine** to test Angular components and user interactions, while **Selenium** is used for end-to-end (E2E) testing to simulate real user behavior.  
 **URLs:** [Mockito](https://site.mockito.org), [REST Assured](https://rest-assured.io/), [Karma](https://karma-runner.github.io/latest/index.html), [Jasmine](https://jasmine.github.io), [Selenium](https://www.selenium.dev)
+
+8. **OpenAI GPT-4o** – A large language model developed by OpenAI, integrated into WrapItUp Planner to enhance the note-taking experience with AI-powered features. GPT-4o is used to automatically generate quiz questions from note content, allowing users to test their knowledge directly from their notes. The backend communicates with the OpenAI API to process note content and return structured question sets, which are then stored and served to the frontend.  
+   URL: [OpenAI](https://openai.com)

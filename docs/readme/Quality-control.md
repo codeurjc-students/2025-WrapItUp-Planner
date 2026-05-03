@@ -72,6 +72,21 @@ The automated tests cover the complete basic functionality (Version 0.2) of Wrap
 - **Ban Web Tests**: Comment report and ban functionality flows
 - **Calendar Web Tests**: Task and Event creation, deletion and other expected usage flows.
 
+#### Backend Tests - Version 1.0
+
+**Unit Tests:**
+- **Text extractor tests**: Check the tools to send the data to the AI model works as expected.
+- **Note Service**: Quiz functionality
+
+**Integration Tests (REST API):**
+- **Note API**: Note generation endpoint, quiz generation and quiz taking 
+
+**System Tests:**
+- **Note System**: AI note creation workflow, Quiz generation workflow and Quiz taking.
+
+**End-to-End Tests:**
+- **Note Web Tests**: Note and quiz generation functionality flows
+
 #### Frontend Tests - Version 0.1
 
 **Component Tests:**
@@ -99,6 +114,13 @@ The automated tests cover the complete basic functionality (Version 0.2) of Wrap
 - **Comment Service**: Report comment functionality and admin moderation endpoints
 - **Calendar Service**: Event and task CRUD operations with backend synchronization
 - **User Service**: Task heatmap data retrieval
+
+#### Frontend Tests - Version 1.0
+
+**Component Tests:**
+- **Note Components**: Note generation, quiz creation.
+
+Overall test coverage was greatly improved upon the final release. Many components and services had their test battery expanded to fit better test standards.
 
 All tests ensure data consistency between frontend and backend, proper authentication flows, authorization checks, and correct handling of edge cases and errors.
  
