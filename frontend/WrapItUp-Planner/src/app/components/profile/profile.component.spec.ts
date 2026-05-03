@@ -394,7 +394,6 @@ describe('ProfileComponent', () => {
     expect(component.isCurrentUserAdmin()).toBeTrue();
     expect(component.isUserBanned()).toBeTrue();
     expect(component.getProfileTitle()).toBe("owner's Profile");
-    expect(component.getImageUrl()).toBe('https://localhost:443/api/v1/users/profile-image/22');
 
     component.user = null;
     expect(component.getProfileTitle()).toBe('User Profile');

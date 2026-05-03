@@ -7,12 +7,13 @@ import { CalendarEventDTO } from '../dtos/calendar-event.dto';
 import { CalendarTaskDTO } from '../dtos/calendar-task.dto';
 import { CalendarMonthDTO } from '../dtos/calendar-month.dto';
 import { CalendarDayDTO } from '../dtos/calendar-day.dto';
+import { environment } from '../../environments/environment';
 
 describe('CalendarService', () => {
   let service: CalendarService;
   let httpMock: HttpTestingController;
-
-  const BASE_URL = 'https://localhost:443/api/v1/calendar';
+  
+  const BASE_URL = `${environment.apiUrl}/api/v1/calendar`;
   const EVENTS_URL = `${BASE_URL}/events`;
   const TASKS_URL = `${BASE_URL}/tasks`;
 

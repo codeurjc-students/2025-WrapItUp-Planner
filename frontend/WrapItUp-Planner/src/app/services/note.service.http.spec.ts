@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NoteService } from './note.service';
 import { NoteDTO } from '../dtos/note.dto';
+import { environment } from '../../environments/environment';
 
 describe('NoteService (http unit)', () => {
   let service: NoteService;
   let httpMock: HttpTestingController;
-
-  const BASE_URL = 'https://localhost:443/api/v1/notes';
+  const BASE_URL = `${environment.apiUrl}/api/v1/notes`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

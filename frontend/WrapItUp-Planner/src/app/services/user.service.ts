@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserModelDTO } from '../dtos/user.dto';
-
+import { environment } from '../../environments/environment';
 
 
 
@@ -13,7 +13,7 @@ import { UserModelDTO } from '../dtos/user.dto';
 
 export class UserService {
 
-  private apiUrl = 'https://localhost:443/api/v1/users';
+  private apiUrl = `${environment.apiUrl}/api/v1/users`;
 
   constructor(private http: HttpClient) { }
 

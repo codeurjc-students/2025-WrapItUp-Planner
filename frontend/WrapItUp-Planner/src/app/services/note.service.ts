@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { NoteDTO } from '../dtos/note.dto';
 import { Page } from '../dtos/page.dto';
 import { QuizResultDTO } from '../dtos/quiz-result.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NoteService {
 
-  private apiUrl = 'https://localhost:443/api/v1/notes';
+  private apiUrl = `${environment.apiUrl}/api/v1/notes`;
 
   constructor(private http: HttpClient) { }
 
