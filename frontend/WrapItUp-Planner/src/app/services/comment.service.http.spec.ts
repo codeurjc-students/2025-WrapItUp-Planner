@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CommentService } from './comment.service';
+import { environment } from '../../environments/environment';
 
 describe('CommentService (http unit)', () => {
   let service: CommentService;
   let httpMock: HttpTestingController;
 
-  const NOTES_URL = 'https://localhost:443/api/v1/notes';
-  const ADMIN_URL = 'https://localhost:443/api/v1/admin/reported-comments';
+  const NOTES_URL = `${environment.apiUrl}/api/v1/notes`;
+  const ADMIN_URL = `${environment.apiUrl}/api/v1/admin/reported-comments`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

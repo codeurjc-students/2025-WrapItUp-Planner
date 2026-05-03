@@ -9,6 +9,7 @@ import { UserModelDTO } from '../dtos/user.dto';
 import { CommentDTO } from '../dtos/comment.dto';
 import { finalize } from 'rxjs';
 import { Observable, catchError, forkJoin, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface QuizQuestion {
   question: string;
@@ -341,7 +342,7 @@ export class NoteDetailComponent implements OnInit {
       return '';
     }
 
-    return `https://localhost${comment.userProfilePicUrl}`;
+    return `${environment.apiUrl}${comment.userProfilePicUrl}`;
   }
 
   loadMoreComments(): void {
