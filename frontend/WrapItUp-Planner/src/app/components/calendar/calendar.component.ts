@@ -93,7 +93,8 @@ export class CalendarComponent implements OnInit {
   openDayView(daySummary: CalendarDaySummaryDTO | null): void {
     if (!daySummary) return;
     
-    const date = new Date(daySummary.date);
+    const [year, month, day] = daySummary.date.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const dialogRef = this.dialog.open(DayViewDialogComponent, {
       width: '1000px',
       maxWidth: '95vw',
