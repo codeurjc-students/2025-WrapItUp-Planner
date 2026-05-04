@@ -64,3 +64,25 @@ The Docker images are automatically built and published using GitHub Actions:
 - **Development builds:** Triggered on every push to `main`
 - **Release builds:** Triggered when a new GitHub release is published
 - All builds are pushed to DockerHub with appropriate version tags
+
+### Remote Deployment — URJC
+
+As part of the project development process, this release was deployed to a remote URJC machine with SSH access. The URJC environment was provided with a user account that had the required permissions and the necessary SSH keys. Docker and Docker Compose were installed on the remote host to run the application and its database.
+
+Notes:
+- A `.env` file is required in the same directory as the `docker-compose.yml` on the remote machine with the required environment variables (MySQL credentials, Spring datasource settings, SSL settings, and `OPENAI_API_KEY`).
+- The `dev` image tags were used for testing the deployment on URJC.
+
+Commands used on the remote host to fetch and run the development images:
+
+```bash
+docker pull arturox2500/wrapitup_planner:dev
+docker pull arturox2500/wrapitup_planner-compose:dev
+
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:dev /bin/sh
+docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
+docker rm temp-compose
+
+docker-compose up -d
+```
+

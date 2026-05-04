@@ -31,9 +31,9 @@ All expected functionality has now been completed, and the application is consid
 
 ### Demo Videos
 
-**Version 0.2:**
+**Version 1.0:**
 <br>
-[![Demo Video v0.2](https://img.youtube.com/vi/h_z9azzQjCk/0.jpg)](https://youtu.be/h_z9azzQjCk)
+[![Demo Video v1.0](https://img.youtube.com/vi/_cuC3-al830/0.jpg)](https://youtu.be/_cuC3-al830)
 
 ---
 

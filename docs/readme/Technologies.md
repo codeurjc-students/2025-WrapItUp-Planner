@@ -12,6 +12,9 @@ URL: [Angular](https://angular.io)
 4. **Maven** – A build automation and dependency management tool for Java projects. In WrapItUp Planner, Maven manages the project dependencies, build lifecycle, and packaging for the Spring Boot backend, ensuring that the application is consistently built, tested, and deployable.  
    URL: [Maven](https://maven.apache.org)
 
+5. **ngx-charts** – An Angular charting library built on D3.js. The frontend uses ngx-charts to render the quiz performance line chart and other visualizations in the user profile and quiz results.  
+   URL: [ngx-charts](https://swimlane.github.io/ngx-charts/)
+
 6. **SQL** – A relational database language used to manage and query the application’s data. In WrapItUp Planner, SQL (via MySQL) stores all of the application's data. The backend connects to the database through MySQL Connector, performing CRUD operations and ensuring data consistency, integrity, and persistence throughout the system.   
    URL: [MySQL](https://www.mysql.com)
 

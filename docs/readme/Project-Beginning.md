@@ -84,9 +84,9 @@ the application will be released, and it will also be deployed.
 
 **Phase 5 - Version 1.0 - Advanced Functionality (Deadline Apr. 15)**
 
-Start Date -
+Start Date - March 19th
 
-End Date -
+End Date - Mid-May
 
 The application will be finalized, and a version 1.0 will be released.
 
@@ -232,7 +232,7 @@ Registered users and administrators will be allowed to have their own profile pi
 
 -   Ngx-charts as a framework for all data visualization in the project.
 
--   Google's Gemini Developer API for all the AI driven functionalities.
+-   Google's Gemini Developer API for all the AI driven functionalities. 
 
 ## Advanced Query
 
