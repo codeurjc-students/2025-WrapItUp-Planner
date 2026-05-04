@@ -149,48 +149,6 @@ public class CalendarWebTest extends BaseWebTest {
         assertTrue(completedTask.isDisplayed(), "Task should show as completed");
     }
 
-    @Disabled
-    @Test
-    void testDeleteEvent() throws InterruptedException {
-        long ts = System.currentTimeMillis();
-        String username = "deleteUser" + ts;
-        String email = "delete+" + ts + "@example.com";
-        String password = "Password123";
-
-        registerAndLogin(username, email, password);
-
-        driver.get(getBaseUrl() + "calendar");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".calendar-header")));
-
-        WebElement newEventButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".new-event-button")));
-        newEventButton.click();
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".dialog-container")));
-
-        driver.findElement(By.id("event-title")).sendKeys("Event to delete");
-        WebElement saveButton = driver.findElement(By.cssSelector(".save-button"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveButton);
-
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".dialog-container")));
-
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".calendar-day")));
-        WebElement firstDay = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".calendar-day:not(.empty)")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstDay);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".dialog-container")));
-
-        WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".delete-button-small")));
-        deleteButton.click();
-
-        wait.until(ExpectedConditions.alertIsPresent());
-        driver.switchTo().alert().accept();
-
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".event-item")));
-    }
-
     @Test
     void testNavigateBetweenMonths() {
         long ts = System.currentTimeMillis();

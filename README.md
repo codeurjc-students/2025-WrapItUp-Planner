@@ -12,22 +12,22 @@ These generated resources are integrated into the learning experience. Users can
 
 All expected functionality has now been completed, and the application is considered fully developed and ready for use.
 
-### Screenshots (new functionality)
+### Latest Developed Features - Screenshots
 
-[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
-*Admin profile page with access to moderation dashboard*
+[![Profile](images/v.1.0/profile.png)](images/v.1.0/profile.png)
+*Updated profile visual presentation*
 
-[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
-*Admin dashboard showing reported comments with moderation actions*
+[![Create Note (AI)](images/v.1.0/createNoteAI.png)](images/v.1.0/createNoteAI.png)
+*Upload notes and AI processing interface*
 
-[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
-*User profile page with task heatmap visualization*
+[![Generate Quiz](images/v.1.0/generateQuiz.png)](images/v.1.0/generateQuiz.png)
+*Generate multiple-choice questions*
 
-[![Calendar](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
-*Calendar view with events and daily tasks*
+[![Quiz](images/v.1.0/quiz.png)](images/v.1.0/quiz.png)
+*Interactive quiz interface for study sessions*
 
-[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
-*Account banned notification page*
+[![Quiz Results](images/v.1.0/quizResults.png)](images/v.1.0/quizResults.png)
+*Performance line chart and quiz results*
 
 ### Demo Videos
 
@@ -44,40 +44,24 @@ All expected functionality has now been completed, and the application is consid
 
 As of version 1.0, development is complete and the application is finalized.
 
-### Functionalities (Version 0.2)
+### Latest Developed Features — Screenshots
 
-**Admin Features:**
+**Key Screens:**
 
-[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
-*Admin profile page with access to moderation dashboard*
+[![Profile](images/v.1.0/profile.png)](images/v.1.0/profile.png)
+*Updated profile presentations*
 
-[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
-*Admin dashboard showing reported comments with moderation actions (ignore, delete, view profile, view original note)*
+[![Create Note (AI)](images/v.1.0/createNoteAI.png)](images/v.1.0/createNoteAI.png)
+*Note upload and AI processing*
 
-[![Banned User Profile](images/v.0.2/bannedUser.png)](images/v.0.2/bannedUser.png)
-*Admin view of a banned user profile with unban option*
+[![Generate Quiz](images/v.1.0/generateQuiz.png)](images/v.1.0/generateQuiz.png)
+*Automatic question generation and JSON export*
 
-**Moderation:**
+[![Quiz](images/v.1.0/quiz.png)](images/v.1.0/quiz.png)
+*Interactive quiz UI*
 
-[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
-*Account banned notification page displayed when a banned user attempts to access the platform*
-
-**Calendar Features:**
-
-[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
-*User profile page with task heatmap visualization showing pending tasks for the current month*
-
-[![Calendar Monthly View](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
-*Calendar monthly view with events (colored dots) and daily tasks (checkbox indicators)*
-
-[![Calendar Daily View](images/v.0.2/daily-view.png)](images/v.0.2/daily-view.png)
-*Calendar daily view showing events and tasks for a specific day with add/edit/delete options*
-
-[![Create Task](images/v.0.2/createTask.png)](images/v.0.2/createTask.png)
-*Create new daily task dialog with title and description fields*
-
-[![Multi-day Event](images/v.0.2/Multi-day-event.png)](images/v.0.2/Multi-day-event.png)
-*Create multi-day event dialog with color selection, date range, and time configuration*
+[![Quiz Results](images/v.1.0/quizResults.png)](images/v.1.0/quizResults.png)
+*Quiz performance and results chart*
 
 ### Detailed Functionalities
 
@@ -138,6 +122,8 @@ SPRING_DATASOURCE_PASSWORD=<value>
 SPRING_JPA_HIBERNATE_DDL_AUTO=<value>
 SERVER_PORT=<value>
 SERVER_SSL_KEY_STORE_PASSWORD=<value>
+
+OPENAI_API_KEY=<value>
 ```
 
 ### Accessing the Application
