@@ -27,7 +27,7 @@ The testing strategy covers both the **backend (server)** and the **frontend (cl
 
 ### Functional Coverage
 
-The automated tests cover the complete basic functionality (Version 0.2) of WrapItUp Planner, making sure the application works according to what it was designed to accomplish:
+The automated tests cover the complete functionality (Version 1.0) of WrapItUp Planner, making sure the application works according to what it was designed to accomplish:
 
 #### Backend Tests - Version 0.1
 

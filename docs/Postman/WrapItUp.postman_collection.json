@@ -1,2234 +1,2342 @@
 {
-	"info": {
-		"_postman_id": "bf2e1840-c98f-4852-a289-b5cab3d49704",
-		"name": "WrapItUp Planner Copy 3",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "53156338",
-		"_collection_link": "https://gutierrezarturox1-160530.postman.co/workspace/Arturo-Gutierrez's-Workspace~ec95113d-fb1f-4e85-8ebd-ce7ab5da906d/collection/53156338-bf2e1840-c98f-4852-a289-b5cab3d49704?action=share&source=collection_link&creator=53156338"
-	},
-	"item": [
-		{
-			"name": "1. Public Access (No Login)",
-			"item": [
-				{
-					"name": "View Public Note 1 (Pythagorean Theorem)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Can view public note without auth\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.include('Pythagorean');",
-									"    pm.expect(jsonData.visibility).to.eql('PUBLIC');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to View Private Note (Should Fail)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"pm.test(\"Error message about login\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('log in');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/2",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"2"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to Comment Without Login (Should Fail)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"content\": \"Trying to comment without login\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "2. New User Registration and Setup",
-			"item": [
-				{
-					"name": "Register New User (testUser)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"User registered successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('registered');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"testUser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/user",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login as testUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Login successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});",
-									"",
-									"pm.test(\"Auth cookies are set\", function () {",
-									"    pm.expect(pm.cookies.has('AuthToken')).to.be.true;",
-									"    pm.expect(pm.cookies.has('RefreshToken')).to.be.true;",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"testUser\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/login",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get testUser Profile",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"User profile retrieved\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData.username).to.eql('testUser');",
-									"    pm.collectionVariables.set('testUserId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update User Email",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Email updated\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.email).to.eql('testuser.updated@example.com');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"testuser.updated@example.com\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Upload Profile Image",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Image uploaded\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('image');",
-									"    pm.expect(jsonData.image).to.include('/api/v1/users/profile-image/');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users/upload-image",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"upload-image"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Profile Image",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Image content type is correct\", function () {",
-									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('image');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users/profile-image/{{testUserId}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"profile-image",
-								"{{testUserId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create First Note",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Note created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData.title).to.eql('My First Test Note');",
-									"    pm.collectionVariables.set('testUserNote1Id', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"My First Test Note\",\n    \"overview\": \"Introduction to testing\",\n    \"summary\": \"This is my first note created for testing purposes. It contains important information about the testing process.\",\n    \"jsonQuestions\": \"[{\\\"question\\\": \\\"What is testing?\\\"}, {\\\"question\\\": \\\"Why is it important?\\\"}]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"OTHERS\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Second Note",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Second note created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData.title).to.eql('Advanced Mathematics Notes');",
-									"    pm.collectionVariables.set('testUserNote2Id', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Advanced Mathematics Notes\",\n    \"overview\": \"Complex mathematical concepts\",\n    \"summary\": \"Comprehensive notes covering advanced topics in mathematics including calculus, linear algebra, and differential equations.\",\n    \"jsonQuestions\": \"[]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"MATHS\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Edit First Note",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Note updated\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.include('UPDATED');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"My First Test Note - UPDATED\",\n    \"overview\": \"Updated introduction to testing\",\n    \"summary\": \"This note has been updated with additional information and improvements to the testing methodology.\",\n    \"jsonQuestions\": \"[{\\\"question\\\": \\\"What is testing?\\\"}, {\\\"question\\\": \\\"Why is it important?\\\"}, {\\\"question\\\": \\\"What did we update?\\\"}]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"OTHERS\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/{{testUserNote1Id}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"{{testUserNote1Id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Share First Note with genericUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Note shared\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.sharedWithUserIds).to.be.an('array');",
-									"    pm.expect(jsonData.sharedWithUserIds.length).to.be.greaterThan(0);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"genericUser\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/{{testUserNote1Id}}/share",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"{{testUserNote1Id}}",
-								"share"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout testUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Logout successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/logout",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "3. genericUser Operations",
-			"item": [
-				{
-					"name": "Login as genericUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Login successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"genericUser\",\n    \"password\": \"12345678\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/login",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View First Page of My Notes (Filtered by SCIENCE)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Paginated notes returned with category filter\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('content');",
-									"    pm.expect(jsonData).to.have.property('totalElements');",
-									"    pm.expect(jsonData.content).to.be.an('array');",
-									"    if (jsonData.content.length > 0) {",
-									"        jsonData.content.forEach(note => {",
-									"            pm.expect(note.category).to.eql('SCIENCE');",
-									"        });",
-									"    }",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes?page=0&category=SCIENCE",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "category",
-									"value": "SCIENCE"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View Shared Notes",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Shared notes returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('content');",
-									"    pm.expect(jsonData.content).to.be.an('array');",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/shared?page=0",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"shared"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Open Comments of Note 1",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Comments returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('content');",
-									"    pm.expect(jsonData.content).to.be.an('array');",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments?page=0",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Comment to Note 1",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Comment created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData.username).to.eql('genericUser');",
-									"    pm.collectionVariables.set('genericUserCommentId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"content\": \"This is a great explanation of the Pythagorean theorem! Very helpful for my studies.\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Own Comment",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 204\", function () {",
-									"    pm.response.to.have.status(204);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments/{{genericUserCommentId}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments",
-								"{{genericUserCommentId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete One of genericUser's Notes",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/5",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"5"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Report Comment",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Comment reported successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.reported).to.eql(true);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments/2/report",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments",
-								"2",
-								"report"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Calendar Event",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Event created successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Study Session');",
-									"    pm.collectionVariables.set('eventId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Study Session\",\n    \"description\": \"Math homework review\",\n    \"startDate\": \"2026-03-15T14:00:00\",\n    \"endDate\": \"2026-03-15T16:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/events",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"events"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Calendar Task",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Task created successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Complete Assignment');",
-									"    pm.collectionVariables.set('taskId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Complete Assignment\",\n    \"description\": \"Finish calculus problems\",\n    \"taskDate\": \"2026-03-20\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout genericUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/logout",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "4. Admin Operations",
-			"item": [
-				{
-					"name": "Login as admin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Admin login successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"12345678\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/login",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to View Admin Notes (Should Fail)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 403 or 404\", function () {",
-									"    pm.expect([403, 404]).to.include(pm.response.code);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes?page=0&size=10",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Comment to Public Note 1",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Admin comment created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData.content).to.include('admin');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"content\": \"As an admin, I find this content very informative and well-structured.\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete a Note (Note 3 - French Revolution)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 403 or 200\", function () {",
-									"    pm.expect([200, 403]).to.include(pm.response.code);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/3",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete a Comment (Comment 1)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 204 or 403\", function () {",
-									"    pm.expect([204, 403]).to.include(pm.response.code);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/notes/1/comments/1",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notes",
-								"1",
-								"comments",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Reported Comments",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Reported comments list returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.content).to.be.an('array');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/admin/reported-comments?page=0&size=10",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin",
-								"reported-comments"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Unreport Comment (Ignore Flag)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Comment unreported successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.reported).to.eql(false);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/admin/reported-comments/3/unreport",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin",
-								"reported-comments",
-								"3",
-								"unreport"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Reported Comment",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/admin/reported-comments/7",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin",
-								"reported-comments",
-								"7"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Ban User (secondUser)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"User banned successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('BANNED');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users/2/ban",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"2",
-								"ban"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Unban User (secondUser)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"User unbanned successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('ACTIVE');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/users/2/unban",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"2",
-								"unban"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout admin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Logout successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/logout",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "5. Calendar Operations - genericUser",
-			"item": [
-				{
-					"name": "Login as genericUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Login successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"genericUser\",\n    \"password\": \"12345678\"\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/login",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create New Calendar Event",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Event created successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Team Meeting');",
-									"    pm.expect(jsonData.color).to.eql('BLUE');",
-									"    pm.collectionVariables.set('calendarEventId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Team Meeting\",\n    \"description\": \"Weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T11:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/events",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"events"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create New Calendar Task",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Task created successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
-									"    pm.expect(jsonData.completed).to.eql(false);",
-									"    pm.collectionVariables.set('calendarTaskId', jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": false\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Calendar Events",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Events list returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('array');",
-									"    pm.expect(jsonData.length).to.be.greaterThan(0);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/events",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"events"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Calendar Tasks (Pending Only)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Tasks list returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('array');",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks?pendingOnly=true",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks"
-							],
-							"query": [
-								{
-									"key": "pendingOnly",
-									"value": "true"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Tasks for Daily View (March 15)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Daily tasks returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('array');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks?date=2026-03-15",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks"
-							],
-							"query": [
-								{
-									"key": "date",
-									"value": "2026-03-15"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Events for Daily View (March 15)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Daily calendar data returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('object');",
-									"    pm.expect(jsonData).to.have.property('events');",
-									"    pm.expect(jsonData).to.have.property('tasks');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/day?date=2026-03-15",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"day"
-							],
-							"query": [
-								{
-									"key": "date",
-									"value": "2026-03-15"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Monthly View Data (March 2026)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Monthly calendar data returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('object');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/month/2026/3",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"month",
-								"2026",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Created Event",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Event updated successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Updated Team Meeting');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Team Meeting\",\n    \"description\": \"Extended weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T12:00:00\",\n    \"color\": \"GREEN\",\n    \"allDay\": false\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"events",
-								"{{calendarEventId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Toggle Task As Done",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Task updated successfully\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
-									"    pm.expect(jsonData.completed).to.eql(true);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs - COMPLETED\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": true\n}"
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}/toggle",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks",
-								"{{calendarTaskId}}",
-								"toggle"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Created Event",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"events",
-								"{{calendarEventId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Created Task",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"calendar",
-								"tasks",
-								"{{calendarTaskId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout genericUser",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Logout successful\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql('SUCCESS');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/v1/auth/logout",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "baseURL",
-			"value": "https://localhost:443",
-			"type": "string"
-		},
-		{
-			"key": "testUserNote1Id",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "testUserNote2Id",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "genericUserCommentId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "testUserId",
-			"value": ""
-		},
-		{
-			"key": "calendarEventId",
-			"value": "",
-			"type": "string",
-			"description": {
-				"content": "ID of created calendar event for testing",
-				"type": "text/plain"
-			}
-		},
-		{
-			"key": "calendarTaskId",
-			"value": "",
-			"type": "string",
-			"description": {
-				"content": "ID of created calendar task for testing",
-				"type": "text/plain"
-			}
-		},
-		{
-			"key": "eventId",
-			"value": ""
-		},
-		{
-			"key": "taskId",
-			"value": ""
-		}
-	]
+  "info": {
+    "_postman_id": "2fd92b7b-d0f5-4978-9bb8-69f3dbdd54f9",
+    "name": "WrapItUp Planner Test Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53156338",
+    "_collection_link": "https://go.postman.co/collection/53156338-2fd92b7b-d0f5-4978-9bb8-69f3dbdd54f9?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Public Access (No Login)",
+      "item": [
+        {
+          "name": "View Public Note 1 (Pythagorean Theorem)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Can view public note without auth\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.include('Pythagorean');",
+                  "    pm.expect(jsonData.visibility).to.eql('PUBLIC');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Try to View Private Note (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message about login\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('log in');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/2",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Try to Comment Without Login (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"Trying to comment without login\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. New User Registration and Setup",
+      "item": [
+        {
+          "name": "Register New User (testUser)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"User registered successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('registered');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testUser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/user",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as testUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Login successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});",
+                  "",
+                  "pm.test(\"Auth cookies are set\", function () {",
+                  "    pm.expect(pm.cookies.has('AuthToken')).to.be.true;",
+                  "    pm.expect(pm.cookies.has('RefreshToken')).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testUser\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/login",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get testUser Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User profile retrieved\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.username).to.eql('testUser');",
+                  "    pm.collectionVariables.set('testUserId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Email updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.email).to.eql('testuser.updated@example.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"testuser.updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Profile Image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Image uploaded\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('image');",
+                  "    pm.expect(jsonData.image).to.include('/api/v1/users/profile-image/');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users/upload-image",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "upload-image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile Image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Image content type is correct\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('image');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users/profile-image/{{testUserId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile-image",
+                "{{testUserId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create First Note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Note created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.title).to.eql('My First Test Note');",
+                  "    pm.collectionVariables.set('testUserNote1Id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"My First Test Note\",\n    \"overview\": \"Introduction to testing\",\n    \"summary\": \"This is my first note created for testing purposes. It contains important information about the testing process.\",\n    \"jsonQuestions\": \"[{\\\"question\\\": \\\"What is testing?\\\"}, {\\\"question\\\": \\\"Why is it important?\\\"}]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"OTHERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Second Note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Second note created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.title).to.eql('Advanced Mathematics Notes');",
+                  "    pm.collectionVariables.set('testUserNote2Id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Advanced Mathematics Notes\",\n    \"overview\": \"Complex mathematical concepts\",\n    \"summary\": \"Comprehensive notes covering advanced topics in mathematics including calculus, linear algebra, and differential equations.\",\n    \"jsonQuestions\": \"[]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"MATHS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Edit First Note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Note updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.include('UPDATED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"My First Test Note - UPDATED\",\n    \"overview\": \"Updated introduction to testing\",\n    \"summary\": \"This note has been updated with additional information and improvements to the testing methodology.\",\n    \"jsonQuestions\": \"[{\\\"question\\\": \\\"What is testing?\\\"}, {\\\"question\\\": \\\"Why is it important?\\\"}, {\\\"question\\\": \\\"What did we update?\\\"}]\",\n    \"visibility\": \"PRIVATE\",\n    \"category\": \"OTHERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/{{testUserNote1Id}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "{{testUserNote1Id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Share First Note with genericUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Note shared\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.sharedWithUserIds).to.be.an('array');",
+                  "    pm.expect(jsonData.sharedWithUserIds.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"genericUser\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/{{testUserNote1Id}}/share",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "{{testUserNote1Id}}",
+                "share"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout testUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Logout successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/logout",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. genericUser Operations",
+      "item": [
+        {
+          "name": "Login as genericUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Login successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"genericUser\",\n    \"password\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/login",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View First Page of My Notes (Filtered by SCIENCE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Paginated notes returned with category filter\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData).to.have.property('totalElements');",
+                  "    pm.expect(jsonData.content).to.be.an('array');",
+                  "    if (jsonData.content.length > 0) {",
+                  "        jsonData.content.forEach(note => {",
+                  "            pm.expect(note.category).to.eql('SCIENCE');",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes?page=0&category=SCIENCE",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "category",
+                  "value": "SCIENCE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View Shared Notes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Shared notes returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData.content).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/shared?page=0",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "shared"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Open Comments of Note 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Comments returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData.content).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments?page=0",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment to Note 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.username).to.eql('genericUser');",
+                  "    pm.collectionVariables.set('genericUserCommentId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"This is a great explanation of the Pythagorean theorem! Very helpful for my studies.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Own Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments/{{genericUserCommentId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments",
+                "{{genericUserCommentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete One of genericUser's Notes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/5",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Report Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment reported successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.reported).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments/2/report",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments",
+                "2",
+                "report"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Calendar Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Event created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Study Session');",
+                  "    pm.collectionVariables.set('eventId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Study Session\",\n    \"description\": \"Math homework review\",\n    \"startDate\": \"2026-03-15T14:00:00\",\n    \"endDate\": \"2026-03-15T16:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/events",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Calendar Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Task created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Complete Assignment');",
+                  "    pm.collectionVariables.set('taskId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Complete Assignment\",\n    \"description\": \"Finish calculus problems\",\n    \"taskDate\": \"2026-03-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout genericUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/logout",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Operations",
+      "item": [
+        {
+          "name": "Login as admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Admin login successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/login",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Try to View Admin Notes (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 or 404\", function () {",
+                  "    pm.expect([403, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes?page=0&size=10",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment to Public Note 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Admin comment created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.content).to.include('admin');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"As an admin, I find this content very informative and well-structured.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a Note (Note 3 - French Revolution)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 or 200\", function () {",
+                  "    pm.expect([200, 403]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/3",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a Comment (Comment 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 or 403\", function () {",
+                  "    pm.expect([204, 403]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/comments/1",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reported Comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Reported comments list returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.content).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/admin/reported-comments?page=0&size=10",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "reported-comments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unreport Comment (Ignore Flag)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment unreported successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.reported).to.eql(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/admin/reported-comments/3/unreport",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "reported-comments",
+                "3",
+                "unreport"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Reported Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/admin/reported-comments/7",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "reported-comments",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ban User (secondUser)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User banned successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('BANNED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users/2/ban",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "2",
+                "ban"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unban User (secondUser)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User unbanned successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('ACTIVE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/users/2/unban",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "2",
+                "unban"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Logout successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/logout",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Calendar Operations - genericUser",
+      "item": [
+        {
+          "name": "Login as genericUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Login successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"genericUser\",\n    \"password\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/login",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Calendar Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Event created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Team Meeting');",
+                  "    pm.expect(jsonData.color).to.eql('BLUE');",
+                  "    pm.collectionVariables.set('calendarEventId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Team Meeting\",\n    \"description\": \"Weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T11:00:00\",\n    \"color\": \"BLUE\",\n    \"allDay\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/events",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Calendar Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Task created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
+                  "    pm.expect(jsonData.completed).to.eql(false);",
+                  "    pm.collectionVariables.set('calendarTaskId', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Calendar Events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Events list returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/events",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Calendar Tasks (Pending Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Tasks list returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks?pendingOnly=true",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "pendingOnly",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tasks for Daily View (March 15)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Daily tasks returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks?date=2026-03-15",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-03-15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Events for Daily View (March 15)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Daily calendar data returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('events');",
+                  "    pm.expect(jsonData).to.have.property('tasks');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/day?date=2026-03-15",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "day"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-03-15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Monthly View Data (March 2026)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Monthly calendar data returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/month/2026/3",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "month",
+                "2026",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Created Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Event updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Updated Team Meeting');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated Team Meeting\",\n    \"description\": \"Extended weekly team sync meeting\",\n    \"startDate\": \"2026-03-15T10:00:00\",\n    \"endDate\": \"2026-03-15T12:00:00\",\n    \"color\": \"GREEN\",\n    \"allDay\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "events",
+                "{{calendarEventId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Task As Done",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Task updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.eql('Complete Project Documentation');",
+                  "    pm.expect(jsonData.completed).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Complete Project Documentation\",\n    \"description\": \"Finish writing user manual and API docs - COMPLETED\",\n    \"taskDate\": \"2026-03-15\",\n    \"completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}/toggle",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks",
+                "{{calendarTaskId}}",
+                "toggle"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Created Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/events/{{calendarEventId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "events",
+                "{{calendarEventId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Created Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/calendar/tasks/{{calendarTaskId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "calendar",
+                "tasks",
+                "{{calendarTaskId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout genericUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Logout successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('SUCCESS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/api/v1/auth/logout",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. AI -based",
+      "item": [
+        {
+          "name": "Create Note with AI",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "type": "file",
+                  "key": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/ai",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "ai"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST \"$BASE_URL/api/v1/notes/ai\" \\\r\n  -H \"Authorization: Bearer $TOKEN\" \\\r\n  -H \"Accept: application/json\" \\\r\n  -F \"file=@/ruta/al/archivo.pdf\""
+          },
+          "response": []
+        },
+        {
+          "name": "Create AI Questions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer $TOKEN"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "7750477b-ef7f-424d-b3e8-e1fd656dd531",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/v1/notes/1/ai/questions",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notes",
+                "1",
+                "ai",
+                "questions"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST \"$BASE_URL/api/v1/notes/$NOTE_ID/ai/questions\" \\\r\n  -H \"Authorization: Bearer $TOKEN\" \\\r\n  -H \"Accept: application/json\" \\\r\n  -F \"file=@/ruta/al/archivo.pdf\""
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "https://localhost:443",
+      "type": "string"
+    },
+    {
+      "key": "testUserNote1Id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserNote2Id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "genericUserCommentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserId",
+      "value": ""
+    },
+    {
+      "key": "calendarEventId",
+      "value": "",
+      "type": "string",
+      "description": "ID of created calendar event for testing"
+    },
+    {
+      "key": "calendarTaskId",
+      "value": "",
+      "type": "string",
+      "description": "ID of created calendar task for testing"
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    }
+  ]
 }

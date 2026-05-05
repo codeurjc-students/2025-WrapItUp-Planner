@@ -159,9 +159,14 @@ public class NoteService {
             throw new SecurityException("You do not have permission to generate quiz questions for this note");
         }
 
+        // Do not allow regenerating questions if they already exist
+        if (note.getJsonQuestions() != null && !note.getJsonQuestions().isBlank()) {
+            throw new IllegalStateException("This note already contains generated questions");
+        }
+
         String extractedText = documentTextExtractorService.extractText(file);
         String quizJson = openAiService.generateQuizFromText(extractedText);
-        note.setJsonQuestions(quizJson);
+        note.setJsonQuestions(quizJson != null ? quizJson : "");
         note.setLastModified(LocalDateTime.now());
 
         Note updated = noteRepository.save(note);
