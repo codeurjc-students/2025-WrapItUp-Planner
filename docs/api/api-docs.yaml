@@ -404,6 +404,95 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/v1/notes/{id}/quiz-results:
+    post:
+      tags:
+      - note-rest-controller
+      operationId: submitQuizResult
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizResultDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/notes/{id}/ai/questions:
+    post:
+      tags:
+      - note-rest-controller
+      operationId: generateQuestionsWithAi
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/notes/ai:
+    post:
+      tags:
+      - note-rest-controller
+      operationId: createNoteWithAi
+      parameters:
+      - name: visibility
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/v1/calendar/tasks:
     get:
       tags:
@@ -861,6 +950,8 @@ components:
           format: int64
         username:
           type: string
+        displayName:
+          type: string
         userProfilePicUrl:
           type: string
         createdAt:
@@ -980,6 +1071,20 @@ components:
         lastModified:
           type: string
           format: date-time
+    QuizResultDTO:
+      type: object
+      properties:
+        quizScore:
+          type: integer
+          format: int32
+        quizMaxScore:
+          type: integer
+          format: int32
+        quizProgressPercentages:
+          type: array
+          items:
+            type: number
+            format: double
     AuthResponse:
       type: object
       properties:

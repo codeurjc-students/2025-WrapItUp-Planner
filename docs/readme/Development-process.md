@@ -16,8 +16,8 @@
   - Pull Requests are reviewed and pass automated quality gates before merging.  
 - **Metrics tracked**:
   - **Commits:** 209 commits in total.
-  - **Branches:** 32 branches.
-  - **Pull Requests:** 42 PR created and merged.
+  - **Branches:** 40 branches.
+  - **Pull Requests:** 50 PR created and merged.
 - **Repository activity visualizations**:
   - **Commits over time:**  
     ![Commits](../../images/Commits.png)
@@ -80,3 +80,11 @@
   - Review and manage reported comments
   - Unflag comments that were incorrectly reported
   - Ban users from accessing the platform when necessary
+
+### 5.4. Version 1.0
+**Release Date:** May 2025
+
+**Features:**
+- **AI-Powered Notes:**
+  - Automatic quiz generation from note content powered by OpenAI GPT-4o
+  - Users can test their knowledge directly from their notes

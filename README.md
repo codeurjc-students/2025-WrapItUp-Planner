@@ -2,85 +2,66 @@
 
 WrapItUp Planner is an All-In-One collaborative web platform designed to help students manage their academic journey more efficiently. The application combines study organization, knowledge sharing, and AI-powered tools into a single platform. Students can create and share notes, collaborate through comments, and organize their academic life effectively.
 
-## Version 0.2
+## Version 1.0
 
-Version 0.2 of WrapItUp Planner extends the functionality previously seen in version 0.1. This update introduces moderation tools for admins and also the application's calendar.
+Version 1.0 of WrapItUp Planner marks the successful completion of the application, with all planned features fully implemented. Building upon earlier iterations, this final version delivers a complete user experience across both productivity and moderation functionalities.
 
-Admins now have access to their own dashboard, where they can review user reported comments, a new feature that allows users and admins to flag comments as inappropiate. From the dashboard admins can decide whether the content is correctly flagged or not. If necessary admins may ban users from accessing the platform.
+The latest additions focus on intelligent content processing for registered users. Users can upload their notes directly to the platform, where they are automatically analyzed using artificial intelligence. The system generates a structured overview, a concise summary, and multiple-choice questions formatted in JSON, transforming raw notes into interactive study material. For manually written notes, users can generate the multiple choice question by providing the original source material.
 
-In addition to updating the moderation side of the application, this version introduces the calendar feature, designed to help users organize their schedules. Using the calendar users can create daily tasks or multi-day events to better manage their time.
+These generated resources are integrated into the learning experience. Users can engage with interactive quizzes based on the AI-generated questions, enabling more effective and dynamic study sessions. To further support learning, the application tracks quiz performance and presents results through a line chart, allowing users to monitor their progress over time.
 
-### Screenshots (new functionality)
+All expected functionality has now been completed, and the application is considered fully developed and ready for use.
 
-[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
-*Admin profile page with access to moderation dashboard*
+### Latest Developed Features - Screenshots
 
-[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
-*Admin dashboard showing reported comments with moderation actions*
+[![Profile](images/v.1.0/profile.png)](images/v.1.0/profile.png)
+*Updated profile visual presentation*
 
-[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
-*User profile page with task heatmap visualization*
+[![Create Note (AI)](images/v.1.0/createNoteAI.png)](images/v.1.0/createNoteAI.png)
+*Upload notes and AI processing interface*
 
-[![Calendar](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
-*Calendar view with events and daily tasks*
+[![Generate Quiz](images/v.1.0/generateQuiz.png)](images/v.1.0/generateQuiz.png)
+*Generate multiple-choice questions*
 
-[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
-*Account banned notification page*
+[![Quiz](images/v.1.0/quiz.png)](images/v.1.0/quiz.png)
+*Interactive quiz interface for study sessions*
+
+[![Quiz Results](images/v.1.0/quizResults.png)](images/v.1.0/quizResults.png)
+*Performance line chart and quiz results*
 
 ### Demo Videos
 
-**Version 0.2:**
+**Version 1.0:**
 <br>
-[![Demo Video v0.2](https://img.youtube.com/vi/h_z9azzQjCk/0.jpg)](https://youtu.be/h_z9azzQjCk)
+[![Demo Video v1.0](https://img.youtube.com/vi/_cuC3-al830/0.jpg)](https://youtu.be/_cuC3-al830)
 
 ---
 
 **Features demonstrated by user type:**
-- **Registered Users**: Access the calendar, create, edit, and delete their own events and daily tasks, and view a **heat map** in their profile that visualizes their pending daily tasks.
-- **Administrators**: Access all reported comments through the admin dashboard, unflag comments if they were incorrectly reported, and ban users from the platform when necessary.
+- **Registered Users**: Upload notes to the platform, which are processed using artificial intelligence to generate an overview, a summary, and multiple-choice questions in JSON format. They can access interactive quizzes based on this generated content and view a line chart in their profile that visualizes their performance progression after completing quizzes.
 
 ### Current Development Status
 
-The application is currently in development and will be continuously improved as further versions are released.
+As of version 1.0, development is complete and the application is finalized.
 
-## Future Versions
+### Latest Developed Features — Screenshots
 
-The next release of WrapItUp Planner will focus on the AI component of the application, registered users will be able to upload notes to the platform, which will be processed using artificial intelligence to automatically generate an overview, a summary, and multiple-choice questions in JSON format. These outputs will allow users to access interactive quizzes derived from their uploaded materials.
+**Key Screens:**
 
-### Functionalities (Version 0.2)
+[![Profile](images/v.1.0/profile.png)](images/v.1.0/profile.png)
+*Updated profile presentations*
 
-**Admin Features:**
+[![Create Note (AI)](images/v.1.0/createNoteAI.png)](images/v.1.0/createNoteAI.png)
+*Note upload and AI processing*
 
-[![Admin Profile](images/v.0.2/adminProfile.png)](images/v.0.2/adminProfile.png)
-*Admin profile page with access to moderation dashboard*
+[![Generate Quiz](images/v.1.0/generateQuiz.png)](images/v.1.0/generateQuiz.png)
+*Automatic question generation and JSON export*
 
-[![Admin Dashboard](images/v.0.2/adminDashboard.png)](images/v.0.2/adminDashboard.png)
-*Admin dashboard showing reported comments with moderation actions (ignore, delete, view profile, view original note)*
+[![Quiz](images/v.1.0/quiz.png)](images/v.1.0/quiz.png)
+*Interactive quiz UI*
 
-[![Banned User Profile](images/v.0.2/bannedUser.png)](images/v.0.2/bannedUser.png)
-*Admin view of a banned user profile with unban option*
-
-**Moderation:**
-
-[![Banned Page](images/v.0.2/bannedPage.png)](images/v.0.2/bannedPage.png)
-*Account banned notification page displayed when a banned user attempts to access the platform*
-
-**Calendar Features:**
-
-[![User Profile](images/v.0.2/Userprofile.png)](images/v.0.2/Userprofile.png)
-*User profile page with task heatmap visualization showing pending tasks for the current month*
-
-[![Calendar Monthly View](images/v.0.2/calendar.png)](images/v.0.2/calendar.png)
-*Calendar monthly view with events (colored dots) and daily tasks (checkbox indicators)*
-
-[![Calendar Daily View](images/v.0.2/daily-view.png)](images/v.0.2/daily-view.png)
-*Calendar daily view showing events and tasks for a specific day with add/edit/delete options*
-
-[![Create Task](images/v.0.2/createTask.png)](images/v.0.2/createTask.png)
-*Create new daily task dialog with title and description fields*
-
-[![Multi-day Event](images/v.0.2/Multi-day-event.png)](images/v.0.2/Multi-day-event.png)
-*Create multi-day event dialog with color selection, date range, and time configuration*
+[![Quiz Results](images/v.1.0/quizResults.png)](images/v.1.0/quizResults.png)
+*Quiz performance and results chart*
 
 ### Detailed Functionalities
 
@@ -99,9 +80,7 @@ The next release of WrapItUp Planner will focus on the AI component of the appli
 | Registered Users    | - Use an interactive calendar to create events spanning one or multiple days.<br>- Manage daily tasks in the form of a to-do list.<br>- View the calendar in both monthly and daily formats, with a modal window appearing upon selecting a specific day in the monthly view.<br>- Report inappropriate comments made by other users. <br> - View a heatmap in their profile displaying the number of daily tasks assigned during the current month.<br> |
 | Administrators      | - Review user-reported comments in a ticket-based format. <br>- Ability to ban a user from accessing the platform. |
 
-### Planned Features
-
-**Advanced Functionality - NEXT RELEASE (Version 1.0)**
+**Advanced Functionality - IMPLEMENTED**
 
 | User Type           | Features |
 |--------------------|---------|
@@ -121,13 +100,30 @@ Before running the application, ensure you have Docker installed on your system:
 To run the application on your local machine, execute the following commands in your terminal:
 
 ```bash
-docker pull arturox2500/wrapitup_planner:0.2
-docker pull arturox2500/wrapitup_planner-compose:0.2
-docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.2 cmd.exe
+docker pull arturox2500/wrapitup_planner:1.0
+docker pull arturox2500/wrapitup_planner-compose:1.0
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:1.0 cmd.exe
 docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
-docker cp temp-compose:/.env ./.env
 docker rm temp-compose
 docker compose up -d
+```
+#### Environment Setup
+To run the application, create a `.env` file in the same directory as the `docker-compose.yml` and define the required environment variables there. The file should include entries for the MySQL credentials, Spring datasource settings, and server SSL configuration using this format:
+
+```env
+MYSQL_ROOT_PASSWORD=<value>
+MYSQL_DATABASE=<value>
+MYSQL_USER=<value>
+MYSQL_PASSWORD=<value>
+
+SPRING_DATASOURCE_URL=<value>
+SPRING_DATASOURCE_USERNAME=<value>
+SPRING_DATASOURCE_PASSWORD=<value>
+SPRING_JPA_HIBERNATE_DDL_AUTO=<value>
+SERVER_PORT=<value>
+SERVER_SSL_KEY_STORE_PASSWORD=<value>
+
+OPENAI_API_KEY=<value>
 ```
 
 ### Accessing the Application
@@ -144,6 +140,7 @@ The application comes with pre-loaded sample data for testing purposes. You can 
 |----------|-------|----------|------|
 | genericUser | genericUser@example.com | 12345678 | User |
 | secondUser | secondUser@example.com | 12345678 | User |
+| thirdUser | thirdUser@example.com | 12345678 | User |
 | admin | admin@example.com | 12345678 | Administrator |
 
 ### Sample Data Overview
@@ -151,19 +148,22 @@ The application comes with pre-loaded sample data for testing purposes. You can 
 The application is initialized with sample data to demonstrate its functionality:
 
 **Users**:
-- **genericUser**: Regular user with 12 notes across different categories, a profile picture, calendar events, and daily tasks
-- **secondUser**: Regular user with 6 notes and a profile picture
-- **admin**: Administrator account with full access to all notes and moderation capabilities, they have to access notes through an url in this phase
-
+- **genericUser**: Regular user with 13 notes across different categories, a profile picture, calendar events, and daily tasks
+- **secondUser**: Regular user with 8 notes and a profile picture
+- **thirdUser**: Regular user with 4 notes and a profile picture
+- **admin**: Administrator account with full access to all notes and moderation capabilities.
 **Notes**:
-- 18 total notes covering various subjects (Mathematics, Science, History, Art, Languages, and Others)
+- 25 total notes covering various subjects (Mathematics, Science, History, Art, Languages, and Others)
 - Notes are categorized by topic (e.g., "Pythagorean Theorem" under MATHS, "Photosynthesis" under SCIENCE)
 - Mix of public and private notes
-- Some notes are shared between users (e.g., genericUser's "Pythagorean Theorem" is shared with secondUser)
+- Some notes are shared between users:
+  - genericUser's "Pythagorean Theorem" is shared with secondUser
+  - secondUser's "Quadratic Equations" is shared with genericUser
+  - secondUser's "Impressionism" is shared with genericUser
 
 **Comments**:
-- 12 comments from both genericUser and secondUser showing interaction between users
-- 2 reported comments flagged as inappropriate for admins to review
+- 24 comments from genericUser, secondUser, and thirdUser showing interaction between users
+- 5 reported comments flagged as inappropriate for admins to review
 
 **Calendar Events** (genericUser):
 - 7 events including study sessions, lectures, workshops, and deadlines
@@ -171,12 +171,25 @@ The application is initialized with sample data to demonstrate its functionality
 - Both scheduled events and all-day events
 - Color-coded by type (Blue, Yellow, Green, Red)
 
+**Calendar Events** (secondUser):
+- 2 events: a Chemistry Lab Prep session and a History Debate
+
+**Calendar Events** (thirdUser):
+- 4 events including a coding practice session, statistics revision, a workshop, and a model review meeting
+
 **Calendar Tasks** (genericUser):
 - 18 daily tasks spanning the current month
 - Mix of academic tasks and personal tasks
-- 6 completed tasks and 12 pending tasks
+- 7 completed tasks and 11 pending tasks
 - Tasks visualized in the profile heat map
 
+**Calendar Tasks** (secondUser):
+- 3 tasks: Review Chemistry Notes, Prepare History Summary, and Language Review
+- 2 completed, 1 pending
+
+**Calendar Tasks** (thirdUser):
+- 3 tasks: Build Practice App, Statistics Exercises, and Machine Learning Reading
+- 1 completed, 2 pending
 
 ## Documentation
 

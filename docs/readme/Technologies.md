@@ -12,8 +12,14 @@ URL: [Angular](https://angular.io)
 4. **Maven** – A build automation and dependency management tool for Java projects. In WrapItUp Planner, Maven manages the project dependencies, build lifecycle, and packaging for the Spring Boot backend, ensuring that the application is consistently built, tested, and deployable.  
    URL: [Maven](https://maven.apache.org)
 
+5. **ngx-charts** – An Angular charting library built on D3.js. The frontend uses ngx-charts to render the quiz performance line chart and other visualizations in the user profile and quiz results.  
+   URL: [ngx-charts](https://swimlane.github.io/ngx-charts/)
+
 6. **SQL** – A relational database language used to manage and query the application’s data. In WrapItUp Planner, SQL (via MySQL) stores all of the application's data. The backend connects to the database through MySQL Connector, performing CRUD operations and ensuring data consistency, integrity, and persistence throughout the system.   
    URL: [MySQL](https://www.mysql.com)
 
 7. **Testing Frameworks** – The project implements unit, integration, and end-to-end testing to guarantee reliability and maintainability. The backend uses **REST Assured** and **Mockito** to test business logic and RESTful API endpoints. The frontend relies on **Karma** and **Jasmine** to test Angular components and user interactions, while **Selenium** is used for end-to-end (E2E) testing to simulate real user behavior.  
 **URLs:** [Mockito](https://site.mockito.org), [REST Assured](https://rest-assured.io/), [Karma](https://karma-runner.github.io/latest/index.html), [Jasmine](https://jasmine.github.io), [Selenium](https://www.selenium.dev)
+
+8. **OpenAI GPT-4o** – A large language model developed by OpenAI, integrated into WrapItUp Planner to enhance the note-taking experience with AI-powered features. GPT-4o is used to automatically generate quiz questions from note content, allowing users to test their knowledge directly from their notes. The backend communicates with the OpenAI API to process note content and return structured question sets, which are then stored and served to the frontend.  
+   URL: [OpenAI](https://openai.com)

@@ -23,6 +23,7 @@ The application is publicly available through **DockerHub**:
 - `dev` - Development version (auto-deployed from `main` branch)
 - `0.1` - Stable release version 0.1
 - `0.2` - Stable release version 0.2
+- `1.0` - Stable release version 1.0
 
 ### Quick Deployment
 
@@ -42,12 +43,14 @@ SPRING_DATASOURCE_PASSWORD=<value>
 SPRING_JPA_HIBERNATE_DDL_AUTO=<value>
 SERVER_PORT=<value>
 SERVER_SSL_KEY_STORE_PASSWORD=<value>
+
+OPENAI_API_KEY=<value>
 ```
 
 ```bash
-docker pull arturox2500/wrapitup_planner:0.2
-docker pull arturox2500/wrapitup_planner-compose:0.2
-docker create --name temp-compose arturox2500/wrapitup_planner-compose:0.2 cmd.exe
+docker pull arturox2500/wrapitup_planner:1.0
+docker pull arturox2500/wrapitup_planner-compose:1.0
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:1.0 cmd.exe
 docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
 docker rm temp-compose
 docker compose up -d
@@ -61,3 +64,25 @@ The Docker images are automatically built and published using GitHub Actions:
 - **Development builds:** Triggered on every push to `main`
 - **Release builds:** Triggered when a new GitHub release is published
 - All builds are pushed to DockerHub with appropriate version tags
+
+### Remote Deployment — URJC
+
+As part of the project development process, this release was deployed to a remote URJC machine with SSH access. The URJC environment was provided with a user account that had the required permissions and the necessary SSH keys. Docker and Docker Compose were installed on the remote host to run the application and its database.
+
+Notes:
+- A `.env` file is required in the same directory as the `docker-compose.yml` on the remote machine with the required environment variables (MySQL credentials, Spring datasource settings, SSL settings, and `OPENAI_API_KEY`).
+- The `dev` image tags were used for testing the deployment on URJC.
+
+Commands used on the remote host to fetch and run the development images:
+
+```bash
+docker pull arturox2500/wrapitup_planner:dev
+docker pull arturox2500/wrapitup_planner-compose:dev
+
+docker create --name temp-compose arturox2500/wrapitup_planner-compose:dev /bin/sh
+docker cp temp-compose:/docker-compose.yml ./docker-compose.yml
+docker rm temp-compose
+
+docker-compose up -d
+```
+
