@@ -69,6 +69,14 @@ The Docker images are automatically built and published using GitHub Actions:
 
 As part of the project development process, this release was deployed to a remote URJC machine with SSH access. The URJC environment was provided with a user account that had the required permissions and the necessary SSH keys. Docker and Docker Compose were installed on the remote host to run the application and its database.
 
+#### Reverse Proxy - Nginx
+
+**Nginx** is configured as a reverse proxy to serve the application over HTTPS using the official SSL certificate stored in `/home/vmuser/certs/`. 
+
+- Handles HTTPS encryption
+- Redirects HTTP traffic to HTTPS
+- Forwards requests to the Spring Boot application
+
 Notes:
 - A `.env` file is required in the same directory as the `docker-compose.yml` on the remote machine with the required environment variables (MySQL credentials, Spring datasource settings, SSL settings, and `OPENAI_API_KEY`).
 - The `dev` image tags were used for testing the deployment on URJC.
