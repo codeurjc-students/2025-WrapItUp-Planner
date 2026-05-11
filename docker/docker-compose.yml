@@ -39,8 +39,8 @@ services:
       SERVER_SSL_KEY_STORE_PASSWORD: "${SERVER_SSL_KEY_STORE_PASSWORD}"
       
 
-    ports:
-      - "443:443"
+    expose:
+      - "443"
     networks:
       - wrapitup-network
     healthcheck:
@@ -49,6 +49,21 @@ services:
       timeout: 10s
       retries: 3
       start_period: 90s
+    
+    nginx:
+      image: nginx:latest
+      container_name: nginx
+      restart: unless-stopped
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf
+        - /home/vmuser/certs:/etc/nginx/certs
+      depends_on:
+        - app
+      networks:
+        - wrapitup-network-dev
 
 volumes:
   db_data:
