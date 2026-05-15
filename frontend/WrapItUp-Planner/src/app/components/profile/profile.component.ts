@@ -4,6 +4,7 @@ import { UserModelDTO } from '../../dtos/user.dto';
 import { UserStatus } from '../../dtos/user-status.enum';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
 selector: 'app-profile',
@@ -223,7 +224,7 @@ export class ProfileComponent implements OnInit {
       return this.imagePreview;
     }
     if (this.user?.image) {
-      return 'https://localhost:443' + this.user.image;
+      return `${environment.apiUrl}` + this.user.image;
     }
     return 'assets/genericUser.png';
   }

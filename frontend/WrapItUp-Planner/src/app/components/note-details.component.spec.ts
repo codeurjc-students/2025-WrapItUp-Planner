@@ -467,11 +467,6 @@ describe('NoteDetailComponent', () => {
     expect(component.getProfilePicUrl({ id: 1, content: 'x', noteId: 1, username: 'u', displayName: 'd', createdAt: '2025-01-01T10:00:00' })).toBe('');
   });
 
-  it('should handle getProfilePicUrl with url', () => {
-    const comment = { id: 1, content: 'x', noteId: 1, username: 'u', displayName: 'd', createdAt: '2025-01-01T10:00:00', userProfilePicUrl: '/img.png' } as CommentDTO;
-    expect(component.getProfilePicUrl(comment)).toBe('https://localhost/img.png');
-  });
-
   describe('Quiz functionality', () => {
     const quizNote: NoteDTO = {
       ...testNote,

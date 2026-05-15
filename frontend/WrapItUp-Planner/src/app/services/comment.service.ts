@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CommentDTO } from '../dtos/comment.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommentService {
-  private apiUrl = 'https://localhost:443/api/v1/notes';
+  private apiUrl = `${environment.apiUrl}/api/v1/notes`;
 
   constructor(private http: HttpClient) {}
 
@@ -50,7 +51,7 @@ export class CommentService {
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<any>('https://localhost:443/api/v1/admin/reported-comments', {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/admin/reported-comments`, {
       params,
       withCredentials: true
     });
@@ -58,7 +59,7 @@ export class CommentService {
 
   unreportComment(commentId: number): Observable<CommentDTO> {
     return this.http.post<CommentDTO>(
-      `https://localhost:443/api/v1/admin/reported-comments/${commentId}/unreport`,
+      `${environment.apiUrl}/api/v1/admin/reported-comments/${commentId}/unreport`,
       {},
       { withCredentials: true }
     );
@@ -66,7 +67,7 @@ export class CommentService {
 
   deleteReportedComment(commentId: number): Observable<void> {
     return this.http.delete<void>(
-      `https://localhost:443/api/v1/admin/reported-comments/${commentId}`,
+      `${environment.apiUrl}/api/v1/admin/reported-comments/${commentId}`,
       { withCredentials: true }
     );
   }
