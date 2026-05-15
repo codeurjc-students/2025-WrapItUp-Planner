@@ -8,7 +8,7 @@ describe('AuthService (integration with real API)', () => {
   let service: AuthService;
   // create a unique suffix for this test run to avoid duplicate-user errors
   const _ts = Date.now();
-  const TEST_USER = `u_test_integration_${_ts}`;
+  const TEST_USER = `u${String(_ts).slice(-12)}`;
   const TEST_EMAIL = `atest+${_ts}@example.com`;
 
   beforeEach(() => {
