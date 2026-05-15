@@ -5,15 +5,16 @@ import { CalendarEventDTO } from '../dtos/calendar-event.dto';
 import { CalendarTaskDTO } from '../dtos/calendar-task.dto';
 import { CalendarDayDTO } from '../dtos/calendar-day.dto';
 import { CalendarMonthDTO } from '../dtos/calendar-month.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CalendarService {
 
-  private apiUrl = 'https://localhost:443/api/v1/calendar';
-  private eventsUrl = 'https://localhost:443/api/v1/calendar/events';
-  private tasksUrl = 'https://localhost:443/api/v1/calendar/tasks';
+  private apiUrl = `${environment.apiUrl}/api/v1/calendar`;
+  private eventsUrl = `${environment.apiUrl}/api/v1/calendar/events`;
+  private tasksUrl = `${environment.apiUrl}/api/v1/calendar/tasks`;
 
   constructor(private http: HttpClient) { }
 

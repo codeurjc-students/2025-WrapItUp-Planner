@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserModelDTO } from '../dtos/user.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { UserModelDTO } from '../dtos/user.dto';
 export class AuthService {
 
   // Direct backend URL on HTTPS port 443 for testing
-  private baseUrl = 'https://localhost:443/api/v1/auth';
+  private baseUrl = `${environment.apiUrl}/api/v1/auth`;
 
   constructor(private http: HttpClient) { }
 

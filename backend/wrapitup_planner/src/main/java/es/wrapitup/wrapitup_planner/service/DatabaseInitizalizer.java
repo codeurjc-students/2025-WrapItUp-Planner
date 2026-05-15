@@ -72,17 +72,20 @@ public class DatabaseInitizalizer {
     @PostConstruct
     public void init() throws IOException{
 
-        // User 1: genericUser
-        UserModel user = new UserModel(
-            "genericUser", 
-            "genericUser@example.com", 
-            passwordEncoder.encode("12345678"), 
-            UserStatus.ACTIVE, 
+            UserModel user = new UserModel(
+            "genericUser",
+            "genericUser@example.com",
+            passwordEncoder.encode("12345678"),
+            UserStatus.ACTIVE,
             "USER"
         );
+
         user.setProfilePic(saveImageFromFile("images/calendar.jpg"));
-        userRepository.save(user);
+
+        user = userRepository.save(user);
+
         user.setImage("/api/v1/users/profile-image/" + user.getId());
+
         userRepository.save(user);
 
         // User 2: secondUser
