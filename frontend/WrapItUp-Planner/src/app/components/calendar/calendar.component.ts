@@ -115,7 +115,8 @@ export class CalendarComponent implements OnInit {
   openNewEventDialog(): void {
     const dialogRef = this.dialog.open(CreateEventDialogComponent, {
       width: '750px',
-      maxWidth: '95vw'
+      maxWidth: '95vw',
+      maxHeight: '90vh'
     });
 
     dialogRef.afterClosed().subscribe(() => {

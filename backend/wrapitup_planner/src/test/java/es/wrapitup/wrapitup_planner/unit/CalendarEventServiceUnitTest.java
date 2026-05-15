@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
 import es.wrapitup.wrapitup_planner.dto.CalendarEventDTO;
 import es.wrapitup.wrapitup_planner.dto.CalendarEventMapper;
@@ -114,6 +115,22 @@ public class CalendarEventServiceUnitTest {
         assertNotNull(result);
         assertEquals("Test Event", result.getTitle());
         verify(eventRepository).save(any(CalendarEvent.class));
+    }
+
+    @Test
+    void createEventTruncatesTitleToMaxLength() {
+        String longTitle = "a".repeat(150);
+        testEventDTO.setTitle(longTitle);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(eventRepository.save(any(CalendarEvent.class))).thenReturn(testEvent);
+
+        eventService.createEvent(testEventDTO, "testuser");
+
+        ArgumentCaptor<CalendarEvent> eventCaptor = ArgumentCaptor.forClass(CalendarEvent.class);
+        verify(eventRepository).save(eventCaptor.capture());
+        assertNotNull(eventCaptor.getValue().getTitle());
+        assertEquals(50, eventCaptor.getValue().getTitle().length());
     }
 
     @Test

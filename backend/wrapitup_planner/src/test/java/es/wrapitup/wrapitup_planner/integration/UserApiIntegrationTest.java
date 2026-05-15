@@ -1,6 +1,7 @@
 package es.wrapitup.wrapitup_planner.integration;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -36,6 +37,10 @@ public class UserApiIntegrationTest {
 
     private String authToken;
     private String refreshToken;
+
+    private String uniqueUsername(String prefix) {
+        return prefix + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    }
 
     @BeforeEach
     void setUp() {
@@ -75,7 +80,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void registerUserWithValidData() {
-        String username = "validuser_" + System.currentTimeMillis();
+        String username = uniqueUsername("valid");
 
         given()
             .contentType(ContentType.JSON)
@@ -89,7 +94,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void registerUserWithShortPassword() {
-        String username = "shortpass_" + System.currentTimeMillis();
+        String username = uniqueUsername("short");
 
         given()
             .contentType(ContentType.JSON)
@@ -115,7 +120,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void registerDuplicateUsername() {
-        String username = "duplicate_" + System.currentTimeMillis();
+        String username = uniqueUsername("dup");
 
         registerUser(username, username + "@example.com", "password123");
 
@@ -141,7 +146,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void getCurrentUserWithAuthentication() {
-        String username = "authuser_" + System.currentTimeMillis();
+        String username = uniqueUsername("auth");
 
         registerUser(username, username + "@example.com", "password123");
         authToken = loginUser(username, "password123");
@@ -160,7 +165,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void updateUserWithValidData() {
-        String username = "updateuser_" + System.currentTimeMillis();
+        String username = uniqueUsername("upd");
 
         registerUser(username, username + "@example.com", "password123");
         authToken = loginUser(username, "password123");
@@ -181,7 +186,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void updateUserWithBlankEmail() {
-        String username = "blankemail_" + System.currentTimeMillis();
+        String username = uniqueUsername("blank");
 
         registerUser(username, username + "@example.com", "password123");
         authToken = loginUser(username, "password123");
@@ -200,7 +205,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void testLogoutAndRefreshToken() {
-        String username = "logoutuser_" + System.currentTimeMillis();
+        String username = uniqueUsername("logout");
 
         registerUser(username, username + "@example.com", "password123");
         
@@ -236,8 +241,8 @@ public class UserApiIntegrationTest {
 
     @Test
     void adminCanBanUser() {
-        String adminUsername = "admin_" + System.currentTimeMillis();
-        String targetUsername = "target_" + System.currentTimeMillis();
+        String adminUsername = uniqueUsername("admin");
+        String targetUsername = uniqueUsername("target");
 
         // Create admin user directly in database
         createAdminUser(adminUsername, "admin123");
@@ -274,8 +279,8 @@ public class UserApiIntegrationTest {
 
     @Test
     void adminCanUnbanUser() {
-        String adminUsername = "admin_unban_" + System.currentTimeMillis();
-        String targetUsername = "target_unban_" + System.currentTimeMillis();
+        String adminUsername = uniqueUsername("aunban");
+        String targetUsername = uniqueUsername("tunban");
 
         // Create admin user directly in database
         createAdminUser(adminUsername, "admin123");
@@ -310,8 +315,8 @@ public class UserApiIntegrationTest {
 
     @Test
     void nonAdminCannotBanUser() {
-        String regularUsername = "regular_" + System.currentTimeMillis();
-        String targetUsername = "target_regular_" + System.currentTimeMillis();
+        String regularUsername = uniqueUsername("reg");
+        String targetUsername = uniqueUsername("treg");
 
         registerUser(regularUsername, regularUsername + "@example.com", "password123");
         String regularToken = loginUser(regularUsername, "password123");
@@ -338,8 +343,8 @@ public class UserApiIntegrationTest {
 
     @Test
     void nonAdminCannotUnbanUser() {
-        String regularUsername = "regular_unban_" + System.currentTimeMillis();
-        String targetUsername = "target_regular_unban_" + System.currentTimeMillis();
+        String regularUsername = uniqueUsername("regu");
+        String targetUsername = uniqueUsername("tregu");
 
         registerUser(regularUsername, regularUsername + "@example.com", "password123");
         String regularToken = loginUser(regularUsername, "password123");
@@ -366,7 +371,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void banNonExistentUserReturns404() {
-        String adminUsername = "admin_notfound_" + System.currentTimeMillis();
+        String adminUsername = uniqueUsername("anf");
         createAdminUser(adminUsername, "admin123");
         String adminToken = loginUser(adminUsername, "admin123");
 
@@ -381,7 +386,7 @@ public class UserApiIntegrationTest {
 
     @Test
     void unbanNonExistentUserReturns404() {
-        String adminUsername = "admin_unban_notfound_" + System.currentTimeMillis();
+        String adminUsername = uniqueUsername("aunf");
         createAdminUser(adminUsername, "admin123");
         String adminToken = loginUser(adminUsername, "admin123");
 

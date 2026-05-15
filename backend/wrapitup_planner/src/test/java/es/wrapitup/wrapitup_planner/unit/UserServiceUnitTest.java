@@ -158,6 +158,17 @@ public class UserServiceUnitTest {
     }
 
     @Test
+    void createUserWithTooLongUsernameThrowsException() {
+        UserModelDTO dto = new UserModelDTO();
+        dto.setUsername("a".repeat(21));
+        dto.setEmail("new@example.com");
+        dto.setPassword("plainPassword");
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(dto));
+        verify(userRepository, never()).save(any(UserModel.class));
+    }
+
+    @Test
     void updateUserUpdatesFields() {
         UserModel existingUser = new UserModel();
         existingUser.setId(1L);
@@ -194,6 +205,24 @@ public class UserServiceUnitTest {
         assertEquals("New Name", result.getDisplayName());
         assertEquals("new@example.com", result.getEmail());
         assertEquals("/path/to/image.jpg", result.getImage());
+    }
+
+    @Test
+    void updateUserWithTooLongDisplayNameThrowsException() {
+        UserModel existingUser = new UserModel();
+        existingUser.setId(1L);
+        existingUser.setUsername("testuser");
+        existingUser.setEmail("old@example.com");
+        existingUser.setDisplayName("Old Name");
+
+        UserModelDTO updateDTO = new UserModelDTO();
+        updateDTO.setDisplayName("a".repeat(31));
+        updateDTO.setEmail("new@example.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(1L, updateDTO));
+        verify(userRepository, never()).save(any(UserModel.class));
     }
 
     @Test

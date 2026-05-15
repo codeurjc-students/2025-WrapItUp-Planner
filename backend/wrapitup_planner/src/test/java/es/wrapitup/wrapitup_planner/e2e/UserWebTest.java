@@ -5,12 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class UserWebTest extends BaseWebTest {
+
+        private String uniqueUsername(String prefix) {
+                return prefix + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        }
+
+        private String uniqueEmail(String username) {
+                return username + "@example.com";
+        }
 
     @Test
     void testRegisterShortPassword() {
@@ -35,9 +45,8 @@ public class UserWebTest extends BaseWebTest {
 
     @Test
     void testRegisterNewUser() {
-        long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("web");
+                String email = uniqueEmail(username);
         String password = "Password123";
 
         registerUser(username, email, password);
@@ -48,9 +57,8 @@ public class UserWebTest extends BaseWebTest {
 
     @Test
     void testProfilePageAccessAndDisplay() {
-        long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("web");
+                String email = uniqueEmail(username);
         String password = "Password123";
 
         registerAndLogin(username, email, password);
@@ -75,12 +83,11 @@ public class UserWebTest extends BaseWebTest {
 
     @Test
     void testProfileEditAndSave() {
-        long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("web");
+                String email = uniqueEmail(username);
         String password = "Password123";
-        String newDisplayName = "Updated Name " + ts;
-        String newEmail = "updated+" + ts + "@example.com";
+                String newDisplayName = "Updated Name";
+                String newEmail = "updated@example.com";
 
         registerAndLogin(username, email, password);
         

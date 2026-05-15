@@ -68,12 +68,21 @@ public class LoginController {
                     .body(Map.of("error", "Password must be at least 8 characters long"));
         }
 
+        if (userDTO.getUsername() != null) {
+            userDTO.setUsername(userDTO.getUsername().trim());
+        }
+
         if (userService.findByName(userDTO.getUsername()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "User already exists"));
         }
 
-        userService.createUser(userDTO);
+        try {
+            userService.createUser(userDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()

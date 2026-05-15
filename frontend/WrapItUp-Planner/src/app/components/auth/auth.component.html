@@ -7,7 +7,7 @@
     <form (ngSubmit)="onSubmit()">
       <div class="input-group" *ngIf="mode === 'register'">
         <label for="username">Username</label>
-        <input id="username" name="username" [(ngModel)]="model.username" required />
+        <input id="username" name="username" [(ngModel)]="model.username" required maxlength="20" />
       </div>
 
       <div class="input-group" *ngIf="mode === 'register'">
@@ -28,7 +28,7 @@
       <!-- Login fields -->
       <div class="input-group" *ngIf="mode === 'login'">
         <label for="usernameLogin">Username</label>
-        <input id="usernameLogin" name="usernameLogin" [(ngModel)]="username" required />
+        <input id="usernameLogin" name="usernameLogin" [(ngModel)]="username" required maxlength="20" />
       </div>
 
       <div class="input-group" *ngIf="mode === 'login'">
