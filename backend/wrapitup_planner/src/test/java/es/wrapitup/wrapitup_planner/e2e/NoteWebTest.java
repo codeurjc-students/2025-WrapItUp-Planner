@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -12,11 +14,19 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class NoteWebTest extends BaseWebTest {
 
+        private String uniqueUsername(String prefix) {
+                return prefix + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        }
+
+        private String uniqueEmail(String username) {
+                return username + "@example.com";
+        }
+
     @Test
     void testCreateNote() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Test Note " + ts;
         String noteOverview = "This is a test overview";
@@ -59,8 +69,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testCreatePrivateNote() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Private Note " + ts;
 
@@ -90,8 +100,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testEditNote() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String originalTitle = "Original Title " + ts;
         String updatedTitle = "Updated Title " + ts;
@@ -147,8 +157,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testEditNoteChangeVisibility() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Visibility Test Note " + ts;
 
@@ -191,8 +201,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testDeleteNote() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Note to Delete " + ts;
 
@@ -245,8 +255,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testCancelNoteCreation() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
 
         registerAndLogin(username, email, password);
@@ -272,8 +282,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testCancelNoteEdit() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String originalTitle = "Original Title " + ts;
 
@@ -313,10 +323,10 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testShareNoteWorkflow() {
         long ts = System.currentTimeMillis();
-        String ownerUsername = "genericUser" + ts;
-        String ownerEmail = "genericUser+" + ts + "@example.com";
-        String sharedUsername = "genericUser2" + ts;
-        String sharedEmail = "genericUser2+" + ts + "@example.com";
+                String ownerUsername = uniqueUsername("note");
+                String ownerEmail = uniqueEmail(ownerUsername);
+                String sharedUsername = uniqueUsername("share");
+                String sharedEmail = uniqueEmail(sharedUsername);
         String password = "Password123";
         String noteTitle = "Shared Note " + ts;
 
@@ -361,8 +371,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testCreateComment() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Note with Comments " + ts;
         String commentText = "This is a test comment";
@@ -408,8 +418,8 @@ public class NoteWebTest extends BaseWebTest {
         @Test
         void testOwnerSeesGenerateQuizButtonWhenNoteHasNoQuiz() {
                 long ts = System.currentTimeMillis();
-                String username = "quizOwner" + ts;
-                String email = "quizOwner+" + ts + "@example.com";
+                String username = uniqueUsername("quiz");
+                String email = uniqueEmail(username);
                 String password = "Password123";
                 String noteTitle = "Quiz Owner Note " + ts;
 
@@ -435,8 +445,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testDeleteComment() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Note for Comment Deletion " + ts;
         String commentText = "This comment will be deleted";
@@ -487,8 +497,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testAccessMyNotesPage() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
 
         registerAndLogin(username, email, password);
@@ -504,8 +514,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testFilterNotesByCategory() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String mathNoteTitle = "Math Note " + ts;
 
@@ -544,8 +554,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testSearchNotesInMyNotes() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String searchableTitle = "Searchable Note " + ts;
 
@@ -580,8 +590,8 @@ public class NoteWebTest extends BaseWebTest {
     @Test
     void testDeleteNoteFromMyNotes() {
         long ts = System.currentTimeMillis();
-        String username = "genericUser" + ts;
-        String email = "genericUser+" + ts + "@example.com";
+                String username = uniqueUsername("note");
+                String email = uniqueEmail(username);
         String password = "Password123";
         String noteTitle = "Note to Delete " + ts;
 
