@@ -19,6 +19,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 
 @Service
 public class CalendarTaskService {
+
+    private static final int TITLE_MAX_LENGTH = 50;
     
     private final CalendarTaskRepository taskRepository;
     private final CalendarTaskMapper taskMapper;
@@ -29,6 +31,17 @@ public class CalendarTaskService {
         this.taskMapper = taskMapper;
         this.userRepository = userRepository;
     }
+
+    private static String normalizeTitle(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.length() <= TITLE_MAX_LENGTH) {
+            return trimmed;
+        }
+        return trimmed.substring(0, TITLE_MAX_LENGTH);
+    }
     
     private boolean isAdmin(UserModel user) {
         return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
@@ -36,7 +49,8 @@ public class CalendarTaskService {
     
     @Transactional
     public CalendarTaskDTO createTask(CalendarTaskDTO taskDTO, String username) {
-        if (taskDTO.getTitle() == null || taskDTO.getTitle().trim().isEmpty()) {
+        String normalizedTitle = normalizeTitle(taskDTO.getTitle());
+        if (normalizedTitle == null || normalizedTitle.isEmpty()) {
             throw new IllegalArgumentException("Task title is required");
         }
         
@@ -61,7 +75,7 @@ public class CalendarTaskService {
         
         CalendarTask task = new CalendarTask(
             user,
-            taskDTO.getTitle(),
+            normalizedTitle,
             taskDTO.getDescription(),
             taskDTO.getTaskDate()
         );
@@ -92,8 +106,11 @@ public class CalendarTaskService {
             throw new SecurityException("You can only update your own tasks");
         }
         
-        if (taskDTO.getTitle() != null && !taskDTO.getTitle().trim().isEmpty()) {
-            task.setTitle(taskDTO.getTitle());
+        if (taskDTO.getTitle() != null) {
+            String normalizedTitle = normalizeTitle(taskDTO.getTitle());
+            if (normalizedTitle != null && !normalizedTitle.isEmpty()) {
+                task.setTitle(normalizedTitle);
+            }
         }
         
         if (taskDTO.getDescription() != null) {

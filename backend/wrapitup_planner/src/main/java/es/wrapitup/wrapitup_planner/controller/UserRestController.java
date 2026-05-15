@@ -114,7 +114,13 @@ public class UserRestController {
                     .body("Email is required");
         }
 
-        UserModelDTO updatedUser = userService.updateUser(loggedUser.getId(), userDTO);
+        UserModelDTO updatedUser;
+        try {
+            updatedUser = userService.updateUser(loggedUser.getId(), userDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
 
         if (updatedUser == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

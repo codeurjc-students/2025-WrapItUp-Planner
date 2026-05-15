@@ -16,6 +16,9 @@ import java.sql.Blob;
 @Service
 public class UserService {
 
+    private static final int USERNAME_MAX_LENGTH = 20;
+    private static final int DISPLAY_NAME_MAX_LENGTH = 30;
+
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -24,6 +27,34 @@ public class UserService {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    private static String normalizeUsername(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return trimmed;
+        }
+        if (trimmed.length() > USERNAME_MAX_LENGTH) {
+            throw new IllegalArgumentException("Username must be at most " + USERNAME_MAX_LENGTH + " characters");
+        }
+        return trimmed;
+    }
+
+    private static String normalizeDisplayName(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return trimmed;
+        }
+        if (trimmed.length() > DISPLAY_NAME_MAX_LENGTH) {
+            throw new IllegalArgumentException("Display name must be at most " + DISPLAY_NAME_MAX_LENGTH + " characters");
+        }
+        return trimmed;
     }
     
 
@@ -47,9 +78,16 @@ public class UserService {
     }
 
     public void createUser(UserModelDTO userDTO) {
-        UserModel user = new UserModel(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), UserStatus.ACTIVE , "USER");
+        String normalizedUsername = normalizeUsername(userDTO.getUsername());
+        if (normalizedUsername == null || normalizedUsername.isEmpty()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+
+        userDTO.setUsername(normalizedUsername);
+
+        UserModel user = new UserModel(normalizedUsername, userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), UserStatus.ACTIVE , "USER");
         // Set displayName to username by default
-        user.setDisplayName(userDTO.getUsername());
+        user.setDisplayName(normalizedUsername);
         userRepository.save(user);
     }
 
@@ -63,8 +101,12 @@ public class UserService {
         UserModel user = existingUser.get();
         
         // Username cannot be changed - it's used for login
-        if (userDTO.getDisplayName() != null && !userDTO.getDisplayName().isEmpty()) {
-            user.setDisplayName(userDTO.getDisplayName());
+        if (userDTO.getDisplayName() != null) {
+            String normalizedDisplayName = normalizeDisplayName(userDTO.getDisplayName());
+            if (normalizedDisplayName != null && !normalizedDisplayName.isEmpty()) {
+                userDTO.setDisplayName(normalizedDisplayName);
+                user.setDisplayName(normalizedDisplayName);
+            }
         }
         if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
             user.setEmail(userDTO.getEmail());
@@ -90,8 +132,12 @@ public class UserService {
         
         UserModel user = existingUser.get();
         
-        if (userDTO.getDisplayName() != null && !userDTO.getDisplayName().isEmpty()) {
-            user.setDisplayName(userDTO.getDisplayName());
+        if (userDTO.getDisplayName() != null) {
+            String normalizedDisplayName = normalizeDisplayName(userDTO.getDisplayName());
+            if (normalizedDisplayName != null && !normalizedDisplayName.isEmpty()) {
+                userDTO.setDisplayName(normalizedDisplayName);
+                user.setDisplayName(normalizedDisplayName);
+            }
         }
         if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
             user.setEmail(userDTO.getEmail());

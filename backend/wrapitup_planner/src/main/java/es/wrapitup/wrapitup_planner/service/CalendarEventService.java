@@ -18,6 +18,8 @@ import es.wrapitup.wrapitup_planner.repository.UserRepository;
 
 @Service
 public class CalendarEventService {
+
+    private static final int TITLE_MAX_LENGTH = 50;
     
     private final CalendarEventRepository eventRepository;
     private final CalendarEventMapper eventMapper;
@@ -28,6 +30,17 @@ public class CalendarEventService {
         this.eventMapper = eventMapper;
         this.userRepository = userRepository;
     }
+
+    private static String normalizeTitle(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.length() <= TITLE_MAX_LENGTH) {
+            return trimmed;
+        }
+        return trimmed.substring(0, TITLE_MAX_LENGTH);
+    }
     
     private boolean isAdmin(UserModel user) {
         return user != null && user.getRoles() != null && user.getRoles().contains("ADMIN");
@@ -35,7 +48,8 @@ public class CalendarEventService {
     
     @Transactional
     public CalendarEventDTO createEvent(CalendarEventDTO eventDTO, String username) {
-        if (eventDTO.getTitle() == null || eventDTO.getTitle().trim().isEmpty()) {
+        String normalizedTitle = normalizeTitle(eventDTO.getTitle());
+        if (normalizedTitle == null || normalizedTitle.isEmpty()) {
             throw new IllegalArgumentException("Event title is required");
         }
         
@@ -72,7 +86,7 @@ public class CalendarEventService {
         
         CalendarEvent event = new CalendarEvent(
             user,
-            eventDTO.getTitle(),
+            normalizedTitle,
             eventDTO.getDescription(),
             eventDTO.getStartDate(),
             eventDTO.getEndDate(),
@@ -104,8 +118,11 @@ public class CalendarEventService {
             throw new SecurityException("You can only update your own events");
         }
         
-        if (eventDTO.getTitle() != null && !eventDTO.getTitle().trim().isEmpty()) {
-            event.setTitle(eventDTO.getTitle());
+        if (eventDTO.getTitle() != null) {
+            String normalizedTitle = normalizeTitle(eventDTO.getTitle());
+            if (normalizedTitle != null && !normalizedTitle.isEmpty()) {
+                event.setTitle(normalizedTitle);
+            }
         }
         
         if (eventDTO.getDescription() != null) {
